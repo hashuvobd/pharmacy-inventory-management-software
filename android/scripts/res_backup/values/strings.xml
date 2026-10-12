@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">DG Pharma</string>
+    <string name="title_activity_main">DG Pharma</string>
+    <string name="package_name">com.dgpharma.app</string>
+    <string name="custom_url_scheme">com.dgpharma.app</string>
+</resources>

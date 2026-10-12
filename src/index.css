@@ -1,0 +1,331 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #FFFFFF;
+  --color-card: #FFFFFF;
+  --color-textMain: #1D2A3B;
+  --color-textMuted: #64748B;
+  --color-primary: #0697A8;
+  --color-primaryHover: #057d8c;
+  --color-accent: #0697A8;
+  --color-accentHover: #057d8c;
+  --color-border: #E2E8F0;
+  --color-inputBg: #F1F5F9;
+
+  /* Overriding default blue to use #0697A8 as base (blue-600) */
+  --color-blue-50: #f0fbfb;
+  --color-blue-100: #d9f4f6;
+  --color-blue-200: #b7eaed;
+  --color-blue-300: #86dbdf;
+  --color-blue-400: #4ec4cb;
+  --color-blue-500: #2ca6ad;
+  --color-blue-600: #0697A8;
+  --color-blue-700: #057a8a;
+  --color-blue-800: #06626f;
+  --color-blue-900: #09525d;
+  --color-blue-950: #03353e;
+
+  /* Overriding default slate to use #1D2A3B as base (slate-900) */
+  --color-slate-50: #f4f6f8;
+  --color-slate-100: #e3e8ef;
+  --color-slate-200: #c8d3e1;
+  --color-slate-300: #9eafc9;
+  --color-slate-400: #6f88ac;
+  --color-slate-500: #4d6a90;
+  --color-slate-600: #3b5274;
+  --color-slate-700: #304360;
+  --color-slate-800: #28374d;
+  --color-slate-900: #1D2A3B;
+  --color-slate-950: #141c28;
+
+  --font-sans: 'Inter', sans-serif;
+
+  --shadow-soft: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+}
+
+@variant dark (&:where(.dark, .dark *));
+
+.dark {
+  --color-background: #1D2A3B;
+  --color-card: #151F32;
+  --color-textMain: #FFFFFF;
+  --color-textMuted: #94A3B8;
+  --color-border: #151F32;
+  --color-inputBg: #151F32;
+}
+
+.dark .bg-white {
+  background-color: #151F32 !important;
+}
+
+.dark.bg-\[\#F8FAFC\],
+.dark .bg-\[\#F8FAFC\] {
+  background-color: #0B0F19 !important;
+}
+
+.dark .divide-slate-100>*+* {
+  border-color: #1E293B !important;
+}
+
+.dark .divide-slate-200>*+* {
+  border-color: #1E293B !important;
+}
+
+.dark .border-slate-100 {
+  border-color: #1E293B !important;
+}
+
+.dark .border-slate-200 {
+  border-color: #1E293B !important;
+}
+
+.dark .hover\:bg-slate-50\/70:hover {
+  background-color: rgba(30, 41, 59, 0.7) !important;
+}
+
+.dark .hover\:bg-slate-50\/50:hover {
+  background-color: rgba(30, 41, 59, 0.5) !important;
+}
+
+.dark .hover\:text-\[\#1E293B\]:hover {
+  color: #F8FAFC !important;
+}
+
+.dark .text-\[\#1E293B\] {
+  color: #F8FAFC !important;
+}
+
+.dark .text-\[\#475569\] {
+  color: #CBD5E1 !important;
+}
+
+.dark .text-\[\#334155\] {
+  color: #E2E8F0 !important;
+}
+
+.dark .text-\[\#64748B\] {
+  color: #94A3B8 !important;
+}
+
+.dark .border-\[\#E2E8F0\] {
+  border-color: #1E293B !important;
+}
+
+.dark .border-slate-100 {
+  border-color: #1E293B !important;
+}
+
+.dark .bg-slate-50 {
+  background-color: #1E293B !important;
+}
+
+.dark .bg-slate-100 {
+  background-color: #1E293B !important;
+}
+
+.dark .bg-\[\#F1F5F9\] {
+  background-color: #1E293B !important;
+}
+
+.dark .bg-slate-200\/60 {
+  background-color: #1E293B !important;
+}
+
+.dark .hover\:bg-slate-50:hover {
+  background-color: #1E2D4A !important;
+}
+
+.dark .hover\:bg-slate-100:hover {
+  background-color: #1E2D4A !important;
+}
+
+.dark .bg-slate-50\/50 {
+  background-color: rgba(30, 41, 59, 0.5) !important;
+}
+
+.dark .bg-slate-50\/40 {
+  background-color: rgba(30, 41, 59, 0.4) !important;
+}
+
+.dark .bg-slate-50\/30 {
+  background-color: rgba(30, 41, 59, 0.3) !important;
+}
+
+.dark .text-slate-700 {
+  color: #E2E8F0 !important;
+}
+
+.dark .text-slate-600 {
+  color: #CBD5E1 !important;
+}
+
+.dark .text-\[\#94A3B8\] {
+  color: #64748B !important;
+}
+
+.dark select {
+  color: #F8FAFC !important;
+  background-color: #1E293B !important;
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]) {
+  color: #F8FAFC !important;
+  background-color: #1E293B !important;
+}
+
+.dark textarea {
+  color: #F8FAFC !important;
+  background-color: #1E293B !important;
+}
+
+/* Modernized Custom Checkboxes and Radio Buttons */
+input[type="checkbox"],
+input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  width: 0.95rem;
+  height: 0.95rem;
+  display: inline-grid;
+  place-content: center;
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+  outline: none;
+  vertical-align: middle;
+  margin-top: -2px;
+}
+
+input[type="checkbox"] {
+  border-radius: 0.25rem;
+}
+
+input[type="radio"] {
+  border-radius: 50%;
+}
+
+input[type="checkbox"]::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  transform: scale(0);
+  transition: 100ms transform ease-in-out;
+  background-color: #FFFFFF;
+  transform-origin: center;
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+
+input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+input[type="radio"]::before {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  transform: scale(0);
+  transition: 100ms transform ease-in-out;
+  background-color: #FFFFFF;
+}
+
+input[type="radio"]:checked::before {
+  transform: scale(1);
+}
+
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+  background-color: #0697A8 !important;
+  border-color: #0697A8 !important;
+}
+
+/* Dark Mode specific variables for Checkbox/Radio */
+.dark input[type="checkbox"],
+.dark input[type="radio"] {
+  background-color: #1E293B;
+  border-color: #475569;
+}
+
+.dark input[type="checkbox"]:checked,
+.dark input[type="radio"]:checked {
+  color: #FFFFFF !important;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-textMain);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  button,
+  [type="button"],
+  [type="reset"],
+  [type="submit"],
+  [role="button"] {
+    cursor: pointer;
+  }
+
+}
+
+@layer components {
+  .input-field {
+    @apply w-full pl-10 pr-4 py-3 bg-inputBg border border-border rounded-md text-sm transition-all duration-200 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10;
+  }
+
+  .input-icon {
+    @apply absolute left-3 top-1/2 -translate-y-1/2 text-textMuted text-lg;
+  }
+
+  .label-text {
+    @apply block text-sm font-medium text-textMain mb-1.5;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  
+  html, body {
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .print-page-break {
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .print-page-break:last-child {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+}
+/* Hide arrows in number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Remove focus outline and black border when clicking inside Recharts */
+.recharts-wrapper,
+.recharts-wrapper svg,
+.recharts-surface,
+.recharts-wrapper *:focus,
+.recharts-wrapper *:focus-visible,
+.recharts-surface:focus,
+.recharts-surface:focus-visible,
+svg.recharts-surface:focus,
+svg.recharts-surface:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
