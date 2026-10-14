@@ -109,11 +109,10 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
               type="button"
               onClick={() => onRequestMedicine && onRequestMedicine(med)}
               disabled={isRequested}
-              className={`flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                isRequested
+              className={`flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${isRequested
                   ? 'bg-amber-50 text-amber-700 border border-amber-200 cursor-default'
                   : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-sm shadow-amber-500/20 active:scale-95'
-              }`}
+                }`}
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -274,11 +273,10 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
               type="button"
               onClick={() => onRequestMedicine && onRequestMedicine(med)}
               disabled={isRequested}
-              className={`w-full h-8 sm:h-9 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                isRequested
+              className={`w-full h-8 sm:h-9 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${isRequested
                   ? 'bg-amber-50 text-amber-700 border border-amber-200 cursor-default'
                   : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-sm shadow-amber-500/20 active:scale-95'
-              }`}
+                }`}
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -1433,11 +1431,10 @@ const AdminAnalytics = ({ inventory, orders, returns }) => {
               key={p}
               type="button"
               onClick={() => setPage(p)}
-              className={`w-7 h-7 flex items-center justify-center text-[11px] font-bold rounded-lg transition-colors ${
-                p === page
+              className={`w-7 h-7 flex items-center justify-center text-[11px] font-bold rounded-lg transition-colors ${p === page
                   ? 'bg-[#0697A8] text-white shadow-sm'
                   : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
-              }`}
+                }`}
             >
               {p}
             </button>
@@ -1473,7 +1470,7 @@ const AdminAnalytics = ({ inventory, orders, returns }) => {
           <div key={i} className="flex items-center gap-2 py-0.5">
             <span style={{ background: entry.color }} className="w-2.5 h-2.5 rounded-sm flex-shrink-0" />
             <span className="text-slate-500">{entry.name}:</span>
-            <span className="font-black text-slate-800 ml-auto">{typeof entry.value === 'number' && !['Total Orders','Returned','Cancelled'].includes(entry.name) ? `\u09f3${entry.value.toLocaleString()}` : entry.value.toLocaleString()}</span>
+            <span className="font-black text-slate-800 ml-auto">{typeof entry.value === 'number' && !['Total Orders', 'Returned', 'Cancelled'].includes(entry.name) ? `\u09f3${entry.value.toLocaleString()}` : entry.value.toLocaleString()}</span>
           </div>
         ))}
       </div>
@@ -1963,7 +1960,7 @@ const BuyerProfileView = ({ user, allUsers, onUpdateUser, onShowToast, orderCoun
     if (allUsers && allUsers.length > 0) {
       const emailTaken = allUsers.some(
         u => u.email.toLowerCase() === formData.email.trim().toLowerCase() &&
-             u.email.toLowerCase() !== (user?.email || '').toLowerCase()
+          u.email.toLowerCase() !== (user?.email || '').toLowerCase()
       );
       if (emailTaken) {
         setErrorMessage('This email address is already in use by another account.');
@@ -2417,7 +2414,7 @@ export default function App() {
     try {
       const s = localStorage.getItem('dg_session');
       if (s) return JSON.parse(s);
-    } catch {}
+    } catch { }
     return null;
   })();
 
@@ -2461,7 +2458,7 @@ export default function App() {
       } else if (e === 'login') {
         localStorage.removeItem('dg_session');
       }
-    } catch {}
+    } catch { }
   }, [e, n, f]);
 
   let [m, h] = useState([]),
@@ -2515,7 +2512,7 @@ export default function App() {
     try {
       const saved = localStorage.getItem('dg_delivery_men');
       if (saved) return JSON.parse(saved);
-    } catch {}
+    } catch { }
     return [];
   });
   const [dzTab, setDzTab] = useState('zones');
@@ -2525,7 +2522,7 @@ export default function App() {
 
   // Persist delivery men to localStorage
   useEffect(() => {
-    try { localStorage.setItem('dg_delivery_men', JSON.stringify(deliveryMen)); } catch {}
+    try { localStorage.setItem('dg_delivery_men', JSON.stringify(deliveryMen)); } catch { }
   }, [deliveryMen]);
 
   // Get delivery men assigned to a specific zone
@@ -2544,7 +2541,7 @@ export default function App() {
           return Array.from(map.values());
         }
       }
-    } catch {}
+    } catch { }
     return DEFAULT_ADMIN_ROLES;
   });
 
@@ -2552,7 +2549,7 @@ export default function App() {
     try {
       const saved = localStorage.getItem('dg_admin_users');
       if (saved) return JSON.parse(saved);
-    } catch {}
+    } catch { }
     return [];
   });
 
@@ -2560,7 +2557,7 @@ export default function App() {
     try {
       const saved = localStorage.getItem('dg_activity_logs');
       if (saved) return JSON.parse(saved);
-    } catch {}
+    } catch { }
     return [];
   });
 
@@ -2610,15 +2607,15 @@ export default function App() {
 
   // Persist RBAC to localStorage
   useEffect(() => {
-    try { localStorage.setItem('dg_admin_roles', JSON.stringify(adminRoles)); } catch {}
+    try { localStorage.setItem('dg_admin_roles', JSON.stringify(adminRoles)); } catch { }
   }, [adminRoles]);
 
   useEffect(() => {
-    try { localStorage.setItem('dg_admin_users', JSON.stringify(adminStaffUsers)); } catch {}
+    try { localStorage.setItem('dg_admin_users', JSON.stringify(adminStaffUsers)); } catch { }
   }, [adminStaffUsers]);
 
   useEffect(() => {
-    try { localStorage.setItem('dg_activity_logs', JSON.stringify(activityLogs)); } catch {}
+    try { localStorage.setItem('dg_activity_logs', JSON.stringify(activityLogs)); } catch { }
   }, [activityLogs]);
 
   // Permission verification helper
@@ -3134,11 +3131,11 @@ export default function App() {
             id: dm.id,
             name: dm.name,
             phone: dm.phone,
-            zones: Array.isArray(dm.zones) ? dm.zones : (typeof dm.zones === 'string' ? (()=>{ try { return JSON.parse(dm.zones); } catch { return []; } })() : []),
+            zones: Array.isArray(dm.zones) ? dm.zones : (typeof dm.zones === 'string' ? (() => { try { return JSON.parse(dm.zones); } catch { return []; } })() : []),
             createdAt: dm.created_at || dm.createdAt || new Date().toISOString()
           }));
           setDeliveryMen(formatted);
-          try { localStorage.setItem('dg_delivery_men', JSON.stringify(formatted)); } catch {}
+          try { localStorage.setItem('dg_delivery_men', JSON.stringify(formatted)); } catch { }
         }
       } catch (e) {
         console.warn('Could not fetch delivery_men from Supabase:', e);
@@ -3166,7 +3163,7 @@ export default function App() {
             createdAt: r.created_at
           }));
           ze(formattedReqs);
-          try { localStorage.setItem('medicine_requests', JSON.stringify(formattedReqs)); } catch {}
+          try { localStorage.setItem('medicine_requests', JSON.stringify(formattedReqs)); } catch { }
         }
       } catch (e) {
         console.warn('Could not fetch medicine_requests from Supabase:', e);
@@ -3211,7 +3208,7 @@ export default function App() {
             createdAt: u.created_at
           }));
           setAdminStaffUsers(formattedStaff);
-          try { localStorage.setItem('dg_admin_users', JSON.stringify(formattedStaff)); } catch {}
+          try { localStorage.setItem('dg_admin_users', JSON.stringify(formattedStaff)); } catch { }
         }
       } catch (e) {
         console.warn('Could not fetch admin_users from Supabase:', e);
@@ -3233,7 +3230,7 @@ export default function App() {
             actor_role: l.role_name || l.actor_role || 'Staff'
           }));
           setActivityLogs(normalized);
-          try { localStorage.setItem('dg_activity_logs', JSON.stringify(normalized)); } catch {}
+          try { localStorage.setItem('dg_activity_logs', JSON.stringify(normalized)); } catch { }
         }
       } catch (e) {
         console.warn('Could not fetch admin_activity_logs from Supabase:', e);
@@ -3255,7 +3252,7 @@ export default function App() {
             if (deletedId) {
               setActivityLogs(prev => {
                 const next = prev.filter(l => String(l.id) !== String(deletedId));
-                try { localStorage.setItem('dg_activity_logs', JSON.stringify(next)); } catch {}
+                try { localStorage.setItem('dg_activity_logs', JSON.stringify(next)); } catch { }
                 return next;
               });
             } else {
@@ -3269,7 +3266,7 @@ export default function App() {
                     actor_role: l.role_name || l.actor_role || 'Staff'
                   }));
                   setActivityLogs(normalized);
-                  try { localStorage.setItem('dg_activity_logs', JSON.stringify(normalized)); } catch {}
+                  try { localStorage.setItem('dg_activity_logs', JSON.stringify(normalized)); } catch { }
                 }
               });
             }
@@ -3285,7 +3282,7 @@ export default function App() {
               setActivityLogs(prev => {
                 if (prev.some(l => String(l.id) === String(normalized.id))) return prev;
                 const next = [normalized, ...prev];
-                try { localStorage.setItem('dg_activity_logs', JSON.stringify(next)); } catch {}
+                try { localStorage.setItem('dg_activity_logs', JSON.stringify(next)); } catch { }
                 return next;
               });
             }
@@ -4463,8 +4460,8 @@ export default function App() {
 
   const getInvoiceItemPricing = (item) => {
     const rawName = item.name || item.product_name || '';
-    const matchedMed = m.find(med => 
-      String(med.id) === String(item.id || item.medicine_id) || 
+    const matchedMed = m.find(med =>
+      String(med.id) === String(item.id || item.medicine_id) ||
       (rawName && med.name && med.name.toLowerCase() === rawName.toLowerCase()) ||
       (item.product_name && med.product_name && med.product_name.toLowerCase() === item.product_name.toLowerCase()) ||
       (item.brandId && med.brandId && med.brandId === item.brandId)
@@ -4523,7 +4520,7 @@ export default function App() {
       if (reqEmail && currentEmail && reqEmail === currentEmail) return true;
       if (reqPharmId && currentPharmId && (reqPharmId === currentPharmId || reqPharmId === n?.pharmacyId || reqPharmId === n?.id)) return true;
       if (reqPhone && currentPhone && reqPhone !== 'N/A' && currentPhone !== 'N/A' &&
-          reqPhone.replace(/[^0-9]/g, '') === currentPhone.replace(/[^0-9]/g, '') && currentPhone.length >= 7) return true;
+        reqPhone.replace(/[^0-9]/g, '') === currentPhone.replace(/[^0-9]/g, '') && currentPhone.length >= 7) return true;
       if (reqName && currentName && reqName.toLowerCase() === currentName.toLowerCase()) {
         if (['registered pharmacy', 'pharmacy shop', 'demo pharmacy', 'care & cure pharmacy ltd.'].includes(currentName.toLowerCase())) {
           return currentEmail === 'buyer@dgpharma.com';
@@ -4551,7 +4548,7 @@ export default function App() {
       if (orderPharmId && currentPharmId && (orderPharmId === currentPharmId || orderPharmId === n?.pharmacyId || orderPharmId === n?.id)) return true;
       if (orderEmail && currentEmail && orderEmail === currentEmail) return true;
       if (orderPhone && currentPhone && orderPhone !== 'N/A' && currentPhone !== 'N/A' &&
-          orderPhone.replace(/[^0-9]/g, '') === currentPhone.replace(/[^0-9]/g, '') && currentPhone.length >= 7) return true;
+        orderPhone.replace(/[^0-9]/g, '') === currentPhone.replace(/[^0-9]/g, '') && currentPhone.length >= 7) return true;
       if (orderName && currentName && orderName.toLowerCase() === currentName.toLowerCase()) {
         if (['registered pharmacy', 'pharmacy shop', 'demo pharmacy', 'care & cure pharmacy ltd.'].includes(currentName.toLowerCase())) {
           return currentEmail === 'buyer@dgpharma.com';
@@ -4685,7 +4682,7 @@ export default function App() {
       ze(prev => prev.map(r => r.id === req.id ? { ...r, status: 'In Procurement' } : r));
       try {
         supabase.from('medicine_requests').update({ status: 'In Procurement' }).eq('id', req.id);
-      } catch (err) {}
+      } catch (err) { }
       logAdminActivity({
         category: 'MEDICINE_REQUESTS',
         action: 'MARK_IN_PROCUREMENT',
@@ -4974,7 +4971,7 @@ export default function App() {
           ...t,
           status: `Approved`
         } : t);
-        try { localStorage.setItem('dg_users', JSON.stringify(next)); } catch {}
+        try { localStorage.setItem('dg_users', JSON.stringify(next)); } catch { }
         return next;
       });
       let t = E.find(t => t.id === e);
@@ -5025,7 +5022,7 @@ export default function App() {
           status: `Rejected`,
           rejectionReason: xt
         } : t);
-        try { localStorage.setItem('dg_users', JSON.stringify(next)); } catch {}
+        try { localStorage.setItem('dg_users', JSON.stringify(next)); } catch { }
         return next;
       });
       let t = E.find(t => t.id === e);
@@ -5132,7 +5129,7 @@ export default function App() {
               });
               try {
                 localStorage.setItem('dg_users', JSON.stringify(next));
-              } catch {}
+              } catch { }
               return next;
             });
 
@@ -5146,7 +5143,7 @@ export default function App() {
                   localStorage.removeItem('dg_session');
                 }
               }
-            } catch {}
+            } catch { }
 
             // 7. Close inspect modal
             _t(null);
@@ -5922,7 +5919,7 @@ export default function App() {
         </>}
         <div className={`md:hidden pt-[20px] px-4 border-t border-[#E2E8F0] bg-slate-50/40 flex items-center justify-center ${f === `buyer` ? `pb-[88px]` : `pb-[32px]`}`}>
           <button onClick={() => {
-            try { localStorage.removeItem('dg_session'); } catch {}
+            try { localStorage.removeItem('dg_session'); } catch { }
             t(`login`), r(null), Te(!1), l(!1);
           }} className="flex items-center justify-center gap-2 text-sm font-extrabold text-red-600 hover:text-red-700 transition-colors cursor-pointer">
             <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -5976,7 +5973,7 @@ export default function App() {
               </button>
             )}
             <button onClick={() => {
-              try { localStorage.removeItem('dg_session'); } catch {}
+              try { localStorage.removeItem('dg_session'); } catch { }
               t(`login`), r(null), Te(!1), l(!1);
             }} className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer text-left">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -6614,54 +6611,54 @@ export default function App() {
                         </tr>
                       ) : (
                         myOrders.map((e, _idx) => <tr key={e.id || _idx} className="hover:bg-slate-50/50">
-                        <td className="px-5 py-4 font-mono font-bold text-[#0697A8]">
-                          {e.id}
-                        </td>
-                        <td className="px-5 py-4 text-[#475569]">
-                          {e.date}
-                        </td>
-                        <td className="px-5 py-4 text-[#475569]">
-                          {e.paymentMethod}
-                        </td>
-                        <td className="px-5 py-4 font-bold">
-                          {`৳`}
-                          {e.totalAmount.toFixed(2)}
-                        </td>
-                        <td className="px-5 py-4">
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${e.status === `Delivered & Invoiced` ? `bg-emerald-50 text-emerald-800 border-emerald-100` : e.status === `Out for Delivery` ? `bg-purple-50 text-purple-800 border-purple-100` : e.status === `Processing/Packing` ? `bg-[#E0F5F7] text-blue-800 border-[#C2EAF0]` : e.status === `Return Requested` ? `bg-rose-50 text-rose-800 border-rose-200 animate-pulse` : e.status === `Returned` ? `bg-slate-100 text-slate-700 border-slate-300` : `bg-yellow-50 text-yellow-800 border-yellow-200 animate-pulse`}`}>
-                            {e.status}
-                          </span>
-                        </td>
-                        <td className="px-5 py-4">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${e.paymentStatus === `Paid` ? `bg-emerald-100 text-emerald-800` : `bg-yellow-100 text-yellow-800`}`}>
-                            {e.paymentStatus}
-                          </span>
-                        </td>
-                        <td className="px-5 py-4 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            {['Pending', 'Pending Verification', 'Processing/Packing', 'Approved'].includes(e.status) && (
-                              <button onClick={() => {
-                                ke(e);
-                                setIsEditingOrder(true);
-                                let initialQs = {};
-                                e.items.forEach((item, idx) => initialQs[item.id || idx] = item.quantity);
-                                setEditedQuantities(initialQs);
-                              }} className="bg-amber-50 border border-amber-200 hover:bg-amber-100 text-amber-800 px-2.5 py-1.5 rounded-lg font-bold text-[10px] transition-colors inline-flex items-center gap-1" title="Edit order quantities">
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          <td className="px-5 py-4 font-mono font-bold text-[#0697A8]">
+                            {e.id}
+                          </td>
+                          <td className="px-5 py-4 text-[#475569]">
+                            {e.date}
+                          </td>
+                          <td className="px-5 py-4 text-[#475569]">
+                            {e.paymentMethod}
+                          </td>
+                          <td className="px-5 py-4 font-bold">
+                            {`৳`}
+                            {e.totalAmount.toFixed(2)}
+                          </td>
+                          <td className="px-5 py-4">
+                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${e.status === `Delivered & Invoiced` ? `bg-emerald-50 text-emerald-800 border-emerald-100` : e.status === `Out for Delivery` ? `bg-purple-50 text-purple-800 border-purple-100` : e.status === `Processing/Packing` ? `bg-[#E0F5F7] text-blue-800 border-[#C2EAF0]` : e.status === `Return Requested` ? `bg-rose-50 text-rose-800 border-rose-200 animate-pulse` : e.status === `Returned` ? `bg-slate-100 text-slate-700 border-slate-300` : `bg-yellow-50 text-yellow-800 border-yellow-200 animate-pulse`}`}>
+                              {e.status}
+                            </span>
+                          </td>
+                          <td className="px-5 py-4">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${e.paymentStatus === `Paid` ? `bg-emerald-100 text-emerald-800` : `bg-yellow-100 text-yellow-800`}`}>
+                              {e.paymentStatus}
+                            </span>
+                          </td>
+                          <td className="px-5 py-4 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              {['Pending', 'Pending Verification', 'Processing/Packing', 'Approved'].includes(e.status) && (
+                                <button onClick={() => {
+                                  ke(e);
+                                  setIsEditingOrder(true);
+                                  let initialQs = {};
+                                  e.items.forEach((item, idx) => initialQs[item.id || idx] = item.quantity);
+                                  setEditedQuantities(initialQs);
+                                }} className="bg-amber-50 border border-amber-200 hover:bg-amber-100 text-amber-800 px-2.5 py-1.5 rounded-lg font-bold text-[10px] transition-colors inline-flex items-center gap-1" title="Edit order quantities">
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  </svg>
+                                  {`Edit Order`}
+                                </button>
+                              )}
+                              <button onClick={() => ke(e)} className="bg-[#E0F5F7] border border-[#C2EAF0] hover:bg-[#C2EAF0] text-[#0697A8] px-3 py-1.5 rounded-lg font-bold text-[10px] transition-colors inline-flex items-center gap-1">
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
-                                {`Edit Order`}
+                                {`View Invoice`}
                               </button>
-                            )}
-                            <button onClick={() => ke(e)} className="bg-[#E0F5F7] border border-[#C2EAF0] hover:bg-[#C2EAF0] text-[#0697A8] px-3 py-1.5 rounded-lg font-bold text-[10px] transition-colors inline-flex items-center gap-1">
-                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                              </svg>
-                              {`View Invoice`}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>))}
+                            </div>
+                          </td>
+                        </tr>))}
                     </tbody>
                   </table>
                 </div>
@@ -6916,12 +6913,11 @@ export default function App() {
                             )}
                           </div>
                         </div>
-                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                          e.status === 'Restocked & Available' || e.status === 'Added' ? 'bg-emerald-50 text-emerald-700' :
-                          e.status === 'In Procurement' ? 'bg-blue-50 text-blue-700' :
-                          e.status === 'Unavailable / Rejected' ? 'bg-red-50 text-red-700' :
-                          'bg-amber-50 text-amber-700'
-                        }`}>
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${e.status === 'Restocked & Available' || e.status === 'Added' ? 'bg-emerald-50 text-emerald-700' :
+                            e.status === 'In Procurement' ? 'bg-blue-50 text-blue-700' :
+                              e.status === 'Unavailable / Rejected' ? 'bg-red-50 text-red-700' :
+                                'bg-amber-50 text-amber-700'
+                          }`}>
                           {e.status}
                         </span>
                       </div>
@@ -6974,7 +6970,7 @@ export default function App() {
 
               {/* Stats Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                <div 
+                <div
                   onClick={() => setBuyerFilterTab('All')}
                   className={`bg-white dark:bg-slate-800 border p-4 rounded-2xl shadow-xs flex items-center justify-between cursor-pointer transition-all hover:scale-[1.01] ${buyerFilterTab === 'All' ? 'border-blue-500 ring-2 ring-blue-100 dark:ring-blue-900/30' : 'border-[#E2E8F0] dark:border-slate-700'}`}
                 >
@@ -6988,7 +6984,7 @@ export default function App() {
                   <div className="w-10 h-10 bg-blue-50 dark:bg-blue-950/40 rounded-xl flex items-center justify-center text-blue-600 font-bold text-xs">{`👥`}</div>
                 </div>
 
-                <div 
+                <div
                   onClick={() => setBuyerFilterTab('Pending')}
                   className={`bg-white dark:bg-slate-800 border p-4 rounded-2xl shadow-xs flex items-center justify-between cursor-pointer transition-all hover:scale-[1.01] ${buyerFilterTab === 'Pending' ? 'border-amber-500 ring-2 ring-amber-100 dark:ring-amber-900/30' : 'border-[#E2E8F0] dark:border-slate-700'}`}
                 >
@@ -7002,7 +6998,7 @@ export default function App() {
                   <div className="w-10 h-10 bg-amber-50 dark:bg-amber-950/40 rounded-xl flex items-center justify-center text-amber-600 font-bold text-xs">{`🔔`}</div>
                 </div>
 
-                <div 
+                <div
                   onClick={() => setBuyerFilterTab('Approved')}
                   className={`bg-white dark:bg-slate-800 border p-4 rounded-2xl shadow-xs flex items-center justify-between cursor-pointer transition-all hover:scale-[1.01] ${buyerFilterTab === 'Approved' ? 'border-emerald-500 ring-2 ring-emerald-100 dark:ring-emerald-900/30' : 'border-[#E2E8F0] dark:border-slate-700'}`}
                 >
@@ -7016,7 +7012,7 @@ export default function App() {
                   <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl flex items-center justify-center text-emerald-600 font-bold text-xs">{`✓`}</div>
                 </div>
 
-                <div 
+                <div
                   onClick={() => setBuyerFilterTab('Rejected')}
                   className={`bg-white dark:bg-slate-800 border p-4 rounded-2xl shadow-xs flex items-center justify-between cursor-pointer transition-all hover:scale-[1.01] ${buyerFilterTab === 'Rejected' ? 'border-red-500 ring-2 ring-red-100 dark:ring-red-900/30' : 'border-[#E2E8F0] dark:border-slate-700'}`}
                 >
@@ -7042,20 +7038,18 @@ export default function App() {
                   <button
                     key={tab.id}
                     onClick={() => setBuyerFilterTab(tab.id)}
-                    className={`pb-3.5 px-1 relative transition-all flex items-center gap-2 cursor-pointer flex-shrink-0 ${
-                      buyerFilterTab === tab.id
+                    className={`pb-3.5 px-1 relative transition-all flex items-center gap-2 cursor-pointer flex-shrink-0 ${buyerFilterTab === tab.id
                         ? 'text-emerald-700 dark:text-emerald-400 font-bold border-b-2 border-emerald-600'
                         : 'text-[#64748B] dark:text-slate-400 hover:text-[#1D2A3B] dark:hover:text-white'
-                    }`}
+                      }`}
                   >
                     <span>{tab.label}</span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      buyerFilterTab === tab.id
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${buyerFilterTab === tab.id
                         ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300'
                         : tab.count > 0 && tab.id === 'Pending'
-                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 animate-pulse'
-                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
-                    }`}>
+                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 animate-pulse'
+                          : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                      }`}>
                       {tab.count}
                     </span>
                   </button>
@@ -7164,13 +7158,12 @@ export default function App() {
                                   )}
                                 </td>
                                 <td className="px-5 py-4">
-                                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                                    e.status === `Approved` 
-                                      ? `bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300` 
-                                      : e.status === `Rejected` 
-                                      ? `bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-300` 
-                                      : `bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 animate-pulse`
-                                  }`}>
+                                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${e.status === `Approved`
+                                      ? `bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300`
+                                      : e.status === `Rejected`
+                                        ? `bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-300`
+                                        : `bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 animate-pulse`
+                                    }`}>
                                     {e.status}
                                   </span>
                                 </td>
@@ -7253,13 +7246,12 @@ export default function App() {
                                   {e.email} • ID: {e.id}
                                 </p>
                               </div>
-                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                e.status === `Approved` 
-                                  ? `bg-emerald-100 text-emerald-800` 
-                                  : e.status === `Rejected` 
-                                  ? `bg-red-100 text-red-800` 
-                                  : `bg-amber-100 text-amber-800 animate-pulse`
-                              }`}>
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${e.status === `Approved`
+                                  ? `bg-emerald-100 text-emerald-800`
+                                  : e.status === `Rejected`
+                                    ? `bg-red-100 text-red-800`
+                                    : `bg-amber-100 text-amber-800 animate-pulse`
+                                }`}>
                                 {e.status}
                               </span>
                             </div>
@@ -7360,21 +7352,20 @@ export default function App() {
                   let t = e === `All`
                     ? b.length
                     : e === `Returned Orders`
-                    ? b.filter(t => t.status === `Returned` || t.status === `Return Requested` || (t.status && t.status.toLowerCase().includes(`return`))).length
-                    : e === `Requested Medicine`
-                    ? Re.length
-                    : b.filter(t => t.status === e).length;
+                      ? b.filter(t => t.status === `Returned` || t.status === `Return Requested` || (t.status && t.status.toLowerCase().includes(`return`))).length
+                      : e === `Requested Medicine`
+                        ? Re.length
+                        : b.filter(t => t.status === e).length;
                   return <button key={e} onClick={() => Xt(e)} className={`pb-3.5 px-1 relative transition-all flex-shrink-0 ${Yt === e ? `text-emerald-700 font-bold border-b-2 border-emerald-600` : `text-[#64748B] hover:text-[#1D2A3B]`}`}>
                     <span>{e}</span>
-                    <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
-                      Yt === e 
-                        ? `bg-emerald-100 text-emerald-800` 
-                        : (e === 'Requested Medicine' && t > 0) 
-                        ? `bg-amber-100 text-amber-800` 
-                        : (e === 'Returned Orders' && t > 0) 
-                        ? `bg-rose-100 text-rose-700` 
-                        : `bg-slate-100 text-slate-500`
-                    }`}>
+                    <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold ${Yt === e
+                        ? `bg-emerald-100 text-emerald-800`
+                        : (e === 'Requested Medicine' && t > 0)
+                          ? `bg-amber-100 text-amber-800`
+                          : (e === 'Returned Orders' && t > 0)
+                            ? `bg-rose-100 text-rose-700`
+                            : `bg-slate-100 text-slate-500`
+                      }`}>
                       {t}
                     </span>
                   </button>;
@@ -7471,12 +7462,11 @@ export default function App() {
                                 <select
                                   value={req.status || 'Pending Review'}
                                   onChange={(e) => handleUpdateRequestStatus(req.id, e.target.value)}
-                                  className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border focus:outline-none cursor-pointer ${
-                                    req.status === 'Restocked & Available' ? 'bg-emerald-50 text-emerald-800 border-emerald-300' :
-                                    req.status === 'In Procurement' ? 'bg-blue-50 text-blue-800 border-blue-300' :
-                                    req.status === 'Unavailable / Rejected' ? 'bg-red-50 text-red-800 border-red-300' :
-                                    'bg-amber-50 text-amber-800 border-amber-300'
-                                  }`}
+                                  className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border focus:outline-none cursor-pointer ${req.status === 'Restocked & Available' ? 'bg-emerald-50 text-emerald-800 border-emerald-300' :
+                                      req.status === 'In Procurement' ? 'bg-blue-50 text-blue-800 border-blue-300' :
+                                        req.status === 'Unavailable / Rejected' ? 'bg-red-50 text-red-800 border-red-300' :
+                                          'bg-amber-50 text-amber-800 border-amber-300'
+                                    }`}
                                 >
                                   <option value="Pending Review">Pending Review</option>
                                   <option value="In Procurement">In Procurement</option>
@@ -7575,14 +7565,13 @@ export default function App() {
                               {e.totalAmount.toFixed(2)}
                             </td>
                             <td className="px-5 py-4">
-                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                                e.status === `Delivered & Invoiced` ? `bg-emerald-50 text-emerald-800 border-emerald-100` :
-                                e.status === `Out for Delivery` ? `bg-purple-50 text-purple-800 border-purple-100` :
-                                e.status === `Processing/Packing` ? `bg-[#E0F5F7] text-blue-800 border-[#C2EAF0]` :
-                                e.status === `Return Requested` ? `bg-rose-50 text-rose-800 border-rose-200 animate-pulse` :
-                                e.status === `Returned` ? `bg-slate-100 text-slate-700 border-slate-300` :
-                                `bg-yellow-50 text-yellow-800 border-yellow-200`
-                              }`}>
+                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${e.status === `Delivered & Invoiced` ? `bg-emerald-50 text-emerald-800 border-emerald-100` :
+                                  e.status === `Out for Delivery` ? `bg-purple-50 text-purple-800 border-purple-100` :
+                                    e.status === `Processing/Packing` ? `bg-[#E0F5F7] text-blue-800 border-[#C2EAF0]` :
+                                      e.status === `Return Requested` ? `bg-rose-50 text-rose-800 border-rose-200 animate-pulse` :
+                                        e.status === `Returned` ? `bg-slate-100 text-slate-700 border-slate-300` :
+                                          `bg-yellow-50 text-yellow-800 border-yellow-200`
+                                }`}>
                                 {e.status}
                               </span>
                             </td>
@@ -7794,16 +7783,14 @@ export default function App() {
                                     ? p.zones.filter(z => z !== zoneObj.name)
                                     : [...p.zones, zoneObj.name]
                                 }))}
-                                className={`h-full px-3 rounded-xl text-xs font-bold transition-all duration-150 flex items-center justify-between border cursor-pointer select-none ${
-                                  isSelected
+                                className={`h-full px-3 rounded-xl text-xs font-bold transition-all duration-150 flex items-center justify-between border cursor-pointer select-none ${isSelected
                                     ? `bg-gradient-to-r ${zoneObj.activeGradient} text-white border-transparent shadow-sm scale-[1.01]`
                                     : 'bg-slate-50 hover:bg-slate-100 text-[#475569] border-slate-200 hover:border-slate-300'
-                                }`}
+                                  }`}
                               >
                                 <div className="flex items-center gap-2">
-                                  <div className={`w-4 h-4 rounded-md flex items-center justify-center transition-all ${
-                                    isSelected ? 'bg-white/25 text-white' : 'border border-slate-300 bg-white'
-                                  }`}>
+                                  <div className={`w-4 h-4 rounded-md flex items-center justify-center transition-all ${isSelected ? 'bg-white/25 text-white' : 'border border-slate-300 bg-white'
+                                    }`}>
                                     {isSelected && (
                                       <svg className="w-2.5 h-2.5 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -7812,9 +7799,8 @@ export default function App() {
                                   </div>
                                   <span className="tracking-tight">{zoneObj.name}</span>
                                 </div>
-                                <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-md ${
-                                  isSelected ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-500'
-                                }`}>
+                                <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-md ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-500'
+                                  }`}>
                                   {zoneObj.tag}
                                 </span>
                               </button>
@@ -7931,9 +7917,8 @@ export default function App() {
                             </a>
                           </p>
                           <div className="flex gap-1.5 mt-1.5">
-                            {dm.zones.map(z => <span key={z} className={`text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 ${
-                              z === 'Dhaka' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            }`}>
+                            {dm.zones.map(z => <span key={z} className={`text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 ${z === 'Dhaka' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              }`}>
                               <span className={`w-1.5 h-1.5 rounded-full ${z === 'Dhaka' ? 'bg-blue-500' : 'bg-emerald-500'}`} />
                               {z}{` Zone`}
                             </span>)}
@@ -8268,9 +8253,8 @@ export default function App() {
                         if (!prevSearch && zt) setPrevSearch(zt);
                         Bt(e.target.value);
                       }}
-                      className={`w-full pl-9 py-2 border border-[#E2E8F0] rounded-xl text-xs bg-slate-50 focus:bg-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-[#C2EAF0] transition-all ${
-                        zt || (prevSearch && prevSearch !== zt) ? 'pr-16' : 'pr-3'
-                      }`}
+                      className={`w-full pl-9 py-2 border border-[#E2E8F0] rounded-xl text-xs bg-slate-50 focus:bg-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-[#C2EAF0] transition-all ${zt || (prevSearch && prevSearch !== zt) ? 'pr-16' : 'pr-3'
+                        }`}
                     />
                     {(zt || (prevSearch && prevSearch !== zt)) && (
                       <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
@@ -8339,9 +8323,8 @@ export default function App() {
                         setPrevCompany(Ut);
                         Wt(e.target.value);
                       }}
-                      className={`w-full border border-[#E2E8F0] rounded-xl text-[11px] font-bold text-[#475569] pl-3 py-2 bg-slate-50 focus:bg-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-[#C2EAF0] transition-all appearance-none cursor-pointer ${
-                        Ut !== 'all' || (prevCompany && prevCompany !== 'all') ? 'pr-20' : 'pr-8'
-                      }`}
+                      className={`w-full border border-[#E2E8F0] rounded-xl text-[11px] font-bold text-[#475569] pl-3 py-2 bg-slate-50 focus:bg-white focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-[#C2EAF0] transition-all appearance-none cursor-pointer ${Ut !== 'all' || (prevCompany && prevCompany !== 'all') ? 'pr-20' : 'pr-8'
+                        }`}
                     >
                       <option value="all">
                         {`All Manufacturers (`}
@@ -8420,11 +8403,10 @@ export default function App() {
                     {f === `admin` && (
                       <button
                         onClick={() => setBulkPriceOpen(!bulkPriceOpen)}
-                        className={`inline-flex items-center justify-center text-center gap-2 px-3.5 py-2.5 sm:py-2 rounded-xl text-[11px] font-bold shadow-sm transition-all w-full sm:w-auto ${
-                          bulkPriceOpen
+                        className={`inline-flex items-center justify-center text-center gap-2 px-3.5 py-2.5 sm:py-2 rounded-xl text-[11px] font-bold shadow-sm transition-all w-full sm:w-auto ${bulkPriceOpen
                             ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white'
                             : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white'
-                        }`}
+                          }`}
                       >
                         <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -8835,13 +8817,12 @@ export default function App() {
                           {typeof b.id === 'string' && b.id.includes('-') && b.id.length > 12 ? `${b.id.substring(0, 8)}...` : b.id}
                         </td>
                         <td className="px-5 py-4">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                            b.type === 'automated'
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${b.type === 'automated'
                               ? 'bg-blue-50 text-blue-700 border border-blue-200'
                               : b.type === 'manual'
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-slate-100 text-slate-700'
-                          }`}>
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                : 'bg-slate-100 text-slate-700'
+                            }`}>
                             {b.type === 'automated' ? 'Automated Cloud' : b.type === 'manual' ? 'Manual Snapshot' : 'Local Backup'}
                           </span>
                         </td>
@@ -8968,9 +8949,8 @@ export default function App() {
                           return (
                             <label
                               key={cat.key}
-                              className={`flex items-start gap-3 p-3 rounded-xl border transition-all cursor-pointer select-none ${
-                                isChecked ? 'bg-orange-50/50 border-orange-300 shadow-xs' : 'bg-white border-slate-200 opacity-60 hover:opacity-90'
-                              }`}
+                              className={`flex items-start gap-3 p-3 rounded-xl border transition-all cursor-pointer select-none ${isChecked ? 'bg-orange-50/50 border-orange-300 shadow-xs' : 'bg-white border-slate-200 opacity-60 hover:opacity-90'
+                                }`}
                             >
                               <input
                                 type="checkbox"
@@ -9098,11 +9078,10 @@ export default function App() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setStaffSubTab('users')}
-                      className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-                        staffSubTab === 'users'
+                      className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${staffSubTab === 'users'
                           ? 'bg-[#1D2A3B] text-white shadow-md'
                           : 'bg-white border border-[#E2E8F0] text-[#64748B] hover:bg-slate-50'
-                      }`}
+                        }`}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -9115,11 +9094,10 @@ export default function App() {
 
                     <button
                       onClick={() => setStaffSubTab('roles')}
-                      className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-                        staffSubTab === 'roles'
+                      className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${staffSubTab === 'roles'
                           ? 'bg-[#1D2A3B] text-white shadow-md'
                           : 'bg-white border border-[#E2E8F0] text-[#64748B] hover:bg-slate-50'
-                      }`}
+                        }`}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -9171,11 +9149,10 @@ export default function App() {
                                 <tr key={staff.id} className={isSuper ? "bg-amber-50/20 hover:bg-amber-50/50 transition-colors" : "hover:bg-slate-50/70 transition-colors"}>
                                   <td className="px-5 py-3.5">
                                     <div className="flex items-center gap-3">
-                                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
-                                        isSuper 
-                                          ? 'bg-amber-100 text-amber-800' 
+                                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${isSuper
+                                          ? 'bg-amber-100 text-amber-800'
                                           : (isInactive ? 'bg-slate-200 text-slate-600' : 'bg-teal-100 text-teal-800')
-                                      }`}>
+                                        }`}>
                                         {isSuper ? 'SA' : (staff.name ? staff.name.slice(0, 2).toUpperCase() : 'ST')}
                                       </div>
                                       <div>
@@ -9219,11 +9196,10 @@ export default function App() {
                                     ) : (
                                       <button
                                         onClick={() => handleToggleStaffStatus(staff)}
-                                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer ${
-                                          isInactive
+                                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-all cursor-pointer ${isInactive
                                             ? 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                             : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                                        }`}
+                                          }`}
                                         title="Click to toggle account access status"
                                       >
                                         <span className={`w-1.5 h-1.5 rounded-full ${isInactive ? 'bg-slate-400' : 'bg-emerald-600'}`}></span>
@@ -9426,14 +9402,14 @@ export default function App() {
                       <button
                         onClick={() => {
                           const csvHeader = "ID,Timestamp,Actor Name,Actor Email,Actor Role,Category,Action,Details,Target ID\n";
-                          const csvRows = activityLogs.map(l => 
+                          const csvRows = activityLogs.map(l =>
                             `"${l.id}","${l.created_at}","${l.user_name || l.actor_name || ''}","${l.user_email || l.actor_email || ''}","${l.role_name || l.actor_role || ''}","${l.category}","${l.action}","${(l.details || '').replace(/"/g, '""')}","${l.target_id || ''}"`
                           ).join("\n");
                           const blob = new Blob([csvHeader + csvRows], { type: 'text/csv;charset=utf-8;' });
                           const url = URL.createObjectURL(blob);
                           const a = document.createElement('a');
                           a.href = url;
-                          a.download = `dg_admin_activity_log_${new Date().toISOString().slice(0,10)}.csv`;
+                          a.download = `dg_admin_activity_log_${new Date().toISOString().slice(0, 10)}.csv`;
                           a.click();
                           T('Activity logs exported to CSV.');
                         }}
@@ -9451,7 +9427,7 @@ export default function App() {
                           const url = URL.createObjectURL(blob);
                           const a = document.createElement('a');
                           a.href = url;
-                          a.download = `dg_admin_activity_log_${new Date().toISOString().slice(0,10)}.json`;
+                          a.download = `dg_admin_activity_log_${new Date().toISOString().slice(0, 10)}.json`;
                           a.click();
                           T('Activity logs exported to JSON.');
                         }}
@@ -9533,11 +9509,10 @@ export default function App() {
                           <button
                             key={cat.id}
                             onClick={() => { setActivityCategoryFilter(cat.id); setActivityPage(1); }}
-                            className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer text-[11px] ${
-                              isSelected
+                            className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all cursor-pointer text-[11px] ${isSelected
                                 ? 'bg-amber-600 text-white shadow-xs'
                                 : 'bg-slate-100 hover:bg-slate-200 text-[#64748B]'
-                            }`}
+                              }`}
                           >
                             {cat.label}
                           </button>
@@ -9756,799 +9731,1302 @@ export default function App() {
           </div>
         </nav>}
 
-      {/* Role Creation & Configuration Modal */}
-      {roleModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1D2A3B]/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="bg-white rounded-3xl shadow-2xl p-6 max-w-2xl w-full max-h-[90vh] flex flex-col space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex justify-between items-center pb-3 border-b border-[#E2E8F0]">
-              <div>
-                <h3 className="text-base font-bold text-[#1D2A3B]">
-                  {editingRole ? `Edit Role: ${editingRole.name}` : 'Create New Custom Role'}
-                </h3>
-                <p className="text-xs text-[#64748B]">Choose granular access permissions to grant this role.</p>
-              </div>
-              <button
-                onClick={() => { setRoleModalOpen(false); setEditingRole(null); }}
-                className="text-[#64748B] hover:text-[#1D2A3B] p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {roleFormError && (
-              <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
-                {roleFormError}
-              </div>
-            )}
-
-            <form onSubmit={handleSaveRole} className="flex-1 overflow-y-auto pr-1 space-y-4">
-              <div className="grid grid-cols-1 gap-3">
+        {/* Role Creation & Configuration Modal */}
+        {roleModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1D2A3B]/60 backdrop-blur-sm p-4 overflow-y-auto">
+            <div className="bg-white rounded-3xl shadow-2xl p-6 max-w-2xl w-full max-h-[90vh] flex flex-col space-y-4 animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex justify-between items-center pb-3 border-b border-[#E2E8F0]">
                 <div>
-                  <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1.5">
-                    Role Name <span className="text-red-500">*</span>
+                  <h3 className="text-base font-bold text-[#1D2A3B]">
+                    {editingRole ? `Edit Role: ${editingRole.name}` : 'Create New Custom Role'}
+                  </h3>
+                  <p className="text-xs text-[#64748B]">Choose granular access permissions to grant this role.</p>
+                </div>
+                <button
+                  onClick={() => { setRoleModalOpen(false); setEditingRole(null); }}
+                  className="text-[#64748B] hover:text-[#1D2A3B] p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {roleFormError && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
+                  {roleFormError}
+                </div>
+              )}
+
+              <form onSubmit={handleSaveRole} className="flex-1 overflow-y-auto pr-1 space-y-4">
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1.5">
+                      Role Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={roleFormData.name}
+                      onChange={(e) => setRoleFormData(p => ({ ...p, name: e.target.value }))}
+                      placeholder="e.g. Warehouse Inventory Supervisor"
+                      className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1.5">
+                      Role Purpose / Description
+                    </label>
+                    <input
+                      type="text"
+                      value={roleFormData.description}
+                      onChange={(e) => setRoleFormData(p => ({ ...p, description: e.target.value }))}
+                      placeholder="Brief description of the responsibilities associated with this role"
+                      className="w-full bg-slate-50 border border-slate-200 text-xs text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Permission Categories Checklist */}
+                <div className="pt-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider">
+                      Permissions Allocation ({roleFormData.permissions.length} of {ALL_PERMISSION_KEYS.length} selected)
+                    </label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setRoleFormData(p => ({ ...p, permissions: [...ALL_PERMISSION_KEYS] }))}
+                        className="text-[10px] font-bold text-teal-600 hover:text-teal-800 cursor-pointer"
+                      >
+                        Select All
+                      </button>
+                      <span className="text-slate-300">|</span>
+                      <button
+                        type="button"
+                        onClick={() => setRoleFormData(p => ({ ...p, permissions: [] }))}
+                        className="text-[10px] font-bold text-slate-500 hover:text-slate-700 cursor-pointer"
+                      >
+                        Clear All
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    {ADMIN_PERMISSION_CATEGORIES.map((category) => {
+                      const catKeys = category.permissions.map(p => p.key);
+                      const allCatChecked = catKeys.every(k => roleFormData.permissions.includes(k));
+                      const someCatChecked = catKeys.some(k => roleFormData.permissions.includes(k));
+
+                      const toggleCategory = () => {
+                        if (allCatChecked) {
+                          setRoleFormData(p => ({
+                            ...p,
+                            permissions: p.permissions.filter(k => !catKeys.includes(k))
+                          }));
+                        } else {
+                          setRoleFormData(p => ({
+                            ...p,
+                            permissions: Array.from(new Set([...p.permissions, ...catKeys]))
+                          }));
+                        }
+                      };
+
+                      return (
+                        <div key={category.id} className="bg-slate-50 rounded-2xl border border-slate-200 p-3.5 transition-all">
+                          <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-200/60">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm">{category.icon}</span>
+                                <h5 className="font-bold text-xs text-[#1D2A3B]">{category.name}</h5>
+                              </div>
+                              <p className="text-[10px] text-[#64748B] ml-6">{category.description}</p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={toggleCategory}
+                              className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${allCatChecked
+                                  ? 'bg-teal-600 text-white'
+                                  : someCatChecked
+                                    ? 'bg-teal-100 text-teal-800'
+                                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
+                                }`}
+                            >
+                              {allCatChecked ? 'All Selected' : 'Toggle Category'}
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                            {category.permissions.map((perm) => {
+                              const isChecked = roleFormData.permissions.includes(perm.key);
+                              return (
+                                <label
+                                  key={perm.key}
+                                  className={`flex items-start gap-2.5 p-2 rounded-xl border transition-all cursor-pointer ${isChecked
+                                      ? 'bg-white border-teal-500 ring-1 ring-teal-100'
+                                      : 'bg-white/60 border-slate-200 hover:bg-white'
+                                    }`}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setRoleFormData(p => ({ ...p, permissions: [...p.permissions, perm.key] }));
+                                      } else {
+                                        setRoleFormData(p => ({ ...p, permissions: p.permissions.filter(k => k !== perm.key) }));
+                                      }
+                                    }}
+                                    className="mt-0.5 rounded border-slate-300 text-teal-600 focus:ring-teal-500 cursor-pointer"
+                                  />
+                                  <div className="min-w-0 flex-1">
+                                    <div className="font-bold text-[11px] text-[#1D2A3B] leading-tight">{perm.label}</div>
+                                    <div className="text-[10px] text-[#64748B] mt-0.5 leading-tight">{perm.desc}</div>
+                                  </div>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-[#E2E8F0] flex items-center justify-end gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => { setRoleModalOpen(false); setEditingRole(null); }}
+                    className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={roleFormLoading}
+                    className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold shadow-md shadow-teal-500/10 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {roleFormLoading ? 'Saving Role...' : (editingRole ? 'Update Role Policy' : 'Create Role')}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Staff Account Provisioning Modal */}
+        {staffModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1D2A3B]/60 backdrop-blur-sm p-4">
+            <div className="bg-white rounded-3xl shadow-2xl p-6 max-w-md w-full space-y-4 animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex justify-between items-center pb-3 border-b border-[#E2E8F0]">
+                <div>
+                  <h3 className="text-base font-bold text-[#1D2A3B]">
+                    {editingStaffUser ? `Edit Staff Account` : 'Add Staff Administrator'}
+                  </h3>
+                  <p className="text-xs text-[#64748B]">Provide credentials and select an authorized role policy.</p>
+                </div>
+                <button
+                  onClick={() => { setStaffModalOpen(false); setEditingStaffUser(null); }}
+                  className="text-[#64748B] hover:text-[#1D2A3B] p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {staffFormError && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
+                  {staffFormError}
+                </div>
+              )}
+
+              <form onSubmit={handleSaveStaffUser} className="space-y-3.5">
+                <div>
+                  <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
+                    Full Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     required
-                    value={roleFormData.name}
-                    onChange={(e) => setRoleFormData(p => ({ ...p, name: e.target.value }))}
-                    placeholder="e.g. Warehouse Inventory Supervisor"
-                    className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-all"
+                    value={staffFormData.name}
+                    onChange={(e) => setStaffFormData(p => ({ ...p, name: e.target.value }))}
+                    placeholder="e.g. Asif Mahmud"
+                    className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] focus:ring-2 focus:ring-[#C2EAF0] transition-all"
                   />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1.5">
-                    Role Purpose / Description
-                  </label>
-                  <input
-                    type="text"
-                    value={roleFormData.description}
-                    onChange={(e) => setRoleFormData(p => ({ ...p, description: e.target.value }))}
-                    placeholder="Brief description of the responsibilities associated with this role"
-                    className="w-full bg-slate-50 border border-slate-200 text-xs text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-100 transition-all"
-                  />
-                </div>
-              </div>
-
-              {/* Permission Categories Checklist */}
-              <div className="pt-2">
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider">
-                    Permissions Allocation ({roleFormData.permissions.length} of {ALL_PERMISSION_KEYS.length} selected)
-                  </label>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setRoleFormData(p => ({ ...p, permissions: [...ALL_PERMISSION_KEYS] }))}
-                      className="text-[10px] font-bold text-teal-600 hover:text-teal-800 cursor-pointer"
-                    >
-                      Select All
-                    </button>
-                    <span className="text-slate-300">|</span>
-                    <button
-                      type="button"
-                      onClick={() => setRoleFormData(p => ({ ...p, permissions: [] }))}
-                      className="text-[10px] font-bold text-slate-500 hover:text-slate-700 cursor-pointer"
-                    >
-                      Clear All
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  {ADMIN_PERMISSION_CATEGORIES.map((category) => {
-                    const catKeys = category.permissions.map(p => p.key);
-                    const allCatChecked = catKeys.every(k => roleFormData.permissions.includes(k));
-                    const someCatChecked = catKeys.some(k => roleFormData.permissions.includes(k));
-
-                    const toggleCategory = () => {
-                      if (allCatChecked) {
-                        setRoleFormData(p => ({
-                          ...p,
-                          permissions: p.permissions.filter(k => !catKeys.includes(k))
-                        }));
-                      } else {
-                        setRoleFormData(p => ({
-                          ...p,
-                          permissions: Array.from(new Set([...p.permissions, ...catKeys]))
-                        }));
-                      }
-                    };
-
-                    return (
-                      <div key={category.id} className="bg-slate-50 rounded-2xl border border-slate-200 p-3.5 transition-all">
-                        <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-200/60">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm">{category.icon}</span>
-                              <h5 className="font-bold text-xs text-[#1D2A3B]">{category.name}</h5>
-                            </div>
-                            <p className="text-[10px] text-[#64748B] ml-6">{category.description}</p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={toggleCategory}
-                            className={`px-2 py-0.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
-                              allCatChecked
-                                ? 'bg-teal-600 text-white'
-                                : someCatChecked
-                                ? 'bg-teal-100 text-teal-800'
-                                : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
-                            }`}
-                          >
-                            {allCatChecked ? 'All Selected' : 'Toggle Category'}
-                          </button>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                          {category.permissions.map((perm) => {
-                            const isChecked = roleFormData.permissions.includes(perm.key);
-                            return (
-                              <label
-                                key={perm.key}
-                                className={`flex items-start gap-2.5 p-2 rounded-xl border transition-all cursor-pointer ${
-                                  isChecked
-                                    ? 'bg-white border-teal-500 ring-1 ring-teal-100'
-                                    : 'bg-white/60 border-slate-200 hover:bg-white'
-                                }`}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={isChecked}
-                                  onChange={(e) => {
-                                    if (e.target.checked) {
-                                      setRoleFormData(p => ({ ...p, permissions: [...p.permissions, perm.key] }));
-                                    } else {
-                                      setRoleFormData(p => ({ ...p, permissions: p.permissions.filter(k => k !== perm.key) }));
-                                    }
-                                  }}
-                                  className="mt-0.5 rounded border-slate-300 text-teal-600 focus:ring-teal-500 cursor-pointer"
-                                />
-                                <div className="min-w-0 flex-1">
-                                  <div className="font-bold text-[11px] text-[#1D2A3B] leading-tight">{perm.label}</div>
-                                  <div className="text-[10px] text-[#64748B] mt-0.5 leading-tight">{perm.desc}</div>
-                                </div>
-                              </label>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-[#E2E8F0] flex items-center justify-end gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => { setRoleModalOpen(false); setEditingRole(null); }}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={roleFormLoading}
-                  className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold shadow-md shadow-teal-500/10 transition-all cursor-pointer disabled:opacity-50"
-                >
-                  {roleFormLoading ? 'Saving Role...' : (editingRole ? 'Update Role Policy' : 'Create Role')}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Staff Account Provisioning Modal */}
-      {staffModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1D2A3B]/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl shadow-2xl p-6 max-w-md w-full space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex justify-between items-center pb-3 border-b border-[#E2E8F0]">
-              <div>
-                <h3 className="text-base font-bold text-[#1D2A3B]">
-                  {editingStaffUser ? `Edit Staff Account` : 'Add Staff Administrator'}
-                </h3>
-                <p className="text-xs text-[#64748B]">Provide credentials and select an authorized role policy.</p>
-              </div>
-              <button
-                onClick={() => { setStaffModalOpen(false); setEditingStaffUser(null); }}
-                className="text-[#64748B] hover:text-[#1D2A3B] p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {staffFormError && (
-              <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
-                {staffFormError}
-              </div>
-            )}
-
-            <form onSubmit={handleSaveStaffUser} className="space-y-3.5">
-              <div>
-                <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
-                  Full Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={staffFormData.name}
-                  onChange={(e) => setStaffFormData(p => ({ ...p, name: e.target.value }))}
-                  placeholder="e.g. Asif Mahmud"
-                  className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] focus:ring-2 focus:ring-[#C2EAF0] transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
-                  Login Email <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={staffFormData.email}
-                  onChange={(e) => setStaffFormData(p => ({ ...p, email: e.target.value }))}
-                  placeholder="asif@dgpharma.shop"
-                  className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] focus:ring-2 focus:ring-[#C2EAF0] transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={staffFormData.phone}
-                  onChange={(e) => setStaffFormData(p => ({ ...p, phone: e.target.value.replace(/\D/g, '') }))}
-                  placeholder="e.g. 01712345678"
-                  maxLength={15}
-                  className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] focus:ring-2 focus:ring-[#C2EAF0] transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
-                  {editingStaffUser ? 'Change Password (optional)' : 'Account Password'} {!editingStaffUser && <span className="text-red-500">*</span>}
-                </label>
-                <input
-                  type="password"
-                  required={!editingStaffUser}
-                  value={staffFormData.password}
-                  onChange={(e) => setStaffFormData(p => ({ ...p, password: e.target.value }))}
-                  placeholder={editingStaffUser ? 'Leave blank to keep current password' : 'Min 6 characters'}
-                  className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] focus:ring-2 focus:ring-[#C2EAF0] transition-all"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
-                    Assign Role <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={staffFormData.roleId}
-                    onChange={(e) => setStaffFormData(p => ({ ...p, roleId: e.target.value }))}
-                    className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-3 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] transition-all"
-                  >
-                    {adminRoles.map((role) => (
-                      <option key={role.id} value={role.id}>
-                        {role.name}
-                      </option>
-                    ))}
-                  </select>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
-                    Access Status
+                    Login Email <span className="text-red-500">*</span>
                   </label>
-                  <select
-                    value={staffFormData.status}
-                    onChange={(e) => setStaffFormData(p => ({ ...p, status: e.target.value }))}
-                    className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-3 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] transition-all"
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-end gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => { setStaffModalOpen(false); setEditingStaffUser(null); }}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={staffFormLoading}
-                  className="px-6 py-2.5 bg-[#0697A8] hover:bg-[#057A88] text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 transition-all cursor-pointer disabled:opacity-50"
-                >
-                  {staffFormLoading ? 'Saving...' : (editingStaffUser ? 'Save Changes' : 'Provision User')}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Admin Profile & Password Settings Modal */}
-      {adminProfileModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1D2A3B]/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-3xl shadow-2xl p-6 max-w-md w-full space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex justify-between items-center pb-3 border-b border-[#E2E8F0]">
-              <div>
-                <h3 className="text-base font-bold text-[#1D2A3B]">My Profile & Password Settings</h3>
-                <p className="text-xs text-[#64748B]">Update your operator profile and portal login credentials.</p>
-              </div>
-              <button
-                onClick={() => setAdminProfileModalOpen(false)}
-                className="text-[#64748B] hover:text-[#1D2A3B] p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {adminProfileError && (
-              <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
-                {adminProfileError}
-              </div>
-            )}
-
-            {adminProfileSuccess && (
-              <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-xs font-semibold flex items-center gap-2">
-                <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>{adminProfileSuccess}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleAdminProfileSave} className="space-y-3.5">
-              <div>
-                <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
-                  Registered Email (Read-Only)
-                </label>
-                <input
-                  type="email"
-                  disabled
-                  value={n?.email || ''}
-                  className="w-full bg-slate-100 border border-slate-200 text-xs font-mono text-slate-600 rounded-xl px-4 py-2.5 cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
-                  Full Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={adminProfileForm.name}
-                  onChange={(e) => setAdminProfileForm(p => ({ ...p, name: e.target.value }))}
-                  placeholder="Your Full Name"
-                  className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] focus:ring-2 focus:ring-[#C2EAF0] transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={adminProfileForm.phone}
-                  onChange={(e) => setAdminProfileForm(p => ({ ...p, phone: e.target.value.replace(/\D/g, '') }))}
-                  placeholder="e.g. 01712345678"
-                  maxLength={15}
-                  className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] focus:ring-2 focus:ring-[#C2EAF0] transition-all"
-                />
-              </div>
-
-              <div className="pt-2 border-t border-slate-100">
-                <h4 className="text-xs font-bold text-[#1D2A3B] mb-2">Change Password</h4>
-                <div className="space-y-2.5">
-                  <div>
-                    <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
-                      New Password
-                    </label>
-                    <input
-                      type="password"
-                      value={adminProfileForm.newPassword}
-                      onChange={(e) => setAdminProfileForm(p => ({ ...p, newPassword: e.target.value }))}
-                      placeholder="Leave blank to keep unchanged (min 6 chars)"
-                      className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2 outline-none focus:bg-white focus:border-[#0697A8] transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
-                      Confirm New Password
-                    </label>
-                    <input
-                      type="password"
-                      value={adminProfileForm.confirmPassword}
-                      onChange={(e) => setAdminProfileForm(p => ({ ...p, confirmPassword: e.target.value }))}
-                      placeholder="Retype new password"
-                      className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2 outline-none focus:bg-white focus:border-[#0697A8] transition-all"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-end gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setAdminProfileModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 cursor-pointer"
-                >
-                  Close
-                </button>
-                <button
-                  type="submit"
-                  disabled={adminProfileLoading}
-                  className="px-6 py-2.5 bg-[#0697A8] hover:bg-[#057A88] text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 transition-all cursor-pointer disabled:opacity-50"
-                >
-                  {adminProfileLoading ? 'Saving...' : 'Save Profile Changes'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {barcodeModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1D2A3B]/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl shadow-2xl p-6 max-w-sm w-full mx-4 space-y-4">
-            <div className="flex justify-between items-center pb-2 border-b border-[#E2E8F0]">
-              <h3 className="text-sm font-bold text-[#1D2A3B]">{`Scan Invoice Barcode`}</h3>
-              <button onClick={() => setBarcodeModalOpen(false)} className="text-[#64748B] hover:text-[#1D2A3B] p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <p className="text-xs text-[#64748B]">
-                {`Position the barcode on the printed invoice within the camera view to scan.`}
-              </p>
-
-              <div id="barcode-reader-container" className="overflow-hidden rounded-2xl bg-slate-50 border border-slate-200 aspect-video relative flex items-center justify-center">
-                <div id="barcode-reader-element" className="w-full h-full"></div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">{`Or enter Order ID manually`}</div>
-                <div className="flex gap-2">
                   <input
-                    type="text"
-                    placeholder="e.g. DG-2026-0000"
-                    id="manualBarcodeVal"
-                    className="flex-1 text-xs border border-[#E2E8F0] rounded-xl px-3.5 py-2 uppercase outline-none focus:border-[#0697A8] font-mono"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        const val = e.target.value.trim().toUpperCase();
-                        if (val) handleBarcodeScanned(val);
-                      }
-                    }}
+                    type="email"
+                    required
+                    value={staffFormData.email}
+                    onChange={(e) => setStaffFormData(p => ({ ...p, email: e.target.value }))}
+                    placeholder="asif@dgpharma.shop"
+                    className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] focus:ring-2 focus:ring-[#C2EAF0] transition-all"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={staffFormData.phone}
+                    onChange={(e) => setStaffFormData(p => ({ ...p, phone: e.target.value.replace(/\D/g, '') }))}
+                    placeholder="e.g. 01712345678"
+                    maxLength={15}
+                    className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] focus:ring-2 focus:ring-[#C2EAF0] transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
+                    {editingStaffUser ? 'Change Password (optional)' : 'Account Password'} {!editingStaffUser && <span className="text-red-500">*</span>}
+                  </label>
+                  <input
+                    type="password"
+                    required={!editingStaffUser}
+                    value={staffFormData.password}
+                    onChange={(e) => setStaffFormData(p => ({ ...p, password: e.target.value }))}
+                    placeholder={editingStaffUser ? 'Leave blank to keep current password' : 'Min 6 characters'}
+                    className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] focus:ring-2 focus:ring-[#C2EAF0] transition-all"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
+                      Assign Role <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={staffFormData.roleId}
+                      onChange={(e) => setStaffFormData(p => ({ ...p, roleId: e.target.value }))}
+                      className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-3 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] transition-all"
+                    >
+                      {adminRoles.map((role) => (
+                        <option key={role.id} value={role.id}>
+                          {role.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
+                      Access Status
+                    </label>
+                    <select
+                      value={staffFormData.status}
+                      onChange={(e) => setStaffFormData(p => ({ ...p, status: e.target.value }))}
+                      className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-3 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] transition-all"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-end gap-2.5">
                   <button
-                    onClick={() => {
-                      const val = document.getElementById('manualBarcodeVal')?.value.trim().toUpperCase();
-                      if (val) handleBarcodeScanned(val);
-                    }}
-                    className="bg-[#0697A8] hover:bg-[#057A88] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer"
+                    type="button"
+                    onClick={() => { setStaffModalOpen(false); setEditingStaffUser(null); }}
+                    className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 cursor-pointer"
                   >
-                    Open
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={staffFormLoading}
+                    className="px-6 py-2.5 bg-[#0697A8] hover:bg-[#057A88] text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {staffFormLoading ? 'Saving...' : (editingStaffUser ? 'Save Changes' : 'Provision User')}
                   </button>
                 </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Admin Profile & Password Settings Modal */}
+        {adminProfileModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1D2A3B]/60 backdrop-blur-sm p-4">
+            <div className="bg-white rounded-3xl shadow-2xl p-6 max-w-md w-full space-y-4 animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex justify-between items-center pb-3 border-b border-[#E2E8F0]">
+                <div>
+                  <h3 className="text-base font-bold text-[#1D2A3B]">My Profile & Password Settings</h3>
+                  <p className="text-xs text-[#64748B]">Update your operator profile and portal login credentials.</p>
+                </div>
+                <button
+                  onClick={() => setAdminProfileModalOpen(false)}
+                  className="text-[#64748B] hover:text-[#1D2A3B] p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {adminProfileError && (
+                <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
+                  {adminProfileError}
+                </div>
+              )}
+
+              {adminProfileSuccess && (
+                <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-xs font-semibold flex items-center gap-2">
+                  <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>{adminProfileSuccess}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleAdminProfileSave} className="space-y-3.5">
+                <div>
+                  <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
+                    Registered Email (Read-Only)
+                  </label>
+                  <input
+                    type="email"
+                    disabled
+                    value={n?.email || ''}
+                    className="w-full bg-slate-100 border border-slate-200 text-xs font-mono text-slate-600 rounded-xl px-4 py-2.5 cursor-not-allowed"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
+                    Full Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={adminProfileForm.name}
+                    onChange={(e) => setAdminProfileForm(p => ({ ...p, name: e.target.value }))}
+                    placeholder="Your Full Name"
+                    className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] focus:ring-2 focus:ring-[#C2EAF0] transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={adminProfileForm.phone}
+                    onChange={(e) => setAdminProfileForm(p => ({ ...p, phone: e.target.value.replace(/\D/g, '') }))}
+                    placeholder="e.g. 01712345678"
+                    maxLength={15}
+                    className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-[#0697A8] focus:ring-2 focus:ring-[#C2EAF0] transition-all"
+                  />
+                </div>
+
+                <div className="pt-2 border-t border-slate-100">
+                  <h4 className="text-xs font-bold text-[#1D2A3B] mb-2">Change Password</h4>
+                  <div className="space-y-2.5">
+                    <div>
+                      <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
+                        New Password
+                      </label>
+                      <input
+                        type="password"
+                        value={adminProfileForm.newPassword}
+                        onChange={(e) => setAdminProfileForm(p => ({ ...p, newPassword: e.target.value }))}
+                        placeholder="Leave blank to keep unchanged (min 6 chars)"
+                        className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2 outline-none focus:bg-white focus:border-[#0697A8] transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">
+                        Confirm New Password
+                      </label>
+                      <input
+                        type="password"
+                        value={adminProfileForm.confirmPassword}
+                        onChange={(e) => setAdminProfileForm(p => ({ ...p, confirmPassword: e.target.value }))}
+                        placeholder="Retype new password"
+                        className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl px-4 py-2 outline-none focus:bg-white focus:border-[#0697A8] transition-all"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-end gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setAdminProfileModalOpen(false)}
+                    className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 cursor-pointer"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={adminProfileLoading}
+                    className="px-6 py-2.5 bg-[#0697A8] hover:bg-[#057A88] text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    {adminProfileLoading ? 'Saving...' : 'Save Profile Changes'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {barcodeModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1D2A3B]/60 backdrop-blur-sm">
+            <div className="bg-white rounded-3xl shadow-2xl p-6 max-w-sm w-full mx-4 space-y-4">
+              <div className="flex justify-between items-center pb-2 border-b border-[#E2E8F0]">
+                <h3 className="text-sm font-bold text-[#1D2A3B]">{`Scan Invoice Barcode`}</h3>
+                <button onClick={() => setBarcodeModalOpen(false)} className="text-[#64748B] hover:text-[#1D2A3B] p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-xs text-[#64748B]">
+                  {`Position the barcode on the printed invoice within the camera view to scan.`}
+                </p>
+
+                <div id="barcode-reader-container" className="overflow-hidden rounded-2xl bg-slate-50 border border-slate-200 aspect-video relative flex items-center justify-center">
+                  <div id="barcode-reader-element" className="w-full h-full"></div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">{`Or enter Order ID manually`}</div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="e.g. DG-2026-0000"
+                      id="manualBarcodeVal"
+                      className="flex-1 text-xs border border-[#E2E8F0] rounded-xl px-3.5 py-2 uppercase outline-none focus:border-[#0697A8] font-mono"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          const val = e.target.value.trim().toUpperCase();
+                          if (val) handleBarcodeScanned(val);
+                        }
+                      }}
+                    />
+                    <button
+                      onClick={() => {
+                        const val = document.getElementById('manualBarcodeVal')?.value.trim().toUpperCase();
+                        if (val) handleBarcodeScanned(val);
+                      }}
+                      className="bg-[#0697A8] hover:bg-[#057A88] text-white text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer"
+                    >
+                      Open
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-      {Ue && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1D2A3B]/60 backdrop-blur-sm">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 text-center space-y-5 animate-in zoom-in duration-300">
-          <div className="relative w-24 h-24 mx-auto">
-            <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="42" stroke="#E2E8F0" strokeWidth="6" fill="none" />
-              <circle cx="50" cy="50" r="42" stroke={Ge.error ? `url(#errorGradient)` : `url(#progressGradient)`} strokeWidth="6" fill="none" strokeLinecap="round" strokeDasharray={`${2 * Math.PI * 42}`} strokeDashoffset={`${2 * Math.PI * 42 * (1 - Ge.percent / 100)}`} style={{
-                transition: `stroke-dashoffset 0.3s ease`
-              }} />
-              <defs>
-                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#3B82F6" />
-                  <stop offset="100%" stopColor="#10B981" />
-                </linearGradient>
-                <linearGradient id="errorGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#EF4444" />
-                  <stop offset="100%" stopColor="#B91C1C" />
-                </linearGradient>
-              </defs>
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-xl font-black text-[#1D2A3B]">
-                {Ge.percent}
-                {`%`}
-              </span>
+        )}
+        {Ue && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#1D2A3B]/60 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 text-center space-y-5 animate-in zoom-in duration-300">
+            <div className="relative w-24 h-24 mx-auto">
+              <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" stroke="#E2E8F0" strokeWidth="6" fill="none" />
+                <circle cx="50" cy="50" r="42" stroke={Ge.error ? `url(#errorGradient)` : `url(#progressGradient)`} strokeWidth="6" fill="none" strokeLinecap="round" strokeDasharray={`${2 * Math.PI * 42}`} strokeDashoffset={`${2 * Math.PI * 42 * (1 - Ge.percent / 100)}`} style={{
+                  transition: `stroke-dashoffset 0.3s ease`
+                }} />
+                <defs>
+                  <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#3B82F6" />
+                    <stop offset="100%" stopColor="#10B981" />
+                  </linearGradient>
+                  <linearGradient id="errorGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#EF4444" />
+                    <stop offset="100%" stopColor="#B91C1C" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xl font-black text-[#1D2A3B]">
+                  {Ge.percent}
+                  {`%`}
+                </span>
+              </div>
             </div>
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-[#1D2A3B] tracking-tight">
-              {Ge.error ? `Import Failed!` : Ge.percent >= 100 ? `Import Complete!` : `Processing CSV Data`}
-            </h3>
-            <p className="text-xs text-[#64748B] mt-1">
-              {Ge.error ? `An error occurred during database sync.` : Ge.percent >= 100 ? `All records synced successfully` : `Parsing and mapping inventory records...`}
+            <div>
+              <h3 className="text-lg font-bold text-[#1D2A3B] tracking-tight">
+                {Ge.error ? `Import Failed!` : Ge.percent >= 100 ? `Import Complete!` : `Processing CSV Data`}
+              </h3>
+              <p className="text-xs text-[#64748B] mt-1">
+                {Ge.error ? `An error occurred during database sync.` : Ge.percent >= 100 ? `All records synced successfully` : `Parsing and mapping inventory records...`}
+              </p>
+            </div>
+            <div className="bg-slate-50 rounded-xl px-4 py-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-[#94A3B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span className="text-[11px] font-mono font-bold text-[#475569] truncate max-w-[160px]">
+                    {Ve.fileName}
+                  </span>
+                </div>
+                <span className="text-[10px] font-bold text-[#0697A8]">
+                  {Ge.eta}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-[10px] text-[#64748B]">
+                <span>{`Rows processed`}</span>
+                <span className="font-bold text-[#1D2A3B]">
+                  {Ge.rowsProcessed.toLocaleString()}
+                  {` / `}
+                  {Ge.totalRows.toLocaleString()}
+                </span>
+              </div>
+            </div>
+            <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-[#0697A8] via-indigo-500 to-emerald-500 rounded-full transition-all duration-300 ease-out" style={{
+                width: `${Ge.percent}%`
+              }} />
+            </div>
+            <p className="text-[10px] text-[#94A3B8] font-medium">
+              {Ge.error ? `❌ Sync Failed` : Ge.percent >= 100 ? `✓ Inventory catalog updated` : `Syncing inventory — please do not close this page`}
             </p>
           </div>
-          <div className="bg-slate-50 rounded-xl px-4 py-3 space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-[#94A3B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </div>}
+        {f === `admin` && gt && <div className="fixed inset-0 z-50 flex justify-end font-sans">
+          <div onClick={() => {
+            _t(null), wt(!1);
+          }} className="absolute inset-0 bg-[#1D2A3B]/40 backdrop-blur-xs" />
+          <div className="relative w-full max-w-md md:w-128 bg-white h-full shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300">
+            <div className="px-6 py-5 border-b border-[#E2E8F0] flex justify-between items-center bg-slate-50">
+              <div>
+                <h3 className="text-sm font-bold text-[#1D2A3B]">{`Onboarding Document Verification`}</h3>
+                <p className="text-[11px] text-[#64748B] mt-0.5">
+                  {`Applicant Code: `}
+                  {gt.id}
+                </p>
+              </div>
+              <button onClick={() => {
+                _t(null), wt(!1);
+              }} className="text-[#64748B] hover:text-[#1D2A3B] p-1 rounded-lg hover:bg-slate-100">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
                 </svg>
-                <span className="text-[11px] font-mono font-bold text-[#475569] truncate max-w-[160px]">
-                  {Ve.fileName}
-                </span>
-              </div>
-              <span className="text-[10px] font-bold text-[#0697A8]">
-                {Ge.eta}
-              </span>
+              </button>
             </div>
-            <div className="flex items-center justify-between text-[10px] text-[#64748B]">
-              <span>{`Rows processed`}</span>
-              <span className="font-bold text-[#1D2A3B]">
-                {Ge.rowsProcessed.toLocaleString()}
-                {` / `}
-                {Ge.totalRows.toLocaleString()}
-              </span>
-            </div>
-          </div>
-          <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-[#0697A8] via-indigo-500 to-emerald-500 rounded-full transition-all duration-300 ease-out" style={{
-              width: `${Ge.percent}%`
-            }} />
-          </div>
-          <p className="text-[10px] text-[#94A3B8] font-medium">
-            {Ge.error ? `❌ Sync Failed` : Ge.percent >= 100 ? `✓ Inventory catalog updated` : `Syncing inventory — please do not close this page`}
-          </p>
-        </div>
-      </div>}
-      {f === `admin` && gt && <div className="fixed inset-0 z-50 flex justify-end font-sans">
-        <div onClick={() => {
-          _t(null), wt(!1);
-        }} className="absolute inset-0 bg-[#1D2A3B]/40 backdrop-blur-xs" />
-        <div className="relative w-full max-w-md md:w-128 bg-white h-full shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300">
-          <div className="px-6 py-5 border-b border-[#E2E8F0] flex justify-between items-center bg-slate-50">
-            <div>
-              <h3 className="text-sm font-bold text-[#1D2A3B]">{`Onboarding Document Verification`}</h3>
-              <p className="text-[11px] text-[#64748B] mt-0.5">
-                {`Applicant Code: `}
-                {gt.id}
-              </p>
-            </div>
-            <button onClick={() => {
-              _t(null), wt(!1);
-            }} className="text-[#64748B] hover:text-[#1D2A3B] p-1 rounded-lg hover:bg-slate-100">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-6 space-y-5 text-xs">
-            <div className="bg-slate-50 border border-[#E2E8F0] rounded-xl p-4 space-y-2.5">
-              <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Pharmacy Profile`}</span>
-              <div className="grid grid-cols-2 gap-3 text-[#475569]">
-                <div>
-                  <span className="text-[#94A3B8] block text-[10px]">{`Shop Name`}</span>
-                  <span className="font-bold text-[#1D2A3B]">
-                    {gt.name}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[#94A3B8] block text-[10px]">{`Owner Name`}</span>
-                  <span className="font-bold text-[#1D2A3B]">
-                    {gt.ownerName}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[#94A3B8] block text-[10px]">{`Contact Phone`}</span>
-                  <span className="font-bold text-[#1D2A3B]">
-                    {gt.phone}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[#94A3B8] block text-[10px]">{`Registered Email`}</span>
-                  <span className="font-bold text-[#1D2A3B]">
-                    {gt.email}
-                  </span>
-                </div>
-                <div className="col-span-2">
-                  <span className="text-[#94A3B8] block text-[10px]">{`Physical Address`}</span>
-                  <span className="font-bold text-[#1D2A3B]">
-                    {gt.location}
-                  </span>
+            <div className="flex-1 overflow-y-auto p-6 space-y-5 text-xs">
+              <div className="bg-slate-50 border border-[#E2E8F0] rounded-xl p-4 space-y-2.5">
+                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Pharmacy Profile`}</span>
+                <div className="grid grid-cols-2 gap-3 text-[#475569]">
+                  <div>
+                    <span className="text-[#94A3B8] block text-[10px]">{`Shop Name`}</span>
+                    <span className="font-bold text-[#1D2A3B]">
+                      {gt.name}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[#94A3B8] block text-[10px]">{`Owner Name`}</span>
+                    <span className="font-bold text-[#1D2A3B]">
+                      {gt.ownerName}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[#94A3B8] block text-[10px]">{`Contact Phone`}</span>
+                    <span className="font-bold text-[#1D2A3B]">
+                      {gt.phone}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[#94A3B8] block text-[10px]">{`Registered Email`}</span>
+                    <span className="font-bold text-[#1D2A3B]">
+                      {gt.email}
+                    </span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-[#94A3B8] block text-[10px]">{`Physical Address`}</span>
+                    <span className="font-bold text-[#1D2A3B]">
+                      {gt.location}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="bg-slate-50 border border-[#E2E8F0] rounded-xl p-4 space-y-2.5">
-              <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Official Registrations`}</span>
-              <div className="grid grid-cols-2 gap-3 text-[#475569]">
-                <div>
-                  <span className="text-[#94A3B8] block text-[10px]">{`Drug License Number`}</span>
-                  <span className="font-mono font-bold text-[#1D2A3B]">
-                    {gt.licenseNumber}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-[#94A3B8] block text-[10px]">{`Trade License Code`}</span>
-                  <span className="font-mono font-bold text-[#1D2A3B]">
-                    {gt.tradeLicense}
-                  </span>
+              <div className="bg-slate-50 border border-[#E2E8F0] rounded-xl p-4 space-y-2.5">
+                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Official Registrations`}</span>
+                <div className="grid grid-cols-2 gap-3 text-[#475569]">
+                  <div>
+                    <span className="text-[#94A3B8] block text-[10px]">{`Drug License Number`}</span>
+                    <span className="font-mono font-bold text-[#1D2A3B]">
+                      {gt.licenseNumber}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[#94A3B8] block text-[10px]">{`Trade License Code`}</span>
+                    <span className="font-mono font-bold text-[#1D2A3B]">
+                      {gt.tradeLicense}
+                    </span>
+                  </div>
                 </div>
               </div>
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Verification Attachments`}</span>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 bg-white border border-[#E2E8F0] rounded-xl flex items-center justify-between shadow-xs">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-red-50 text-red-600 rounded-lg flex items-center justify-center font-bold text-xs">{`PDF`}</div>
+                      <div>
+                        <span className="font-bold block text-[11px] text-[#1D2A3B]">{`Drug License`}</span>
+                        <span className="text-[9px] text-[#94A3B8] font-mono truncate max-w-[100px] block">
+                          {gt.drugLicenseFile}
+                        </span>
+                      </div>
+                    </div>
+                    <button onClick={() => T(`Downloading ${gt.drugLicenseFile}...`)} className="text-[#94A3B8] hover:text-[#475569]" title="Download Document">{`⬇️`}</button>
+                  </div>
+                  <div className="p-3 bg-white border border-[#E2E8F0] rounded-xl flex items-center justify-between shadow-xs">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-[#E0F5F7] text-[#0697A8] rounded-lg flex items-center justify-center font-bold text-xs">{`PDF`}</div>
+                      <div>
+                        <span className="font-bold block text-[11px] text-[#1D2A3B]">{`Trade License`}</span>
+                        <span className="text-[9px] text-[#94A3B8] font-mono truncate max-w-[100px] block">{`trade_license_copy.pdf`}</span>
+                      </div>
+                    </div>
+                    <button onClick={() => T(`Downloading trade_license_copy.pdf...`)} className="text-[#94A3B8] hover:text-[#475569]" title="Download Document">{`⬇️`}</button>
+                  </div>
+                </div>
+              </div>
+              <div className="border-t border-[#E2E8F0] pt-4 space-y-3">
+                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`DGDA Compliance Audit Checklist`}</span>
+                <div className="space-y-2 text-[#475569]">
+                  <label className="flex items-center gap-3 p-2 bg-slate-50 hover:bg-slate-100/50 rounded-lg cursor-pointer select-none">
+                    <input type="checkbox" checked={yt.licenseGov} onChange={() => bt({
+                      ...yt,
+                      licenseGov: !yt.licenseGov
+                    })} className="rounded border-[#CBD5E1] text-emerald-600 focus:ring-emerald-500 w-4 h-4" />
+                    <span>{`Verify drug license authenticity on DGDA database portal`}</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-2 bg-slate-50 hover:bg-slate-100/50 rounded-lg cursor-pointer select-none">
+                    <input type="checkbox" checked={yt.addressMatch} onChange={() => bt({
+                      ...yt,
+                      addressMatch: !yt.addressMatch
+                    })} className="rounded border-[#CBD5E1] text-emerald-600 focus:ring-emerald-500 w-4 h-4" />
+                    <span>{`Confirm trade license address matches registered physical storefront`}</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-2 bg-slate-50 hover:bg-slate-100/50 rounded-lg cursor-pointer select-none">
+                    <input type="checkbox" checked={yt.ownerIdVerify} onChange={() => bt({
+                      ...yt,
+                      ownerIdVerify: !yt.ownerIdVerify
+                    })} className="rounded border-[#CBD5E1] text-emerald-600 focus:ring-emerald-500 w-4 h-4" />
+                    <span>{`Cross-reference national identification (NID) with license holder`}</span>
+                  </label>
+                  <label className="flex items-center gap-3 p-2 bg-slate-50 hover:bg-slate-100/50 rounded-lg cursor-pointer select-none">
+                    <input type="checkbox" checked={yt.physicalStoreCheck} onChange={() => bt({
+                      ...yt,
+                      physicalStoreCheck: !yt.physicalStoreCheck
+                    })} className="rounded border-[#CBD5E1] text-emerald-600 focus:ring-emerald-500 w-4 h-4" />
+                    <span>{`Audit shop signage and pharmaceutical warehouse setup photo`}</span>
+                  </label>
+                </div>
+              </div>
+              <div>
+                <label className="block font-bold text-[#64748B] uppercase tracking-wider text-[10px] mb-1.5">{`Auditor Internal Notes`}</label>
+                <textarea rows={2} value={Tt} onChange={e => Et(e.target.value)} placeholder="Record verification findings, notes on scans, etc." className="w-full px-3 py-2 bg-slate-50 border border-[#E2E8F0] rounded-xl focus:outline-none focus:bg-white" />
+              </div>
+              {Ct && <div className="p-4 bg-red-50 border border-red-200 rounded-xl space-y-2 animate-in fade-in duration-200">
+                <label className="block font-bold text-red-800 text-[10px] uppercase">{`Rejection Reason (Required)`}</label>
+                <input type="text" required={!0} value={xt} onChange={e => St(e.target.value)} placeholder="e.g. Drug license scan is blurry or corrupted" className="w-full px-3 py-2 bg-white border border-red-300 rounded-xl text-xs focus:outline-none focus:border-red-500" />
+              </div>}
             </div>
-            <div className="space-y-2">
-              <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Verification Attachments`}</span>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 bg-white border border-[#E2E8F0] rounded-xl flex items-center justify-between shadow-xs">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-red-50 text-red-600 rounded-lg flex items-center justify-center font-bold text-xs">{`PDF`}</div>
-                    <div>
-                      <span className="font-bold block text-[11px] text-[#1D2A3B]">{`Drug License`}</span>
-                      <span className="text-[9px] text-[#94A3B8] font-mono truncate max-w-[100px] block">
-                        {gt.drugLicenseFile}
+            <div className="p-6 border-t border-[#E2E8F0] bg-slate-50 flex flex-col sm:flex-row gap-3">
+              {gt.status === `Pending` ? <>
+                <button onClick={() => vn(gt.id)} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition-colors text-center cursor-pointer">
+                  {Ct ? `Confirm Rejection` : `Reject / Request Info`}
+                </button>
+                <button onClick={() => _n(gt.id)} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors text-center cursor-pointer">{`Approve & Activate Shop`}</button>
+              </> : <div className="flex-1 text-center py-2.5 font-bold text-[#64748B] bg-slate-100 rounded-xl">
+                {`Verification Processed: `}
+                {gt.status}
+              </div>}
+              <button
+                onClick={() => handleDeleteBuyer(gt)}
+                className="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                title="Permanently remove buyer and records"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                <span>Delete Buyer</span>
+              </button>
+            </div>
+          </div>
+        </div>}
+        {f === `admin` && I && <div className="fixed inset-0 z-50 flex justify-end font-sans">
+          <div onClick={() => vt(null)} className="absolute inset-0 bg-[#1D2A3B]/40 backdrop-blur-xs" />
+          <div className="relative w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300">
+            <div className="px-6 py-5 border-b border-[#E2E8F0] flex justify-between items-center bg-slate-50">
+              <div>
+                <h3 className="text-sm font-bold text-[#1D2A3B]">{`Wholesale Order Fulfillment Dispatch`}</h3>
+                <p className="text-[11px] text-[#64748B] mt-0.5">
+                  {`Order ID: `}
+                  {I.id}
+                </p>
+              </div>
+              <button onClick={() => vt(null)} className="text-[#64748B] hover:text-[#1D2A3B] p-1 rounded-lg hover:bg-slate-100">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 space-y-5 text-xs">
+              <div className="bg-slate-50 border border-[#E2E8F0] rounded-xl p-4 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">{`Order Meta`}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${I.status === `Delivered & Invoiced` ? `bg-emerald-50 text-emerald-800 border-emerald-100` : I.status === `Out for Delivery` ? `bg-purple-50 text-purple-800 border-purple-100` : I.status === `Processing/Packing` ? `bg-[#E0F5F7] text-blue-800 border-[#C2EAF0]` : `bg-yellow-50 text-yellow-800 border-yellow-200`}`}>
+                    {I.status}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2.5 text-[#475569]">
+                  <div>
+                    <span className="text-[#94A3B8] block text-[10px]">{`Pharmacy Client`}</span>
+                    <span className="font-bold text-[#1D2A3B]">
+                      {I.buyerName}
+                    </span>
+                    <span className="text-[#64748B] block text-[11px] mt-0.5 font-normal">
+                      {getFullAddress(I) || I.location || 'House #12, Road #4, Block-D, Banani, Dhaka - 1213'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[#94A3B8] block text-[10px]">{`Payment Method`}</span>
+                    <span className="font-bold text-[#1D2A3B]">
+                      {I.paymentMethod}
+                      {` (`}
+                      {I.paymentStatus}
+                      {`)`}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              {I.locationCoordinates && (
+                <div className="bg-slate-50 p-4 rounded-xl border border-[#E2E8F0] mb-4 flex justify-between items-center">
+                  <div>
+                    <div className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Delivery Location`}</div>
+                    <div className="text-xs font-semibold text-[#1D2A3B]">
+                      {I.locationCoordinates.lat.toFixed(4)}, {I.locationCoordinates.lng.toFixed(4)}
+                    </div>
+                  </div>
+                  <a
+                    href={`https://maps.google.com/?q=${I.locationCoordinates.lat},${I.locationCoordinates.lng}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="bg-[#0697A8] hover:bg-[#057A88] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
+                  >
+                    View on Map
+                  </a>
+                </div>
+              )}
+              <div className="space-y-2">
+                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Items Pack Details`}</span>
+                <div className="border border-[#E2E8F0] rounded-xl overflow-hidden bg-white">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="bg-slate-50 text-[9px] text-[#64748B] uppercase font-bold border-b border-[#E2E8F0]">
+                        <th className="p-3">{`SKU & Name`}</th>
+                        <th className="p-3 text-center">{`Wholesale Qty`}</th>
+                        <th className="p-3 text-right">{`Pack Rate`}</th>
+                        <th className="p-3 text-right">{`Subtotal`}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {I.items.map((e, t) => <tr key={e.id || t}>
+                        <td className="p-3">
+                          <span className="font-mono text-[9px] text-[#94A3B8] block">
+                            {e.id}
+                          </span>
+                          {(() => {
+                            const medItem = m.find(med => String(med.id) === String(e.id || e.medicine_id) || (e.name && med.name && med.name.toLowerCase() === e.name.toLowerCase()));
+                            const compName = e.company || e.manufacturer || medItem?.manufacturer || medItem?.company || '';
+                            return (
+                              <>
+                                <div className="font-bold text-[#1D2A3B]">
+                                  {e.name}
+                                  {compName && (
+                                    <span className="font-semibold text-slate-500 text-[11px] ml-1.5">
+                                      ({compName})
+                                    </span>
+                                  )}
+                                </div>
+                                {compName && (
+                                  <div className="text-[10px] text-slate-400 font-medium">
+                                    Company: <span className="font-semibold text-slate-600">{compName}</span>
+                                  </div>
+                                )}
+                              </>
+                            );
+                          })()}
+                        </td>
+                        <td className="p-3 text-center font-semibold text-[#475569]">
+                          {e.quantity}
+                          {` boxes`}
+                        </td>
+                        <td className="p-3 text-right text-[#475569]">
+                          {`৳`}
+                          {e.price.toFixed(2)}
+                        </td>
+                        <td className="p-3 text-right font-bold text-[#1D2A3B]">
+                          {`৳`}
+                          {(e.price * e.quantity).toFixed(2)}
+                        </td>
+                      </tr>)}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {(I.status === 'Return Requested' || I.status === 'Returned') && (
+                <div className="border-t border-[#E2E8F0] pt-4">
+                  <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {I.status === 'Return Requested' && (
+                          <span className="relative flex h-2.5 w-2.5">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+                          </span>
+                        )}
+                        <span className="text-xs font-bold text-rose-900 uppercase tracking-wider">{`Return Order Request Details`}</span>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${I.status === 'Returned' ? 'bg-slate-200 text-slate-700' : 'bg-rose-200 text-rose-900'}`}>
+                        {I.status}
                       </span>
                     </div>
-                  </div>
-                  <button onClick={() => T(`Downloading ${gt.drugLicenseFile}...`)} className="text-[#94A3B8] hover:text-[#475569]" title="Download Document">{`⬇️`}</button>
-                </div>
-                <div className="p-3 bg-white border border-[#E2E8F0] rounded-xl flex items-center justify-between shadow-xs">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-[#E0F5F7] text-[#0697A8] rounded-lg flex items-center justify-center font-bold text-xs">{`PDF`}</div>
-                    <div>
-                      <span className="font-bold block text-[11px] text-[#1D2A3B]">{`Trade License`}</span>
-                      <span className="text-[9px] text-[#94A3B8] font-mono truncate max-w-[100px] block">{`trade_license_copy.pdf`}</span>
+                    <div className="text-xs text-rose-950 space-y-1.5 bg-white/70 p-3 rounded-lg border border-rose-100">
+                      <div className="flex justify-between">
+                        <span className="text-rose-700 font-semibold">{`Request Date:`}</span>
+                        <span className="font-bold">{I.returnDate || I.date || `Recent`}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-rose-700 font-semibold">{`Claimed Refund Value:`}</span>
+                        <span className="font-bold text-rose-800">৳{I.returnRefund !== undefined ? Number(I.returnRefund).toFixed(2) : I.totalAmount.toFixed(2)}</span>
+                      </div>
+                      {I.returnItemsCount !== undefined && (
+                        <div className="flex justify-between">
+                          <span className="text-rose-700 font-semibold">{`Items Claimed for Return:`}</span>
+                          <span className="font-bold">{I.returnItemsCount} units</span>
+                        </div>
+                      )}
+                      <div className="pt-1 border-t border-rose-100">
+                        <span className="text-rose-700 font-semibold block mb-0.5">{`Reason for Return:`}</span>
+                        <p className="text-slate-700 bg-white p-2 rounded border border-rose-100 text-[11px] italic">
+                          {I.returnReason || `No specific reason entered by buyer.`}
+                        </p>
+                      </div>
                     </div>
+                    {I.status === 'Return Requested' && (
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          onClick={async () => {
+                            await yn(I.id, 'Returned');
+                            if (I.items) {
+                              for (const item of I.items) {
+                                const med = m.find(x => String(x.id) === String(item.id));
+                                if (med) {
+                                  const addQty = I.returnItems && I.returnItems[item.id] !== undefined ? I.returnItems[item.id] : item.quantity;
+                                  if (addQty > 0) {
+                                    const newStock = (med.stock || 0) + addQty;
+                                    h(prev => prev.map(x => String(x.id) === String(med.id) ? { ...x, stock: newStock } : x));
+                                    await supabase.from('medicines').update({ stock: newStock }).eq('id', med.id);
+                                  }
+                                }
+                              }
+                            }
+                            T(`Return request for Order #${I.id} approved. Order marked Returned and inventory restocked.`);
+                          }}
+                          className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                          </svg>
+                          {`Approve Return & Restock`}
+                        </button>
+                        <button
+                          onClick={async () => {
+                            await yn(I.id, 'Delivered & Invoiced');
+                            T(`Return request for Order #${I.id} rejected. Order reverted to Delivered & Invoiced.`);
+                          }}
+                          className="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-lg text-xs transition-colors cursor-pointer"
+                        >
+                          {`Reject Return`}
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <button onClick={() => T(`Downloading trade_license_copy.pdf...`)} className="text-[#94A3B8] hover:text-[#475569]" title="Download Document">{`⬇️`}</button>
+                </div>
+              )}
+              <div className="border-t border-[#E2E8F0] pt-4 space-y-4">
+                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Logistics Shipping Dispatch`}</span>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[#64748B] font-bold text-[10px] uppercase mb-1">{`Shipping Courier Partner`}</label>
+                    <select value={Zt} onChange={e => Qt(e.target.value)} className="w-full bg-slate-50 border border-[#E2E8F0] rounded-xl px-2.5 py-1.5 focus:bg-white focus:outline-none">
+                      <option value="PharmaExpress">{`PharmaExpress Direct Cargo`}</option>
+                      <option value="B2B Fleet">{`DigiPharma Fleet Delivery`}</option>
+                      <option value="SA Paribahan">{`SA Paribahan Cargo Services`}</option>
+                      <option value="DHL B2B">{`DHL Enterprise Freight`}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[#64748B] font-bold text-[10px] uppercase mb-1">{`Waybill / Tracking Code`}</label>
+                    <input type="text" value={$t} onChange={e => en(e.target.value)} placeholder="e.g. PE-883901-2026" className="w-full bg-slate-50 border border-[#E2E8F0] rounded-xl px-2.5 py-1.5 focus:bg-white focus:outline-none font-mono" />
+                  </div>
+                </div>
+              </div>
+              <div className="border-t border-[#E2E8F0] pt-4 space-y-2.5">
+                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Advance Order Status Pipeline`}</span>
+                <div className="grid grid-cols-5 gap-2 text-center text-[10px] font-bold select-none">
+                  <button onClick={() => yn(I.id, `Pending Verification`)} className={`py-2 rounded-lg border ${I.status === `Pending Verification` ? `bg-yellow-500 text-white border-yellow-600 shadow-xs` : `bg-slate-50 text-[#475569] border-[#E2E8F0] hover:bg-slate-100`}`}>{`1. Verify`}</button>
+                  <button onClick={() => yn(I.id, `Processing/Packing`)} className={`py-2 rounded-lg border ${I.status === `Processing/Packing` ? `bg-[#0697A8] text-white border-[#057A88] shadow-xs` : `bg-slate-50 text-[#475569] border-[#E2E8F0] hover:bg-slate-100`}`}>{`2. Pack`}</button>
+                  <button onClick={() => yn(I.id, `Out for Delivery`)} className={`py-2 rounded-lg border ${I.status === `Out for Delivery` ? `bg-purple-600 text-white border-purple-700 shadow-xs` : `bg-slate-50 text-[#475569] border-[#E2E8F0] hover:bg-slate-100`}`}>{`3. Dispatch`}</button>
+                  <button onClick={() => yn(I.id, `Delivered & Invoiced`)} className={`py-2 rounded-lg border ${I.status === `Delivered & Invoiced` ? `bg-emerald-600 text-white border-emerald-700 shadow-xs` : `bg-slate-50 text-[#475569] border-[#E2E8F0] hover:bg-slate-100`}`}>{`4. Deliver`}</button>
+                  <button onClick={() => yn(I.id, `Returned`)} className={`py-2 rounded-lg border ${I.status === `Returned` ? `bg-rose-600 text-white border-rose-700 shadow-xs` : I.status === `Return Requested` ? `bg-rose-100 text-rose-800 border-rose-300 font-black animate-pulse` : `bg-slate-50 text-[#475569] border-[#E2E8F0] hover:bg-slate-100`}`}>{`5. Returned`}</button>
                 </div>
               </div>
             </div>
-            <div className="border-t border-[#E2E8F0] pt-4 space-y-3">
-              <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`DGDA Compliance Audit Checklist`}</span>
-              <div className="space-y-2 text-[#475569]">
-                <label className="flex items-center gap-3 p-2 bg-slate-50 hover:bg-slate-100/50 rounded-lg cursor-pointer select-none">
-                  <input type="checkbox" checked={yt.licenseGov} onChange={() => bt({
-                    ...yt,
-                    licenseGov: !yt.licenseGov
-                  })} className="rounded border-[#CBD5E1] text-emerald-600 focus:ring-emerald-500 w-4 h-4" />
-                  <span>{`Verify drug license authenticity on DGDA database portal`}</span>
-                </label>
-                <label className="flex items-center gap-3 p-2 bg-slate-50 hover:bg-slate-100/50 rounded-lg cursor-pointer select-none">
-                  <input type="checkbox" checked={yt.addressMatch} onChange={() => bt({
-                    ...yt,
-                    addressMatch: !yt.addressMatch
-                  })} className="rounded border-[#CBD5E1] text-emerald-600 focus:ring-emerald-500 w-4 h-4" />
-                  <span>{`Confirm trade license address matches registered physical storefront`}</span>
-                </label>
-                <label className="flex items-center gap-3 p-2 bg-slate-50 hover:bg-slate-100/50 rounded-lg cursor-pointer select-none">
-                  <input type="checkbox" checked={yt.ownerIdVerify} onChange={() => bt({
-                    ...yt,
-                    ownerIdVerify: !yt.ownerIdVerify
-                  })} className="rounded border-[#CBD5E1] text-emerald-600 focus:ring-emerald-500 w-4 h-4" />
-                  <span>{`Cross-reference national identification (NID) with license holder`}</span>
-                </label>
-                <label className="flex items-center gap-3 p-2 bg-slate-50 hover:bg-slate-100/50 rounded-lg cursor-pointer select-none">
-                  <input type="checkbox" checked={yt.physicalStoreCheck} onChange={() => bt({
-                    ...yt,
-                    physicalStoreCheck: !yt.physicalStoreCheck
-                  })} className="rounded border-[#CBD5E1] text-emerald-600 focus:ring-emerald-500 w-4 h-4" />
-                  <span>{`Audit shop signage and pharmaceutical warehouse setup photo`}</span>
-                </label>
-              </div>
-            </div>
-            <div>
-              <label className="block font-bold text-[#64748B] uppercase tracking-wider text-[10px] mb-1.5">{`Auditor Internal Notes`}</label>
-              <textarea rows={2} value={Tt} onChange={e => Et(e.target.value)} placeholder="Record verification findings, notes on scans, etc." className="w-full px-3 py-2 bg-slate-50 border border-[#E2E8F0] rounded-xl focus:outline-none focus:bg-white" />
-            </div>
-            {Ct && <div className="p-4 bg-red-50 border border-red-200 rounded-xl space-y-2 animate-in fade-in duration-200">
-              <label className="block font-bold text-red-800 text-[10px] uppercase">{`Rejection Reason (Required)`}</label>
-              <input type="text" required={!0} value={xt} onChange={e => St(e.target.value)} placeholder="e.g. Drug license scan is blurry or corrupted" className="w-full px-3 py-2 bg-white border border-red-300 rounded-xl text-xs focus:outline-none focus:border-red-500" />
-            </div>}
-          </div>
-          <div className="p-6 border-t border-[#E2E8F0] bg-slate-50 flex flex-col sm:flex-row gap-3">
-            {gt.status === `Pending` ? <>
-              <button onClick={() => vn(gt.id)} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition-colors text-center cursor-pointer">
-                {Ct ? `Confirm Rejection` : `Reject / Request Info`}
-              </button>
-              <button onClick={() => _n(gt.id)} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors text-center cursor-pointer">{`Approve & Activate Shop`}</button>
-            </> : <div className="flex-1 text-center py-2.5 font-bold text-[#64748B] bg-slate-100 rounded-xl">
-              {`Verification Processed: `}
-              {gt.status}
-            </div>}
-            <button
-              onClick={() => handleDeleteBuyer(gt)}
-              className="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-              title="Permanently remove buyer and records"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-              <span>Delete Buyer</span>
-            </button>
-          </div>
-        </div>
-      </div>}
-      {f === `admin` && I && <div className="fixed inset-0 z-50 flex justify-end font-sans">
-        <div onClick={() => vt(null)} className="absolute inset-0 bg-[#1D2A3B]/40 backdrop-blur-xs" />
-        <div className="relative w-full max-w-2xl bg-white h-full shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300">
-          <div className="px-6 py-5 border-b border-[#E2E8F0] flex justify-between items-center bg-slate-50">
-            <div>
-              <h3 className="text-sm font-bold text-[#1D2A3B]">{`Wholesale Order Fulfillment Dispatch`}</h3>
-              <p className="text-[11px] text-[#64748B] mt-0.5">
-                {`Order ID: `}
-                {I.id}
-              </p>
-            </div>
-            <button onClick={() => vt(null)} className="text-[#64748B] hover:text-[#1D2A3B] p-1 rounded-lg hover:bg-slate-100">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-6 space-y-5 text-xs">
-            <div className="bg-slate-50 border border-[#E2E8F0] rounded-xl p-4 space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">{`Order Meta`}</span>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${I.status === `Delivered & Invoiced` ? `bg-emerald-50 text-emerald-800 border-emerald-100` : I.status === `Out for Delivery` ? `bg-purple-50 text-purple-800 border-purple-100` : I.status === `Processing/Packing` ? `bg-[#E0F5F7] text-blue-800 border-[#C2EAF0]` : `bg-yellow-50 text-yellow-800 border-yellow-200`}`}>
-                  {I.status}
+            <div className="p-6 border-t border-[#E2E8F0] bg-slate-50 flex items-center justify-between">
+              <div>
+                <span className="text-[#94A3B8] block text-[10px]">{`Invoice Grand Total`}</span>
+                <span className="text-base font-black text-emerald-700">
+                  {`৳`}
+                  {I.totalAmount.toFixed(2)}
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-2.5 text-[#475569]">
-                <div>
-                  <span className="text-[#94A3B8] block text-[10px]">{`Pharmacy Client`}</span>
-                  <span className="font-bold text-[#1D2A3B]">
-                    {I.buyerName}
-                  </span>
-                  <span className="text-[#64748B] block text-[11px] mt-0.5 font-normal">
-                    {getFullAddress(I) || I.location || 'House #12, Road #4, Block-D, Banani, Dhaka - 1213'}
-                  </span>
+              <div className="flex gap-3">
+                <button onClick={() => {
+                  setInvoicesToPrint([I]);
+                  setTriggersPrint(!0);
+                  T(`Preparing print for invoice #${I.id}...`);
+                }} className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold px-4 py-2.5 rounded-xl shadow-sm flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  </svg>
+                  {`Print`}
+                </button>
+                <button onClick={() => {
+                  T(`Dispatched successfully via ${Zt} with Waybill ID: ${$t || `AUTO-9988`}`), vt(null);
+                }} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-md">{`Apply Shipping Manifest`}</button>
+              </div>
+            </div>
+          </div>
+        </div>}
+        {f === `buyer` && (
+          <div className={`fixed inset-0 z-[60] flex justify-end font-sans transition-opacity duration-300 ${xe ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}>
+            <div onClick={() => Se(!1)} className="absolute inset-0 bg-[#1D2A3B]/40 backdrop-blur-xs" />
+            <div className={`relative w-[85%] sm:w-[60%] md:w-120 md:max-w-md bg-white h-full shadow-2xl flex flex-col z-10 transform transition-transform duration-300 ease-in-out border-l border-[#E2E8F0] ${xe ? "translate-x-0" : "translate-x-full"}`}>
+              <div className="px-4 py-3.5 md:px-6 md:py-5 border-b border-[#E2E8F0] flex justify-between items-center bg-slate-50 flex-shrink-0">
+                <div className="min-w-0 pr-2">
+                  <h3 className="text-xs md:text-sm font-bold text-[#1D2A3B] truncate">{`Your Cart`}</h3>
+                  <p className="text-[10px] md:text-[11px] text-[#64748B] mt-0.5 truncate">
+                    {`Account: `}
+                    {tn.name}
+                  </p>
                 </div>
-                <div>
-                  <span className="text-[#94A3B8] block text-[10px]">{`Payment Method`}</span>
-                  <span className="font-bold text-[#1D2A3B]">
-                    {I.paymentMethod}
-                    {` (`}
-                    {I.paymentStatus}
-                    {`)`}
-                  </span>
+                <button onClick={() => Se(!1)} className="text-[#64748B] hover:text-[#1D2A3B] p-1.5 rounded-lg hover:bg-slate-100 flex-shrink-0 cursor-pointer" title="Close Cart">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto min-h-0 p-3 md:p-6 space-y-3 md:space-y-4">
+                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Selected Items List`}</span>
+                {on.length === 0 ? (
+                  <div className="text-center py-8 text-xs text-[#94A3B8]">{`No items selected. Add medicines from the catalog first.`}</div>
+                ) : (
+                  <div className="space-y-2.5">
+                    {on.map((e, _idx) => (
+                      <div key={e.id || _idx} className="flex flex-col sm:flex-row sm:justify-between items-start bg-slate-50 p-2.5 md:p-3 rounded-xl border border-[#E2E8F0] gap-2">
+                        <div className="min-w-0 flex-1 w-full">
+                          <div className="font-bold text-xs text-[#1D2A3B] truncate">{e.name}</div>
+                          <div className="text-[10px] text-[#64748B] font-mono mt-0.5 truncate">{e.generic}</div>
+                          <div className="text-[9px] text-[#94A3B8] mt-1 font-semibold truncate">
+                            {`৳`}
+                            {e.wholesalePrice.toFixed(2)}
+                            {`/box | `}
+                            {e.packSize || `Standard Pack`}
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto flex-shrink-0 pt-1 sm:pt-0 border-t sm:border-0 border-slate-200/60">
+                          <div className="flex border border-[#E2E8F0] rounded-lg overflow-hidden bg-white items-center">
+                            <button onClick={() => ln(e.id, e.quantity - 1)} className="px-2 py-0.5 text-xs text-[#64748B] hover:bg-slate-50 font-bold">{`-`}</button>
+                            <span className="w-7 text-center text-xs font-black py-0.5">{e.quantity}</span>
+                            <button onClick={() => ln(e.id, e.quantity + 1)} className="px-2 py-0.5 text-xs text-[#64748B] hover:bg-slate-50 font-bold">{`+`}</button>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <div className="font-bold text-xs text-[#1D2A3B]">
+                              {`৳`}
+                              {e.itemTotal.toFixed(2)}
+                            </div>
+                            <button onClick={() => ln(e.id, 0)} className="text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 rounded p-1 transition-colors cursor-pointer" title="Remove item">
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="border-t border-[#E2E8F0] pt-3 space-y-2">
+                  <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Payment Method`}</span>
+                  <div className="p-3 bg-emerald-50/80 border border-emerald-200 rounded-xl flex items-start gap-2.5">
+                    <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div>
+                      <span className="font-bold text-xs text-emerald-950 block">{`Cash on Delivery (COD)`}</span>
+                      <span className="text-[10px] text-emerald-700 block mt-0.5">{`Pay invoice total upon delivery directly to courier.`}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="border-t border-[#E2E8F0] pt-3 space-y-2">
+                  <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Delivery Location`}</span>
+                  <div className="flex flex-col gap-2 mb-2">
+                    <input
+                      type="text"
+                      placeholder="Search for an area..."
+                      className="w-full min-w-0 text-xs border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0697A8]"
+                      id="mapSearchInput"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          const q = e.target.value;
+                          if (q) {
+                            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`)
+                              .then(res => res.json())
+                              .then(data => {
+                                if (data && data.length > 0) {
+                                  setDeliveryLocation({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) });
+                                }
+                              });
+                          }
+                        }
+                      }}
+                    />
+                    <div className="flex gap-2 w-full">
+                      <button
+                        type="button"
+                        className="flex-1 bg-[#0697A8] hover:bg-[#057A88] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
+                        onClick={() => {
+                          const q = document.getElementById('mapSearchInput').value;
+                          if (q) {
+                            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`)
+                              .then(res => res.json())
+                              .then(data => {
+                                if (data && data.length > 0) {
+                                  setDeliveryLocation({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) });
+                                  setLocationError(false);
+                                }
+                              });
+                          }
+                        }}
+                      >
+                        Search
+                      </button>
+                      <button
+                        type="button"
+                        className="flex-1 bg-slate-200 hover:bg-slate-300 text-[#1D2A3B] px-3 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap"
+                        onClick={() => {
+                          if ("geolocation" in navigator) {
+                            navigator.geolocation.getCurrentPosition((position) => {
+                              setDeliveryLocation({
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude
+                              });
+                              setLocationError(false);
+                            }, (error) => {
+                              console.error("Error getting location:", error);
+                              alert("Unable to retrieve your location. Please check browser permissions.");
+                            });
+                          } else {
+                            alert("Geolocation is not supported by your browser.");
+                          }
+                        }}
+                        title="Get current location"
+                      >
+                        📍 Locate Me
+                      </button>
+                    </div>
+                  </div>
+                  <div id="map-container" className={`h-48 w-full rounded-xl overflow-hidden border z-10 relative transition-colors ${locationError ? 'border-red-500 shadow-[0_0_0_2px_rgba(239,68,68,0.2)]' : 'border-[#E2E8F0]'}`}>
+                    {locationError && <div className="absolute top-0 inset-x-0 bg-red-500 text-white text-xs text-center py-1 font-bold z-[1000] shadow-sm">Please select a delivery location!</div>}
+                    <MapContainer attributionControl={false} center={[23.8103, 90.4125]} zoom={13} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
+                      <TileLayer
+                        attribution=""
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
+                      <LocationMarker position={deliveryLocation} setPosition={(pos) => { setDeliveryLocation(pos); setLocationError(false); }} />
+                    </MapContainer>
+                  </div>
+                  <span className="text-[9px] text-[#64748B] block mt-1">{`Click on the map to pin your exact delivery location.`}</span>
+                </div>
+              </div>
+              <div className="p-3.5 md:p-6 border-t border-[#E2E8F0] bg-slate-50 space-y-3 flex-shrink-0">
+                <div className="space-y-1 text-xs">
+                  <div className="flex gap-2 mb-4">
+                    <input
+                      type="text"
+                      placeholder="Enter Coupon Code"
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                      className="flex-1 min-w-0 bg-white border border-slate-200 text-sm rounded-xl px-3 py-1.5 outline-none uppercase"
+                    />
+                    <button
+                      onClick={() => {
+                        let code = couponInput.trim();
+                        if (!code) return;
+                        let found = coupons.find(c => c.code === code);
+                        if (found) {
+                          setAppliedCoupon(found);
+                          T(`Coupon applied successfully!`);
+                        } else {
+                          T(`Invalid or expired coupon code.`);
+                          setAppliedCoupon(null);
+                        }
+                      }}
+                      className="bg-slate-200 hover:bg-slate-300 text-[#1D2A3B] px-3 py-1.5 rounded-xl font-bold transition-all"
+                    >
+                      Apply
+                    </button>
+                    {appliedCoupon && (
+                      <button onClick={() => { setAppliedCoupon(null); setCouponInput(``); }} className="text-red-500 hover:text-red-700 px-2 font-bold text-lg leading-none" title="Remove Coupon">
+                        ×
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex justify-between text-[#64748B]">
+                    <span>{`Subtotal:`}</span>
+                    <span className="font-semibold text-[#1D2A3B]">
+                      {`৳`}
+                      {sn.subtotal.toFixed(2)}
+                    </span>
+                  </div>
+                  {sn.totalSpecialDiscounts > 0 && (
+                    <div className="flex justify-between text-blue-600">
+                      <span>{`Special Discount:`}</span>
+                      <span className="font-semibold">
+                        -{`৳`}
+                        {sn.totalSpecialDiscounts.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+
+                  {appliedCoupon && (
+                    <div className="flex justify-between text-purple-600">
+                      <span>{`Coupon (${appliedCoupon.code}):`}</span>
+                      <span className="font-semibold">
+                        -{`৳`}
+                        {sn.couponDiscountAmount.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-[#64748B]">
+                    <span>{`Delivery:`}</span>
+                    <span className="font-semibold text-emerald-600">{`FREE`}</span>
+                  </div>
+                  <div className="h-px bg-slate-200 my-1.5" />
+                  <div className="flex justify-between text-xs md:text-sm font-black text-[#1D2A3B]">
+                    <span>{`Total Payable:`}</span>
+                    <span className="text-sm md:text-base text-[#0697A8]">
+                      {`৳`}
+                      {sn.finalTotal.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+                <button onClick={fn} disabled={on.length === 0} className="w-full bg-[#0697A8] hover:bg-[#057A88] disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-2.5 md:py-3 rounded-xl text-xs shadow-md cursor-pointer transition-all">
+                  {`Place Order (৳`}
+                  {sn.finalTotal.toFixed(2)}
+                  {`)`}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {f === `buyer` && Oe && <div className="fixed inset-0 z-50 flex items-center justify-center p-4 font-sans">
+          <div onClick={() => { ke(null); setIsEditingOrder(false); }} className="absolute inset-0 bg-[#1D2A3B]/40 backdrop-blur-xs" />
+          <div className="relative bg-white rounded-2xl max-w-3xl w-full shadow-2xl p-6 z-10 animate-in fade-in zoom-in-95 duration-200 text-xs">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h3 className="text-sm font-bold text-[#1D2A3B]">
+                  {`Order Details: `}
+                  {Oe.id}
+                </h3>
+                <p className="text-[11px] font-semibold text-slate-700 mt-0.5">
+                  {Oe.buyerName || tn.name}
+                  <span className="font-normal text-slate-500"> • {getFullAddress(Oe) || tn.address}</span>
+                </p>
+                <p className="text-[10px] text-[#64748B] mt-0.5">
+                  {`Purchased on `}
+                  {Oe.date}
+                  {` | via `}
+                  {Oe.paymentMethod}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {['Pending', 'Pending Verification', 'Processing/Packing', 'Approved'].includes(Oe.status) && !isEditingOrder && (
+                  <button onClick={() => {
+                    setIsEditingOrder(!0);
+                    let initialQs = {};
+                    Oe.items.forEach((item, idx) => initialQs[item.id || idx] = item.quantity);
+                    setEditedQuantities(initialQs);
+                  }} className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-lg font-bold hover:bg-emerald-200">
+                    Edit Order
+                  </button>
+                )}
+                <button onClick={() => { ke(null); setIsEditingOrder(false); }} className="text-[#64748B] hover:text-[#1D2A3B] p-1 rounded-lg hover:bg-slate-100">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className="bg-slate-50 p-4 rounded-xl border border-[#E2E8F0] mb-4">
+              <div className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-2.5">{`Real-Time Logistics Status`}</div>
+              <div className="flex justify-between items-center relative px-4">
+                <div className="absolute left-6 right-6 h-0.5 bg-slate-200 top-2.5 -z-0" />
+                <div className="flex flex-col items-center z-10 relative">
+                  <div className="w-4.5 h-4.5 rounded-full bg-emerald-500 border-4 border-white flex items-center justify-center" />
+                  <span className="text-[9px] font-bold text-[#1D2A3B] mt-1">{`Confirmed`}</span>
+                </div>
+                <div className="flex flex-col items-center z-10 relative">
+                  <div className={`w-4.5 h-4.5 rounded-full border-4 border-white flex items-center justify-center ${[`Processing/Packing`, `Out for Delivery`, `Delivered & Invoiced`].includes(Oe.status) ? `bg-emerald-500` : `bg-slate-300`}`} />
+                  <span className="text-[9px] font-bold text-[#1D2A3B] mt-1">{`Packed`}</span>
+                </div>
+                <div className="flex flex-col items-center z-10 relative">
+                  <div className={`w-4.5 h-4.5 rounded-full border-4 border-white flex items-center justify-center ${[`Out for Delivery`, `Delivered & Invoiced`].includes(Oe.status) ? `bg-emerald-500` : `bg-slate-300`}`} />
+                  <span className="text-[9px] font-bold text-[#1D2A3B] mt-1">{`Shipped`}</span>
+                </div>
+                <div className="flex flex-col items-center z-10 relative">
+                  <div className={`w-4.5 h-4.5 rounded-full border-4 border-white flex items-center justify-center ${Oe.status === `Delivered & Invoiced` ? `bg-emerald-500` : `bg-slate-300`}`} />
+                  <span className="text-[9px] font-bold text-[#1D2A3B] mt-1">{`Delivered`}</span>
                 </div>
               </div>
             </div>
-            {I.locationCoordinates && (
+            {Oe.locationCoordinates && (
               <div className="bg-slate-50 p-4 rounded-xl border border-[#E2E8F0] mb-4 flex justify-between items-center">
                 <div>
                   <div className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Delivery Location`}</div>
                   <div className="text-xs font-semibold text-[#1D2A3B]">
-                    {I.locationCoordinates.lat.toFixed(4)}, {I.locationCoordinates.lng.toFixed(4)}
+                    {Oe.locationCoordinates.lat.toFixed(4)}, {Oe.locationCoordinates.lng.toFixed(4)}
                   </div>
                 </div>
                 <a
-                  href={`https://maps.google.com/?q=${I.locationCoordinates.lat},${I.locationCoordinates.lng}`}
+                  href={`https://maps.google.com/?q=${Oe.locationCoordinates.lat},${Oe.locationCoordinates.lng}`}
                   target="_blank"
                   rel="noreferrer"
                   className="bg-[#0697A8] hover:bg-[#057A88] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
@@ -10557,1084 +11035,579 @@ export default function App() {
                 </a>
               </div>
             )}
+            {(() => {
+              const orderZone = getDeliveryZone(Oe.city || Oe.buyerAddress || Oe.location || '');
+              const orderDeliveryMen = orderZone ? getDeliveryMenForZone(orderZone) : [];
+              if (orderDeliveryMen.length === 0 && !orderZone) return null;
+              return <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-200 mb-4">
+                <div className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider mb-2">{`Assigned Delivery Representative`}{orderZone ? ` • ${orderZone} Zone` : ''}</div>
+                {orderDeliveryMen.length > 0 ? orderDeliveryMen.map(dm => <div key={dm.id} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-indigo-200 text-indigo-800 flex items-center justify-center font-bold text-[10px]">{dm.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}</div>
+                    <div>
+                      <span className="text-xs font-bold text-[#1D2A3B]">{dm.name}</span>
+                      <span className="text-[10px] text-[#64748B] ml-2">{dm.phone}</span>
+                    </div>
+                  </div>
+                  <a href={`tel:${dm.phone}`} className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-[10px] font-bold transition-colors flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                    {`Call`}
+                  </a>
+                </div>) : <div className="text-xs text-indigo-500 font-semibold">{`Delivery representative will be assigned soon.`}</div>}
+              </div>;
+            })()}
             <div className="space-y-2">
-              <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Items Pack Details`}</span>
-              <div className="border border-[#E2E8F0] rounded-xl overflow-hidden bg-white">
-                <table className="w-full text-left">
+              <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Items Breakdown & Price Details`}</span>
+              {isEditingOrder && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 flex items-start gap-2.5 mb-2">
+                  <svg className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <div>
+                    <span className="font-bold">Admin Re-Approval Notice:</span> Modifying item quantities will adjust reserved stock and return this order to <strong className="text-amber-800">Pending Verification</strong>. It will require administrator re-approval before fulfillment.
+                  </div>
+                </div>
+              )}
+              <div className="border border-[#E2E8F0] rounded-xl overflow-x-auto bg-white">
+                <table className="w-full text-left border-collapse min-w-[580px]">
                   <thead>
                     <tr className="bg-slate-50 text-[9px] text-[#64748B] uppercase font-bold border-b border-[#E2E8F0]">
-                      <th className="p-3">{`SKU & Name`}</th>
-                      <th className="p-3 text-center">{`Wholesale Qty`}</th>
-                      <th className="p-3 text-right">{`Pack Rate`}</th>
-                      <th className="p-3 text-right">{`Subtotal`}</th>
+                      <th className="p-3">{`Product Name`}</th>
+                      <th className="p-3 text-right">{`MRP`}</th>
+                      <th className="p-3 text-right">{`Discount`}</th>
+                      <th className="p-3 text-right">{`Unit Price`}</th>
+                      <th className="p-3 text-center">{`Quantity`}</th>
+                      <th className="p-3 text-right">{`Total`}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {I.items.map((e, t) => <tr key={e.id || t}>
-                      <td className="p-3">
-                        <span className="font-mono text-[9px] text-[#94A3B8] block">
-                          {e.id}
-                        </span>
-                        {(() => {
-                          const medItem = m.find(med => String(med.id) === String(e.id || e.medicine_id) || (e.name && med.name && med.name.toLowerCase() === e.name.toLowerCase()));
-                          const compName = e.company || e.manufacturer || medItem?.manufacturer || medItem?.company || '';
-                          return (
-                            <>
-                              <div className="font-bold text-[#1D2A3B]">
-                                {e.name}
-                                {compName && (
-                                  <span className="font-semibold text-slate-500 text-[11px] ml-1.5">
-                                    ({compName})
-                                  </span>
-                                )}
-                              </div>
-                              {compName && (
-                                <div className="text-[10px] text-slate-400 font-medium">
-                                  Company: <span className="font-semibold text-slate-600">{compName}</span>
-                                </div>
+                    {Oe.items.map((e, t) => {
+                      const details = getInvoiceItemPricing(e);
+                      const currentQty = isEditingOrder ? (editedQuantities[e.id || t] !== undefined ? editedQuantities[e.id || t] : e.quantity) : e.quantity;
+                      return (
+                        <tr key={e.id || t} className="hover:bg-slate-50/50 transition-colors">
+                          <td className="p-3">
+                            <div className="font-bold text-[#1D2A3B]">
+                              {details.name}
+                              {details.manufacturer && (
+                                <span className="font-semibold text-slate-500 text-[11px] ml-1.5">
+                                  ({details.manufacturer})
+                                </span>
                               )}
-                            </>
-                          );
-                        })()}
-                      </td>
-                      <td className="p-3 text-center font-semibold text-[#475569]">
-                        {e.quantity}
-                        {` boxes`}
-                      </td>
-                      <td className="p-3 text-right text-[#475569]">
-                        {`৳`}
-                        {e.price.toFixed(2)}
-                      </td>
-                      <td className="p-3 text-right font-bold text-[#1D2A3B]">
-                        {`৳`}
-                        {(e.price * e.quantity).toFixed(2)}
-                      </td>
-                    </tr>)}
+                            </div>
+                            {details.manufacturer && (
+                              <div className="text-[10px] text-slate-400 font-medium">
+                                Company: <span className="font-semibold text-slate-600">{details.manufacturer}</span>
+                              </div>
+                            )}
+                          </td>
+                          <td className="p-3 text-right font-medium text-slate-600">
+                            ৳{details.mrp.toFixed(2)}
+                          </td>
+                          <td className="p-3 text-right font-bold text-emerald-600">
+                            ৳{details.discountAmount.toFixed(2)} ({details.discountPercent}%)
+                          </td>
+                          <td className="p-3 text-right font-bold text-[#0697A8]">
+                            ৳{details.unitPrice.toFixed(2)}
+                          </td>
+                          <td className="p-3 text-center font-semibold text-[#475569]">
+                            {isEditingOrder ? (
+                              <input
+                                type="number"
+                                min="0"
+                                className="w-16 p-1 border rounded text-center text-xs"
+                                value={currentQty}
+                                onChange={(ev) => {
+                                  let val = parseInt(ev.target.value) || 0;
+                                  setEditedQuantities({ ...editedQuantities, [e.id || t]: Math.max(0, val) });
+                                }}
+                              />
+                            ) : (
+                              <>{e.quantity}{` boxes`}</>
+                            )}
+                          </td>
+                          <td className="p-3 text-right font-black text-[#1D2A3B]">
+                            ৳{(details.unitPrice * currentQty).toFixed(2)}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
             </div>
-            {(I.status === 'Return Requested' || I.status === 'Returned') && (
-              <div className="border-t border-[#E2E8F0] pt-4">
-                <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {I.status === 'Return Requested' && (
-                        <span className="relative flex h-2.5 w-2.5">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
-                        </span>
-                      )}
-                      <span className="text-xs font-bold text-rose-900 uppercase tracking-wider">{`Return Order Request Details`}</span>
-                    </div>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${I.status === 'Returned' ? 'bg-slate-200 text-slate-700' : 'bg-rose-200 text-rose-900'}`}>
-                      {I.status}
+            <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
+              {isEditingOrder ? (
+                <>
+                  <div className="text-sm font-black text-[#1D2A3B]">
+                    {`New Total: `}
+                    <span className="text-[#0697A8]">
+                      {`৳`}
+                      {Oe.items.reduce((sum, item, idx) => sum + (item.price * (editedQuantities[item.id || idx] || 0)), 0).toFixed(2)}
                     </span>
                   </div>
-                  <div className="text-xs text-rose-950 space-y-1.5 bg-white/70 p-3 rounded-lg border border-rose-100">
-                    <div className="flex justify-between">
-                      <span className="text-rose-700 font-semibold">{`Request Date:`}</span>
-                      <span className="font-bold">{I.returnDate || I.date || `Recent`}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-rose-700 font-semibold">{`Claimed Refund Value:`}</span>
-                      <span className="font-bold text-rose-800">৳{I.returnRefund !== undefined ? Number(I.returnRefund).toFixed(2) : I.totalAmount.toFixed(2)}</span>
-                    </div>
-                    {I.returnItemsCount !== undefined && (
-                      <div className="flex justify-between">
-                        <span className="text-rose-700 font-semibold">{`Items Claimed for Return:`}</span>
-                        <span className="font-bold">{I.returnItemsCount} units</span>
-                      </div>
-                    )}
-                    <div className="pt-1 border-t border-rose-100">
-                      <span className="text-rose-700 font-semibold block mb-0.5">{`Reason for Return:`}</span>
-                      <p className="text-slate-700 bg-white p-2 rounded border border-rose-100 text-[11px] italic">
-                        {I.returnReason || `No specific reason entered by buyer.`}
-                      </p>
-                    </div>
-                  </div>
-                  {I.status === 'Return Requested' && (
-                    <div className="flex gap-2 pt-1">
-                      <button
-                        onClick={async () => {
-                          await yn(I.id, 'Returned');
-                          if (I.items) {
-                            for (const item of I.items) {
-                              const med = m.find(x => String(x.id) === String(item.id));
-                              if (med) {
-                                const addQty = I.returnItems && I.returnItems[item.id] !== undefined ? I.returnItems[item.id] : item.quantity;
-                                if (addQty > 0) {
-                                  const newStock = (med.stock || 0) + addQty;
-                                  h(prev => prev.map(x => String(x.id) === String(med.id) ? { ...x, stock: newStock } : x));
-                                  await supabase.from('medicines').update({ stock: newStock }).eq('id', med.id);
-                                }
-                              }
-                            }
+                  <div className="flex gap-2">
+                    <button onClick={() => setIsEditingOrder(!1)} className="bg-slate-100 hover:bg-slate-200 text-[#475569] px-3.5 py-2 rounded-xl font-bold">{`Cancel`}</button>
+                    <button onClick={async () => {
+                      let newTotal = 0;
+                      let newItems = Oe.items.map((item, idx) => {
+                        let newQ = editedQuantities[item.id || idx] || 0;
+                        newTotal += newQ * item.price;
+                        return { ...item, quantity: newQ };
+                      }).filter(item => item.quantity > 0);
+
+                      const wasApproved = Oe.status === 'Processing/Packing' || Oe.status === 'Approved';
+                      const newStatus = 'Pending Verification';
+
+                      let updatedOrder = {
+                        ...Oe,
+                        items: newItems,
+                        totalAmount: newTotal,
+                        status: newStatus
+                      };
+
+                      // Adjust inventory stock deltas
+                      Oe.items.forEach(oldItem => {
+                        const newItem = newItems.find(i => String(i.id) === String(oldItem.id));
+                        const newQ = newItem ? newItem.quantity : 0;
+                        const delta = newQ - oldItem.quantity;
+                        if (delta !== 0) {
+                          const med = m.find(med => String(med.id) === String(oldItem.id));
+                          if (med) {
+                            const updatedStock = Math.max(0, med.stock - delta);
+                            h(prev => prev.map(x => String(x.id) === String(oldItem.id) ? { ...x, stock: updatedStock } : x));
+                            supabase.from('medicines').update({ stock: updatedStock }).eq('id', oldItem.id);
                           }
-                          T(`Return request for Order #${I.id} approved. Order marked Returned and inventory restocked.`);
-                        }}
-                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-xs transition-colors shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                        </svg>
-                        {`Approve Return & Restock`}
-                      </button>
-                      <button
-                        onClick={async () => {
-                          await yn(I.id, 'Delivered & Invoiced');
-                          T(`Return request for Order #${I.id} rejected. Order reverted to Delivered & Invoiced.`);
-                        }}
-                        className="bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-lg text-xs transition-colors cursor-pointer"
-                      >
-                        {`Reject Return`}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-            <div className="border-t border-[#E2E8F0] pt-4 space-y-4">
-              <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Logistics Shipping Dispatch`}</span>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[#64748B] font-bold text-[10px] uppercase mb-1">{`Shipping Courier Partner`}</label>
-                  <select value={Zt} onChange={e => Qt(e.target.value)} className="w-full bg-slate-50 border border-[#E2E8F0] rounded-xl px-2.5 py-1.5 focus:bg-white focus:outline-none">
-                    <option value="PharmaExpress">{`PharmaExpress Direct Cargo`}</option>
-                    <option value="B2B Fleet">{`DigiPharma Fleet Delivery`}</option>
-                    <option value="SA Paribahan">{`SA Paribahan Cargo Services`}</option>
-                    <option value="DHL B2B">{`DHL Enterprise Freight`}</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[#64748B] font-bold text-[10px] uppercase mb-1">{`Waybill / Tracking Code`}</label>
-                  <input type="text" value={$t} onChange={e => en(e.target.value)} placeholder="e.g. PE-883901-2026" className="w-full bg-slate-50 border border-[#E2E8F0] rounded-xl px-2.5 py-1.5 focus:bg-white focus:outline-none font-mono" />
-                </div>
-              </div>
-            </div>
-            <div className="border-t border-[#E2E8F0] pt-4 space-y-2.5">
-              <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Advance Order Status Pipeline`}</span>
-              <div className="grid grid-cols-5 gap-2 text-center text-[10px] font-bold select-none">
-                <button onClick={() => yn(I.id, `Pending Verification`)} className={`py-2 rounded-lg border ${I.status === `Pending Verification` ? `bg-yellow-500 text-white border-yellow-600 shadow-xs` : `bg-slate-50 text-[#475569] border-[#E2E8F0] hover:bg-slate-100`}`}>{`1. Verify`}</button>
-                <button onClick={() => yn(I.id, `Processing/Packing`)} className={`py-2 rounded-lg border ${I.status === `Processing/Packing` ? `bg-[#0697A8] text-white border-[#057A88] shadow-xs` : `bg-slate-50 text-[#475569] border-[#E2E8F0] hover:bg-slate-100`}`}>{`2. Pack`}</button>
-                <button onClick={() => yn(I.id, `Out for Delivery`)} className={`py-2 rounded-lg border ${I.status === `Out for Delivery` ? `bg-purple-600 text-white border-purple-700 shadow-xs` : `bg-slate-50 text-[#475569] border-[#E2E8F0] hover:bg-slate-100`}`}>{`3. Dispatch`}</button>
-                <button onClick={() => yn(I.id, `Delivered & Invoiced`)} className={`py-2 rounded-lg border ${I.status === `Delivered & Invoiced` ? `bg-emerald-600 text-white border-emerald-700 shadow-xs` : `bg-slate-50 text-[#475569] border-[#E2E8F0] hover:bg-slate-100`}`}>{`4. Deliver`}</button>
-                <button onClick={() => yn(I.id, `Returned`)} className={`py-2 rounded-lg border ${I.status === `Returned` ? `bg-rose-600 text-white border-rose-700 shadow-xs` : I.status === `Return Requested` ? `bg-rose-100 text-rose-800 border-rose-300 font-black animate-pulse` : `bg-slate-50 text-[#475569] border-[#E2E8F0] hover:bg-slate-100`}`}>{`5. Returned`}</button>
-              </div>
+                        }
+                      });
+
+                      // Update order in Supabase
+                      await supabase.from('orders').update({
+                        total_amount: newTotal,
+                        status: newStatus
+                      }).eq('id', Oe.id);
+
+                      // Update order items in Supabase
+                      await supabase.from('order_items').delete().eq('order_id', Oe.id);
+                      let newOrderItems = newItems.map(item => ({
+                        order_id: Oe.id,
+                        medicine_id: String(item.id),
+                        product_name: item.name,
+                        quantity: item.quantity,
+                        unit_price: item.price
+                      }));
+                      if (newOrderItems.length > 0) {
+                        await supabase.from('order_items').insert(newOrderItems);
+                      }
+
+                      // Update local state
+                      x(prev => prev.map(o => o.id === Oe.id ? updatedOrder : o));
+                      ke(updatedOrder);
+                      setIsEditingOrder(!1);
+
+                      const alertMsg = wasApproved
+                        ? `Order updated! Since this order was already approved, it has been sent back for Admin verification and re-approval.`
+                        : `Order updated successfully!`;
+                      T(alertMsg);
+
+                      let notif = {
+                        id: Date.now(),
+                        text: `Order #${Oe.id} was edited by buyer and is now pending admin re-approval.`,
+                        date: `Just now`,
+                        read: !1
+                      };
+                      w(prev => [notif, ...prev]);
+                    }} className="bg-[#0697A8] hover:bg-[#057A88] text-white px-3.5 py-2 rounded-xl font-bold">{`Save Changes`}</button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="text-sm font-black text-[#1D2A3B]">
+                    {`Total Value: `}
+                    <span className="text-[#0697A8]">
+                      {`৳`}
+                      {Oe.totalAmount.toFixed(2)}
+                    </span>
+                  </div>
+                  <button onClick={() => {
+                    setInvoicesToPrint([Oe]);
+                    setTriggersPrint(!0);
+                    T(`Preparing print for invoice #${Oe.id}...`);
+                  }} className="bg-slate-50 hover:bg-slate-100 border border-[#E2E8F0] text-[#475569] px-3.5 py-2 rounded-xl font-bold">{`Download PDF Invoice`}</button>
+                </>
+              )}
             </div>
           </div>
-          <div className="p-6 border-t border-[#E2E8F0] bg-slate-50 flex items-center justify-between">
-            <div>
-              <span className="text-[#94A3B8] block text-[10px]">{`Invoice Grand Total`}</span>
-              <span className="text-base font-black text-emerald-700">
-                {`৳`}
-                {I.totalAmount.toFixed(2)}
-              </span>
+        </div>}
+        {f === `buyer` && Me.isOpen && <div className="fixed inset-0 z-50 flex items-center justify-center p-4 font-sans">
+          <div onClick={() => Ne({
+            isOpen: !1,
+            orderId: ``
+          })} className="absolute inset-0 bg-[#1D2A3B]/40 backdrop-blur-xs" />
+          <div className="relative bg-white rounded-2xl max-w-sm w-full shadow-2xl p-6 z-10 animate-in fade-in zoom-in-95 duration-200 text-center text-xs space-y-4">
+            <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto border-4 border-emerald-50 shadow-md">
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+              </svg>
             </div>
-            <div className="flex gap-3">
+            <div className="space-y-1">
+              <h3 className="text-base font-bold text-[#1D2A3B]">{`B2B Order Placed Successfully`}</h3>
+              <p className="text-xs text-[#0697A8] font-mono font-bold">
+                {`Ref: `}
+                {Me.orderId}
+              </p>
+            </div>
+            <p className="text-[#64748B] leading-relaxed max-w-xs mx-auto">{`Your order has been logged. The warehousing department has queued this for packing and immediate delivery.`}</p>
+            <div className="pt-2 flex flex-col sm:flex-row gap-2">
               <button onClick={() => {
-                setInvoicesToPrint([I]);
-                setTriggersPrint(!0);
-                T(`Preparing print for invoice #${I.id}...`);
-              }} className="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold px-4 py-2.5 rounded-xl shadow-sm flex items-center gap-2">
+                const orderToView = Me.order || b.find(o => o.id === Me.orderId);
+                Ne({ isOpen: !1, orderId: `` });
+                if (orderToView) ke(orderToView);
+              }} className="flex-1 bg-[#0697A8] hover:bg-[#057A88] text-white font-bold py-2.5 rounded-xl shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                {`Print`}
+                {`View Invoice`}
               </button>
               <button onClick={() => {
-                T(`Dispatched successfully via ${Zt} with Waybill ID: ${$t || `AUTO-9988`}`), vt(null);
-              }} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-md">{`Apply Shipping Manifest`}</button>
+                Ne({
+                  isOpen: !1,
+                  orderId: ``
+                }), k(`orders`);
+              }} className="flex-1 bg-slate-50 border border-[#E2E8F0] hover:bg-slate-100 text-[#475569] font-bold py-2.5 rounded-xl">{`Track Shipments`}</button>
+              <button onClick={() => Ne({
+                isOpen: !1,
+                orderId: ``
+              })} className="flex-1 bg-slate-100 hover:bg-slate-200 text-[#1D2A3B] font-bold py-2.5 rounded-xl">{`Continue Buying`}</button>
             </div>
           </div>
-        </div>
-      </div>}
-      {f === `buyer` && (
-        <div className={`fixed inset-0 z-[60] flex justify-end font-sans transition-opacity duration-300 ${xe ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}>
-          <div onClick={() => Se(!1)} className="absolute inset-0 bg-[#1D2A3B]/40 backdrop-blur-xs" />
-          <div className={`relative w-[85%] sm:w-[60%] md:w-120 md:max-w-md bg-white h-full shadow-2xl flex flex-col z-10 transform transition-transform duration-300 ease-in-out border-l border-[#E2E8F0] ${xe ? "translate-x-0" : "translate-x-full"}`}>
-            <div className="px-4 py-3.5 md:px-6 md:py-5 border-b border-[#E2E8F0] flex justify-between items-center bg-slate-50 flex-shrink-0">
-              <div className="min-w-0 pr-2">
-                <h3 className="text-xs md:text-sm font-bold text-[#1D2A3B] truncate">{`Your Cart`}</h3>
-                <p className="text-[10px] md:text-[11px] text-[#64748B] mt-0.5 truncate">
-                  {`Account: `}
-                  {tn.name}
+        </div>}
+        {Ae && <div className="fixed inset-0 z-55 flex items-center justify-center p-4 bg-[#1D2A3B]/40 backdrop-blur-xs font-sans">
+          <div onClick={() => je(null)} className="absolute inset-0" />
+          <div className="relative w-full max-w-2xl bg-white dark:bg-[#1D2A3B] rounded-3xl border border-[#E2E8F0] dark:border-slate-700 shadow-2xl flex flex-col max-h-[85vh] overflow-hidden z-10 animate-in zoom-in-95 duration-200">
+            <div className="px-6 py-5 border-b border-[#E2E8F0] dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-[#1D2A3B]/50">
+              <div>
+                <span className="bg-[#E0F5F7] dark:bg-blue-900/30 text-[#0697A8] dark:text-blue-400 px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+                  {Ae.dosageForm || `Medicine`}
+                </span>
+                <h3 className="text-lg font-black text-[#1D2A3B] dark:text-slate-200 mt-1">
+                  {Ae.name}
+                </h3>
+                <p className="text-xs text-[#64748B] dark:text-slate-400 italic mt-0.5">
+                  {`Active Generic Ingredient: `}
+                  {Ae.generic}
                 </p>
               </div>
-              <button onClick={() => Se(!1)} className="text-[#64748B] hover:text-[#1D2A3B] p-1.5 rounded-lg hover:bg-slate-100 flex-shrink-0 cursor-pointer" title="Close Cart">
+              <button onClick={() => je(null)} className="text-[#64748B] hover:text-[#1D2A3B] dark:text-slate-400 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto min-h-0 p-3 md:p-6 space-y-3 md:space-y-4">
-              <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Selected Items List`}</span>
-              {on.length === 0 ? (
-                <div className="text-center py-8 text-xs text-[#94A3B8]">{`No items selected. Add medicines from the catalog first.`}</div>
-              ) : (
-                <div className="space-y-2.5">
-                  {on.map((e, _idx) => (
-                    <div key={e.id || _idx} className="flex flex-col sm:flex-row sm:justify-between items-start bg-slate-50 p-2.5 md:p-3 rounded-xl border border-[#E2E8F0] gap-2">
-                      <div className="min-w-0 flex-1 w-full">
-                        <div className="font-bold text-xs text-[#1D2A3B] truncate">{e.name}</div>
-                        <div className="text-[10px] text-[#64748B] font-mono mt-0.5 truncate">{e.generic}</div>
-                        <div className="text-[9px] text-[#94A3B8] mt-1 font-semibold truncate">
-                          {`৳`}
-                          {e.wholesalePrice.toFixed(2)}
-                          {`/box | `}
-                          {e.packSize || `Standard Pack`}
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto flex-shrink-0 pt-1 sm:pt-0 border-t sm:border-0 border-slate-200/60">
-                        <div className="flex border border-[#E2E8F0] rounded-lg overflow-hidden bg-white items-center">
-                          <button onClick={() => ln(e.id, e.quantity - 1)} className="px-2 py-0.5 text-xs text-[#64748B] hover:bg-slate-50 font-bold">{`-`}</button>
-                          <span className="w-7 text-center text-xs font-black py-0.5">{e.quantity}</span>
-                          <button onClick={() => ln(e.id, e.quantity + 1)} className="px-2 py-0.5 text-xs text-[#64748B] hover:bg-slate-50 font-bold">{`+`}</button>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <div className="font-bold text-xs text-[#1D2A3B]">
-                            {`৳`}
-                            {e.itemTotal.toFixed(2)}
-                          </div>
-                          <button onClick={() => ln(e.id, 0)} className="text-red-400 hover:text-red-600 bg-red-50 hover:bg-red-100 rounded p-1 transition-colors cursor-pointer" title="Remove item">
-                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+            <div className="flex-1 overflow-y-auto p-6 space-y-5 text-xs text-[#475569] dark:text-slate-300">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 bg-slate-50 dark:bg-[#1D2A3B]/40 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 text-[11px]">
+                <div>
+                  <span className="text-[#94A3B8] block text-[9px] uppercase tracking-wider font-bold">{`Manufacturer`}</span>
+                  <span className="font-bold text-[#1D2A3B] dark:text-slate-200">
+                    {Ae.manufacturer}
+                  </span>
                 </div>
-              )}
-              <div className="border-t border-[#E2E8F0] pt-3 space-y-2">
-                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Payment Method`}</span>
-                <div className="p-3 bg-emerald-50/80 border border-emerald-200 rounded-xl flex items-start gap-2.5">
-                  <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <div>
-                    <span className="font-bold text-xs text-emerald-950 block">{`Cash on Delivery (COD)`}</span>
-                    <span className="text-[10px] text-emerald-700 block mt-0.5">{`Pay invoice total upon delivery directly to courier.`}</span>
-                  </div>
+                <div>
+                  <span className="text-[#94A3B8] block text-[9px] uppercase tracking-wider font-bold">{`Therapeutic Category`}</span>
+                  <span className="font-bold text-[#1D2A3B] dark:text-slate-200">
+                    {Ae.category}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[#94A3B8] block text-[9px] uppercase tracking-wider font-bold">{`Pack Size & Form`}</span>
+                  <span className="font-bold text-[#1D2A3B] dark:text-slate-200">
+                    {Ae.packSize}
+                  </span>
                 </div>
               </div>
-              <div className="border-t border-[#E2E8F0] pt-3 space-y-2">
-                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Delivery Location`}</span>
-                <div className="flex flex-col gap-2 mb-2">
-                  <input
-                    type="text"
-                    placeholder="Search for an area..."
-                    className="w-full min-w-0 text-xs border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0697A8]"
-                    id="mapSearchInput"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const q = e.target.value;
-                        if (q) {
-                          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`)
-                            .then(res => res.json())
-                            .then(data => {
-                              if (data && data.length > 0) {
-                                setDeliveryLocation({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) });
-                              }
-                            });
-                        }
-                      }
-                    }}
-                  />
-                  <div className="flex gap-2 w-full">
-                    <button
-                      type="button"
-                      className="flex-1 bg-[#0697A8] hover:bg-[#057A88] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
-                      onClick={() => {
-                        const q = document.getElementById('mapSearchInput').value;
-                        if (q) {
-                          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`)
-                            .then(res => res.json())
-                            .then(data => {
-                              if (data && data.length > 0) {
-                                setDeliveryLocation({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) });
-                                setLocationError(false);
-                              }
-                            });
-                        }
-                      }}
-                    >
-                      Search
-                    </button>
-                    <button
-                      type="button"
-                      className="flex-1 bg-slate-200 hover:bg-slate-300 text-[#1D2A3B] px-3 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap"
-                      onClick={() => {
-                        if ("geolocation" in navigator) {
-                          navigator.geolocation.getCurrentPosition((position) => {
-                            setDeliveryLocation({
-                              lat: position.coords.latitude,
-                              lng: position.coords.longitude
-                            });
-                            setLocationError(false);
-                          }, (error) => {
-                            console.error("Error getting location:", error);
-                            alert("Unable to retrieve your location. Please check browser permissions.");
-                          });
-                        } else {
-                          alert("Geolocation is not supported by your browser.");
-                        }
-                      }}
-                      title="Get current location"
-                    >
-                      📍 Locate Me
-                    </button>
-                  </div>
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-[#0697A8] dark:text-blue-400">{`Indications`}</h4>
+                  <p className="leading-relaxed bg-[#E0F5F7]/20 dark:bg-blue-900/10 p-3 rounded-xl border border-[#E0F5F7]/50 dark:border-blue-950/20">
+                    {Ae.indications || `This medicine is indicated for systemic treatment under certified prescription.`}
+                  </p>
                 </div>
-                <div id="map-container" className={`h-48 w-full rounded-xl overflow-hidden border z-10 relative transition-colors ${locationError ? 'border-red-500 shadow-[0_0_0_2px_rgba(239,68,68,0.2)]' : 'border-[#E2E8F0]'}`}>
-                  {locationError && <div className="absolute top-0 inset-x-0 bg-red-500 text-white text-xs text-center py-1 font-bold z-[1000] shadow-sm">Please select a delivery location!</div>}
-                  <MapContainer attributionControl={false} center={[23.8103, 90.4125]} zoom={13} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
-                    <TileLayer
-                      attribution=""
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <LocationMarker position={deliveryLocation} setPosition={(pos) => { setDeliveryLocation(pos); setLocationError(false); }} />
-                  </MapContainer>
+                <div className="space-y-1.5">
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">{`Therapeutic Class / Pharmacology`}</h4>
+                  <p className="leading-relaxed">
+                    {Ae.pharmacology || `Pharmacological data is indexed on the drug registry database.`}
+                  </p>
                 </div>
-                <span className="text-[9px] text-[#64748B] block mt-1">{`Click on the map to pin your exact delivery location.`}</span>
+                <div className="space-y-1.5">
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">{`Dosage & Administration`}</h4>
+                  <p className="leading-relaxed bg-slate-50 dark:bg-[#1D2A3B]/30 p-3 rounded-xl border border-slate-100 dark:border-slate-700/50">
+                    {Ae.dosageAdministration || `Consult the prescribing physician for patient-specific dosing.`}
+                  </p>
+                </div>
+                <div className="space-y-1.5">
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-red-600 dark:text-red-400">{`Side Effects`}</h4>
+                  <p className="leading-relaxed">
+                    {Ae.sideEffects || `Common side effects include mild gastrointestinal complaints, nausea, or headache.`}
+                  </p>
+                </div>
+                <div className="space-y-1.5">
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-500">{`Contraindications`}</h4>
+                  <p className="leading-relaxed">
+                    {Ae.contraindications || `Hypersensitivity to the active generic compound or related pharmaceutical classes.`}
+                  </p>
+                </div>
+                {Ae.pregnancyCategory && <div className="space-y-1.5">
+                  <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-500">{`Pregnancy & Lactation`}</h4>
+                  <p className="leading-relaxed">{Ae.pregnancyCategory}</p>
+                </div>}
               </div>
             </div>
-            <div className="p-3.5 md:p-6 border-t border-[#E2E8F0] bg-slate-50 space-y-3 flex-shrink-0">
-              <div className="space-y-1 text-xs">
-                <div className="flex gap-2 mb-4">
-                  <input
-                    type="text"
-                    placeholder="Enter Coupon Code"
-                    value={couponInput}
-                    onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                    className="flex-1 min-w-0 bg-white border border-slate-200 text-sm rounded-xl px-3 py-1.5 outline-none uppercase"
-                  />
-                  <button
-                    onClick={() => {
-                      let code = couponInput.trim();
-                      if (!code) return;
-                      let found = coupons.find(c => c.code === code);
-                      if (found) {
-                        setAppliedCoupon(found);
-                        T(`Coupon applied successfully!`);
-                      } else {
-                        T(`Invalid or expired coupon code.`);
-                        setAppliedCoupon(null);
-                      }
-                    }}
-                    className="bg-slate-200 hover:bg-slate-300 text-[#1D2A3B] px-3 py-1.5 rounded-xl font-bold transition-all"
-                  >
-                    Apply
-                  </button>
-                  {appliedCoupon && (
-                    <button onClick={() => { setAppliedCoupon(null); setCouponInput(``); }} className="text-red-500 hover:text-red-700 px-2 font-bold text-lg leading-none" title="Remove Coupon">
-                      ×
-                    </button>
-                  )}
-                </div>
-                <div className="flex justify-between text-[#64748B]">
-                  <span>{`Subtotal:`}</span>
-                  <span className="font-semibold text-[#1D2A3B]">
-                    {`৳`}
-                    {sn.subtotal.toFixed(2)}
-                  </span>
-                </div>
-                {sn.totalSpecialDiscounts > 0 && (
-                  <div className="flex justify-between text-blue-600">
-                    <span>{`Special Discount:`}</span>
-                    <span className="font-semibold">
-                      -{`৳`}
-                      {sn.totalSpecialDiscounts.toFixed(2)}
-                    </span>
-                  </div>
-                )}
-
-                {appliedCoupon && (
-                  <div className="flex justify-between text-purple-600">
-                    <span>{`Coupon (${appliedCoupon.code}):`}</span>
-                    <span className="font-semibold">
-                      -{`৳`}
-                      {sn.couponDiscountAmount.toFixed(2)}
-                    </span>
-                  </div>
-                )}
-                <div className="flex justify-between text-[#64748B]">
-                  <span>{`Delivery:`}</span>
-                  <span className="font-semibold text-emerald-600">{`FREE`}</span>
-                </div>
-                <div className="h-px bg-slate-200 my-1.5" />
-                <div className="flex justify-between text-xs md:text-sm font-black text-[#1D2A3B]">
-                  <span>{`Total Payable:`}</span>
-                  <span className="text-sm md:text-base text-[#0697A8]">
-                    {`৳`}
-                    {sn.finalTotal.toFixed(2)}
-                  </span>
-                </div>
-              </div>
-              <button onClick={fn} disabled={on.length === 0} className="w-full bg-[#0697A8] hover:bg-[#057A88] disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-2.5 md:py-3 rounded-xl text-xs shadow-md cursor-pointer transition-all">
-                {`Place Order (৳`}
-                {sn.finalTotal.toFixed(2)}
-                {`)`}
-              </button>
+            <div className="px-6 py-4 border-t border-[#E2E8F0] dark:border-slate-700 bg-slate-50 dark:bg-[#1D2A3B]/50 flex justify-between items-center text-[10px] text-[#64748B] dark:text-slate-400">
+              <span>{`Verified B2B Medical Index • DG Pharma`}</span>
+              <button onClick={() => je(null)} className="bg-[#0697A8] hover:bg-[#057A88] text-white font-bold px-4 py-2 rounded-xl text-xs cursor-pointer transition-colors">{`Close Monograph`}</button>
             </div>
           </div>
-        </div>
-      )}
-      {f === `buyer` && Oe && <div className="fixed inset-0 z-50 flex items-center justify-center p-4 font-sans">
-        <div onClick={() => { ke(null); setIsEditingOrder(false); }} className="absolute inset-0 bg-[#1D2A3B]/40 backdrop-blur-xs" />
-        <div className="relative bg-white rounded-2xl max-w-3xl w-full shadow-2xl p-6 z-10 animate-in fade-in zoom-in-95 duration-200 text-xs">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h3 className="text-sm font-bold text-[#1D2A3B]">
-                {`Order Details: `}
-                {Oe.id}
-              </h3>
-              <p className="text-[11px] font-semibold text-slate-700 mt-0.5">
-                {Oe.buyerName || tn.name}
-                <span className="font-normal text-slate-500"> • {getFullAddress(Oe) || tn.address}</span>
-              </p>
-              <p className="text-[10px] text-[#64748B] mt-0.5">
-                {`Purchased on `}
-                {Oe.date}
-                {` | via `}
-                {Oe.paymentMethod}
-              </p>
-            </div>
-            <div className="flex gap-2">
-              {['Pending', 'Pending Verification', 'Processing/Packing', 'Approved'].includes(Oe.status) && !isEditingOrder && (
-                <button onClick={() => {
-                  setIsEditingOrder(!0);
-                  let initialQs = {};
-                  Oe.items.forEach((item, idx) => initialQs[item.id || idx] = item.quantity);
-                  setEditedQuantities(initialQs);
-                }} className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-lg font-bold hover:bg-emerald-200">
-                  Edit Order
-                </button>
+        </div>}
+        {/* Toast notifications removed */}
+        {te.isOpen && <div className="fixed inset-0 bg-[#1D2A3B]/60 backdrop-blur-sm flex items-center justify-center z-[70] p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-in zoom-in-95 duration-200">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${te.isDestructive ? `bg-red-100 text-red-600` : `bg-[#C2EAF0] text-[#0697A8]`}`}>
+              {te.icon === 'lock' ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
               )}
-              <button onClick={() => { ke(null); setIsEditingOrder(false); }} className="text-[#64748B] hover:text-[#1D2A3B] p-1 rounded-lg hover:bg-slate-100">
+            </div>
+            <h3 className="text-lg font-black text-[#1D2A3B] mb-2">
+              {te.title}
+            </h3>
+            <p className="text-sm text-[#475569] mb-6 font-medium leading-relaxed">
+              {te.message}
+            </p>
+            {te.requireInput && (
+              <div className="mb-6">
+                <label className="block text-xs font-bold text-[#64748B] mb-2 uppercase tracking-wider">
+                  {te.inputLabel ? te.inputLabel : (te.expectedInput ? `Type "${te.expectedInput}" to confirm` : `Enter value`)}
+                </label>
+                <input
+                  type={te.inputType || "text"}
+                  value={modalInput}
+                  onChange={e => setModalInput(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && (!te.requireInput || (modalInput && (!te.expectedInput || modalInput === te.expectedInput)))) {
+                      te.onConfirm(modalInput);
+                    }
+                  }}
+                  placeholder={te.inputPlaceholder || (te.inputType === "password" ? "••••••••" : (te.expectedInput || ""))}
+                  autoFocus
+                  className="w-full bg-white border border-[#E2E8F0] rounded-xl px-4 py-2.5 text-sm font-semibold text-[#1D2A3B] focus:border-[#0697A8] focus:ring-4 focus:ring-[#0697A8]/10 transition-all outline-none"
+                />
+              </div>
+            )}
+            <div className="flex gap-3">
+              <button onClick={() => {
+                ne({
+                  isOpen: !1,
+                  title: ``,
+                  message: ``,
+                  onConfirm: null,
+                  isDestructive: !1,
+                  requireInput: !1,
+                  expectedInput: ``,
+                  inputLabel: ``,
+                  inputType: ``,
+                  inputPlaceholder: ``,
+                  confirmText: ``,
+                  icon: ``
+                });
+                setModalInput("");
+              }} className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors text-sm">{`Cancel`}</button>
+              <button disabled={te.requireInput && (!modalInput || (te.expectedInput ? modalInput !== te.expectedInput : false))} onClick={() => te.onConfirm(modalInput)} className={`flex-1 px-4 py-2.5 text-white font-bold rounded-xl transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed ${te.isDestructive ? `bg-red-600 hover:bg-red-700` : `bg-[#0697A8] hover:bg-[#057A88]`}`}>{te.confirmText || `Confirm`}</button>
+            </div>
+          </div>
+        </div>}
+        {_e.isOpen && <div className="fixed inset-0 bg-[#1D2A3B]/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="text-lg font-bold text-[#1D2A3B]">{`Update Product Image`}</h3>
+              <button onClick={() => ve({
+                isOpen: !1,
+                medId: null,
+                currentUrl: ``
+              })} className="text-[#64748B] hover:text-[#1D2A3B] p-1 rounded-lg hover:bg-slate-100 transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-          </div>
-          <div className="bg-slate-50 p-4 rounded-xl border border-[#E2E8F0] mb-4">
-            <div className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-2.5">{`Real-Time Logistics Status`}</div>
-            <div className="flex justify-between items-center relative px-4">
-              <div className="absolute left-6 right-6 h-0.5 bg-slate-200 top-2.5 -z-0" />
-              <div className="flex flex-col items-center z-10 relative">
-                <div className="w-4.5 h-4.5 rounded-full bg-emerald-500 border-4 border-white flex items-center justify-center" />
-                <span className="text-[9px] font-bold text-[#1D2A3B] mt-1">{`Confirmed`}</span>
-              </div>
-              <div className="flex flex-col items-center z-10 relative">
-                <div className={`w-4.5 h-4.5 rounded-full border-4 border-white flex items-center justify-center ${[`Processing/Packing`, `Out for Delivery`, `Delivered & Invoiced`].includes(Oe.status) ? `bg-emerald-500` : `bg-slate-300`}`} />
-                <span className="text-[9px] font-bold text-[#1D2A3B] mt-1">{`Packed`}</span>
-              </div>
-              <div className="flex flex-col items-center z-10 relative">
-                <div className={`w-4.5 h-4.5 rounded-full border-4 border-white flex items-center justify-center ${[`Out for Delivery`, `Delivered & Invoiced`].includes(Oe.status) ? `bg-emerald-500` : `bg-slate-300`}`} />
-                <span className="text-[9px] font-bold text-[#1D2A3B] mt-1">{`Shipped`}</span>
-              </div>
-              <div className="flex flex-col items-center z-10 relative">
-                <div className={`w-4.5 h-4.5 rounded-full border-4 border-white flex items-center justify-center ${Oe.status === `Delivered & Invoiced` ? `bg-emerald-500` : `bg-slate-300`}`} />
-                <span className="text-[9px] font-bold text-[#1D2A3B] mt-1">{`Delivered`}</span>
-              </div>
-            </div>
-          </div>
-          {Oe.locationCoordinates && (
-            <div className="bg-slate-50 p-4 rounded-xl border border-[#E2E8F0] mb-4 flex justify-between items-center">
-              <div>
-                <div className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Delivery Location`}</div>
-                <div className="text-xs font-semibold text-[#1D2A3B]">
-                  {Oe.locationCoordinates.lat.toFixed(4)}, {Oe.locationCoordinates.lng.toFixed(4)}
-                </div>
-              </div>
-              <a
-                href={`https://maps.google.com/?q=${Oe.locationCoordinates.lat},${Oe.locationCoordinates.lng}`}
-                target="_blank"
-                rel="noreferrer"
-                className="bg-[#0697A8] hover:bg-[#057A88] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
-              >
-                View on Map
-              </a>
-            </div>
-          )}
-          {(() => {
-            const orderZone = getDeliveryZone(Oe.city || Oe.buyerAddress || Oe.location || '');
-            const orderDeliveryMen = orderZone ? getDeliveryMenForZone(orderZone) : [];
-            if (orderDeliveryMen.length === 0 && !orderZone) return null;
-            return <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-200 mb-4">
-              <div className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider mb-2">{`Assigned Delivery Representative`}{orderZone ? ` • ${orderZone} Zone` : ''}</div>
-              {orderDeliveryMen.length > 0 ? orderDeliveryMen.map(dm => <div key={dm.id} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-indigo-200 text-indigo-800 flex items-center justify-center font-bold text-[10px]">{dm.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}</div>
-                  <div>
-                    <span className="text-xs font-bold text-[#1D2A3B]">{dm.name}</span>
-                    <span className="text-[10px] text-[#64748B] ml-2">{dm.phone}</span>
-                  </div>
-                </div>
-                <a href={`tel:${dm.phone}`} className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-[10px] font-bold transition-colors flex items-center gap-1">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
-                  {`Call`}
-                </a>
-              </div>) : <div className="text-xs text-indigo-500 font-semibold">{`Delivery representative will be assigned soon.`}</div>}
-            </div>;
-          })()}
-          <div className="space-y-2">
-            <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Items Breakdown & Price Details`}</span>
-            {isEditingOrder && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 flex items-start gap-2.5 mb-2">
-                <svg className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <div>
-                  <span className="font-bold">Admin Re-Approval Notice:</span> Modifying item quantities will adjust reserved stock and return this order to <strong className="text-amber-800">Pending Verification</strong>. It will require administrator re-approval before fulfillment.
-                </div>
-              </div>
-            )}
-            <div className="border border-[#E2E8F0] rounded-xl overflow-x-auto bg-white">
-              <table className="w-full text-left border-collapse min-w-[580px]">
-                <thead>
-                  <tr className="bg-slate-50 text-[9px] text-[#64748B] uppercase font-bold border-b border-[#E2E8F0]">
-                    <th className="p-3">{`Product Name`}</th>
-                    <th className="p-3 text-right">{`MRP`}</th>
-                    <th className="p-3 text-right">{`Discount`}</th>
-                    <th className="p-3 text-right">{`Unit Price`}</th>
-                    <th className="p-3 text-center">{`Quantity`}</th>
-                    <th className="p-3 text-right">{`Total`}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {Oe.items.map((e, t) => {
-                    const details = getInvoiceItemPricing(e);
-                    const currentQty = isEditingOrder ? (editedQuantities[e.id || t] !== undefined ? editedQuantities[e.id || t] : e.quantity) : e.quantity;
-                    return (
-                      <tr key={e.id || t} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="p-3">
-                          <div className="font-bold text-[#1D2A3B]">
-                            {details.name}
-                            {details.manufacturer && (
-                              <span className="font-semibold text-slate-500 text-[11px] ml-1.5">
-                                ({details.manufacturer})
-                              </span>
-                            )}
-                          </div>
-                          {details.manufacturer && (
-                            <div className="text-[10px] text-slate-400 font-medium">
-                              Company: <span className="font-semibold text-slate-600">{details.manufacturer}</span>
-                            </div>
-                          )}
-                        </td>
-                        <td className="p-3 text-right font-medium text-slate-600">
-                          ৳{details.mrp.toFixed(2)}
-                        </td>
-                        <td className="p-3 text-right font-bold text-emerald-600">
-                          ৳{details.discountAmount.toFixed(2)} ({details.discountPercent}%)
-                        </td>
-                        <td className="p-3 text-right font-bold text-[#0697A8]">
-                          ৳{details.unitPrice.toFixed(2)}
-                        </td>
-                        <td className="p-3 text-center font-semibold text-[#475569]">
-                          {isEditingOrder ? (
-                            <input
-                              type="number"
-                              min="0"
-                              className="w-16 p-1 border rounded text-center text-xs"
-                              value={currentQty}
-                              onChange={(ev) => {
-                                let val = parseInt(ev.target.value) || 0;
-                                setEditedQuantities({ ...editedQuantities, [e.id || t]: Math.max(0, val) });
-                              }}
-                            />
-                          ) : (
-                            <>{e.quantity}{` boxes`}</>
-                          )}
-                        </td>
-                        <td className="p-3 text-right font-black text-[#1D2A3B]">
-                          ৳{(details.unitPrice * currentQty).toFixed(2)}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
-            {isEditingOrder ? (
-              <>
-                <div className="text-sm font-black text-[#1D2A3B]">
-                  {`New Total: `}
-                  <span className="text-[#0697A8]">
-                    {`৳`}
-                    {Oe.items.reduce((sum, item, idx) => sum + (item.price * (editedQuantities[item.id || idx] || 0)), 0).toFixed(2)}
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  <button onClick={() => setIsEditingOrder(!1)} className="bg-slate-100 hover:bg-slate-200 text-[#475569] px-3.5 py-2 rounded-xl font-bold">{`Cancel`}</button>
-                  <button onClick={async () => {
-                    let newTotal = 0;
-                    let newItems = Oe.items.map((item, idx) => {
-                      let newQ = editedQuantities[item.id || idx] || 0;
-                      newTotal += newQ * item.price;
-                      return { ...item, quantity: newQ };
-                    }).filter(item => item.quantity > 0);
-
-                    const wasApproved = Oe.status === 'Processing/Packing' || Oe.status === 'Approved';
-                    const newStatus = 'Pending Verification';
-
-                    let updatedOrder = {
-                      ...Oe,
-                      items: newItems,
-                      totalAmount: newTotal,
-                      status: newStatus
-                    };
-
-                    // Adjust inventory stock deltas
-                    Oe.items.forEach(oldItem => {
-                      const newItem = newItems.find(i => String(i.id) === String(oldItem.id));
-                      const newQ = newItem ? newItem.quantity : 0;
-                      const delta = newQ - oldItem.quantity;
-                      if (delta !== 0) {
-                        const med = m.find(med => String(med.id) === String(oldItem.id));
-                        if (med) {
-                          const updatedStock = Math.max(0, med.stock - delta);
-                          h(prev => prev.map(x => String(x.id) === String(oldItem.id) ? { ...x, stock: updatedStock } : x));
-                          supabase.from('medicines').update({ stock: updatedStock }).eq('id', oldItem.id);
-                        }
-                      }
-                    });
-
-                    // Update order in Supabase
-                    await supabase.from('orders').update({
-                      total_amount: newTotal,
-                      status: newStatus
-                    }).eq('id', Oe.id);
-
-                    // Update order items in Supabase
-                    await supabase.from('order_items').delete().eq('order_id', Oe.id);
-                    let newOrderItems = newItems.map(item => ({
-                      order_id: Oe.id,
-                      medicine_id: String(item.id),
-                      product_name: item.name,
-                      quantity: item.quantity,
-                      unit_price: item.price
-                    }));
-                    if (newOrderItems.length > 0) {
-                      await supabase.from('order_items').insert(newOrderItems);
-                    }
-
-                    // Update local state
-                    x(prev => prev.map(o => o.id === Oe.id ? updatedOrder : o));
-                    ke(updatedOrder);
-                    setIsEditingOrder(!1);
-
-                    const alertMsg = wasApproved
-                      ? `Order updated! Since this order was already approved, it has been sent back for Admin verification and re-approval.`
-                      : `Order updated successfully!`;
-                    T(alertMsg);
-
-                    let notif = {
-                      id: Date.now(),
-                      text: `Order #${Oe.id} was edited by buyer and is now pending admin re-approval.`,
-                      date: `Just now`,
-                      read: !1
-                    };
-                    w(prev => [notif, ...prev]);
-                  }} className="bg-[#0697A8] hover:bg-[#057A88] text-white px-3.5 py-2 rounded-xl font-bold">{`Save Changes`}</button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="text-sm font-black text-[#1D2A3B]">
-                  {`Total Value: `}
-                  <span className="text-[#0697A8]">
-                    {`৳`}
-                    {Oe.totalAmount.toFixed(2)}
-                  </span>
-                </div>
-                <button onClick={() => {
-                  setInvoicesToPrint([Oe]);
-                  setTriggersPrint(!0);
-                  T(`Preparing print for invoice #${Oe.id}...`);
-                }} className="bg-slate-50 hover:bg-slate-100 border border-[#E2E8F0] text-[#475569] px-3.5 py-2 rounded-xl font-bold">{`Download PDF Invoice`}</button>
-              </>
-            )}
-          </div>
-        </div>
-      </div>}
-      {f === `buyer` && Me.isOpen && <div className="fixed inset-0 z-50 flex items-center justify-center p-4 font-sans">
-        <div onClick={() => Ne({
-          isOpen: !1,
-          orderId: ``
-        })} className="absolute inset-0 bg-[#1D2A3B]/40 backdrop-blur-xs" />
-        <div className="relative bg-white rounded-2xl max-w-sm w-full shadow-2xl p-6 z-10 animate-in fade-in zoom-in-95 duration-200 text-center text-xs space-y-4">
-          <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto border-4 border-emerald-50 shadow-md">
-            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-base font-bold text-[#1D2A3B]">{`B2B Order Placed Successfully`}</h3>
-            <p className="text-xs text-[#0697A8] font-mono font-bold">
-              {`Ref: `}
-              {Me.orderId}
-            </p>
-          </div>
-          <p className="text-[#64748B] leading-relaxed max-w-xs mx-auto">{`Your order has been logged. The warehousing department has queued this for packing and immediate delivery.`}</p>
-          <div className="pt-2 flex flex-col sm:flex-row gap-2">
-            <button onClick={() => {
-              const orderToView = Me.order || b.find(o => o.id === Me.orderId);
-              Ne({ isOpen: !1, orderId: `` });
-              if (orderToView) ke(orderToView);
-            }} className="flex-1 bg-[#0697A8] hover:bg-[#057A88] text-white font-bold py-2.5 rounded-xl shadow-md flex items-center justify-center gap-1.5 transition-all cursor-pointer">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              {`View Invoice`}
-            </button>
-            <button onClick={() => {
-              Ne({
-                isOpen: !1,
-                orderId: ``
-              }), k(`orders`);
-            }} className="flex-1 bg-slate-50 border border-[#E2E8F0] hover:bg-slate-100 text-[#475569] font-bold py-2.5 rounded-xl">{`Track Shipments`}</button>
-            <button onClick={() => Ne({
-              isOpen: !1,
-              orderId: ``
-            })} className="flex-1 bg-slate-100 hover:bg-slate-200 text-[#1D2A3B] font-bold py-2.5 rounded-xl">{`Continue Buying`}</button>
-          </div>
-        </div>
-      </div>}
-      {Ae && <div className="fixed inset-0 z-55 flex items-center justify-center p-4 bg-[#1D2A3B]/40 backdrop-blur-xs font-sans">
-        <div onClick={() => je(null)} className="absolute inset-0" />
-        <div className="relative w-full max-w-2xl bg-white dark:bg-[#1D2A3B] rounded-3xl border border-[#E2E8F0] dark:border-slate-700 shadow-2xl flex flex-col max-h-[85vh] overflow-hidden z-10 animate-in zoom-in-95 duration-200">
-          <div className="px-6 py-5 border-b border-[#E2E8F0] dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-[#1D2A3B]/50">
-            <div>
-              <span className="bg-[#E0F5F7] dark:bg-blue-900/30 text-[#0697A8] dark:text-blue-400 px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider">
-                {Ae.dosageForm || `Medicine`}
-              </span>
-              <h3 className="text-lg font-black text-[#1D2A3B] dark:text-slate-200 mt-1">
-                {Ae.name}
-              </h3>
-              <p className="text-xs text-[#64748B] dark:text-slate-400 italic mt-0.5">
-                {`Active Generic Ingredient: `}
-                {Ae.generic}
-              </p>
-            </div>
-            <button onClick={() => je(null)} className="text-[#64748B] hover:text-[#1D2A3B] dark:text-slate-400 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-6 space-y-5 text-xs text-[#475569] dark:text-slate-300">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 bg-slate-50 dark:bg-[#1D2A3B]/40 p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 text-[11px]">
-              <div>
-                <span className="text-[#94A3B8] block text-[9px] uppercase tracking-wider font-bold">{`Manufacturer`}</span>
-                <span className="font-bold text-[#1D2A3B] dark:text-slate-200">
-                  {Ae.manufacturer}
-                </span>
-              </div>
-              <div>
-                <span className="text-[#94A3B8] block text-[9px] uppercase tracking-wider font-bold">{`Therapeutic Category`}</span>
-                <span className="font-bold text-[#1D2A3B] dark:text-slate-200">
-                  {Ae.category}
-                </span>
-              </div>
-              <div>
-                <span className="text-[#94A3B8] block text-[9px] uppercase tracking-wider font-bold">{`Pack Size & Form`}</span>
-                <span className="font-bold text-[#1D2A3B] dark:text-slate-200">
-                  {Ae.packSize}
-                </span>
-              </div>
-            </div>
             <div className="space-y-4">
-              <div className="space-y-1.5">
-                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-[#0697A8] dark:text-blue-400">{`Indications`}</h4>
-                <p className="leading-relaxed bg-[#E0F5F7]/20 dark:bg-blue-900/10 p-3 rounded-xl border border-[#E0F5F7]/50 dark:border-blue-950/20">
-                  {Ae.indications || `This medicine is indicated for systemic treatment under certified prescription.`}
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">{`Therapeutic Class / Pharmacology`}</h4>
-                <p className="leading-relaxed">
-                  {Ae.pharmacology || `Pharmacological data is indexed on the drug registry database.`}
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">{`Dosage & Administration`}</h4>
-                <p className="leading-relaxed bg-slate-50 dark:bg-[#1D2A3B]/30 p-3 rounded-xl border border-slate-100 dark:border-slate-700/50">
-                  {Ae.dosageAdministration || `Consult the prescribing physician for patient-specific dosing.`}
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-red-600 dark:text-red-400">{`Side Effects`}</h4>
-                <p className="leading-relaxed">
-                  {Ae.sideEffects || `Common side effects include mild gastrointestinal complaints, nausea, or headache.`}
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-500">{`Contraindications`}</h4>
-                <p className="leading-relaxed">
-                  {Ae.contraindications || `Hypersensitivity to the active generic compound or related pharmaceutical classes.`}
-                </p>
-              </div>
-              {Ae.pregnancyCategory && <div className="space-y-1.5">
-                <h4 className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-500">{`Pregnancy & Lactation`}</h4>
-                <p className="leading-relaxed">{Ae.pregnancyCategory}</p>
-              </div>}
-            </div>
-          </div>
-          <div className="px-6 py-4 border-t border-[#E2E8F0] dark:border-slate-700 bg-slate-50 dark:bg-[#1D2A3B]/50 flex justify-between items-center text-[10px] text-[#64748B] dark:text-slate-400">
-            <span>{`Verified B2B Medical Index • DG Pharma`}</span>
-            <button onClick={() => je(null)} className="bg-[#0697A8] hover:bg-[#057A88] text-white font-bold px-4 py-2 rounded-xl text-xs cursor-pointer transition-colors">{`Close Monograph`}</button>
-          </div>
-        </div>
-      </div>}
-      {/* Toast notifications removed */}
-      {te.isOpen && <div className="fixed inset-0 bg-[#1D2A3B]/60 backdrop-blur-sm flex items-center justify-center z-[70] p-4 animate-in fade-in duration-200">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 animate-in zoom-in-95 duration-200">
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${te.isDestructive ? `bg-red-100 text-red-600` : `bg-[#C2EAF0] text-[#0697A8]`}`}>
-            {te.icon === 'lock' ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            )}
-          </div>
-          <h3 className="text-lg font-black text-[#1D2A3B] mb-2">
-            {te.title}
-          </h3>
-          <p className="text-sm text-[#475569] mb-6 font-medium leading-relaxed">
-            {te.message}
-          </p>
-          {te.requireInput && (
-            <div className="mb-6">
-              <label className="block text-xs font-bold text-[#64748B] mb-2 uppercase tracking-wider">
-                {te.inputLabel ? te.inputLabel : (te.expectedInput ? `Type "${te.expectedInput}" to confirm` : `Enter value`)}
-              </label>
-              <input
-                type={te.inputType || "text"}
-                value={modalInput}
-                onChange={e => setModalInput(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && (!te.requireInput || (modalInput && (!te.expectedInput || modalInput === te.expectedInput)))) {
-                    te.onConfirm(modalInput);
-                  }
-                }}
-                placeholder={te.inputPlaceholder || (te.inputType === "password" ? "••••••••" : (te.expectedInput || ""))}
-                autoFocus
-                className="w-full bg-white border border-[#E2E8F0] rounded-xl px-4 py-2.5 text-sm font-semibold text-[#1D2A3B] focus:border-[#0697A8] focus:ring-4 focus:ring-[#0697A8]/10 transition-all outline-none"
-              />
-            </div>
-          )}
-          <div className="flex gap-3">
-            <button onClick={() => {
-              ne({
-                isOpen: !1,
-                title: ``,
-                message: ``,
-                onConfirm: null,
-                isDestructive: !1,
-                requireInput: !1,
-                expectedInput: ``,
-                inputLabel: ``,
-                inputType: ``,
-                inputPlaceholder: ``,
-                confirmText: ``,
-                icon: ``
-              });
-              setModalInput("");
-            }} className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors text-sm">{`Cancel`}</button>
-            <button disabled={te.requireInput && (!modalInput || (te.expectedInput ? modalInput !== te.expectedInput : false))} onClick={() => te.onConfirm(modalInput)} className={`flex-1 px-4 py-2.5 text-white font-bold rounded-xl transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed ${te.isDestructive ? `bg-red-600 hover:bg-red-700` : `bg-[#0697A8] hover:bg-[#057A88]`}`}>{te.confirmText || `Confirm`}</button>
-          </div>
-        </div>
-      </div>}
-      {_e.isOpen && <div className="fixed inset-0 bg-[#1D2A3B]/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
-          <div className="flex justify-between items-center mb-5">
-            <h3 className="text-lg font-bold text-[#1D2A3B]">{`Update Product Image`}</h3>
-            <button onClick={() => ve({
-              isOpen: !1,
-              medId: null,
-              currentUrl: ``
-            })} className="text-[#64748B] hover:text-[#1D2A3B] p-1 rounded-lg hover:bg-slate-100 transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-2">{`Option 1: Upload File`}</label>
-              <input type="file" accept="image/*" onChange={async event => {
-                let file = event.target.files[0];
-                if (file) {
-                  let formData = new FormData();
-                  formData.append('image', file);
-                  try {
-                    let response = await fetch(`/upload.php`, {
-                      method: 'POST',
-                      body: formData
-                    });
-
-                    let result;
-                    let contentType = response.headers.get('content-type');
-
-                    if (contentType && contentType.indexOf('application/json') !== -1) {
-                      result = await response.json();
-                    } else {
-                      let text = await response.text();
-                      throw Error(`Server returned non-JSON (${response.status}): ` + text.substring(0, 100));
-                    }
-
-                    if (response.ok && result.success) {
-                      wn(_e.medId, result.url);
-                      ve({
-                        isOpen: !1,
-                        medId: null,
-                        currentUrl: ``
+              <div>
+                <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-2">{`Option 1: Upload File`}</label>
+                <input type="file" accept="image/*" onChange={async event => {
+                  let file = event.target.files[0];
+                  if (file) {
+                    let formData = new FormData();
+                    formData.append('image', file);
+                    try {
+                      let response = await fetch(`/upload.php`, {
+                        method: 'POST',
+                        body: formData
                       });
-                    } else {
-                      alert(`Upload failed: ` + (result.error || `Unknown error`));
+
+                      let result;
+                      let contentType = response.headers.get('content-type');
+
+                      if (contentType && contentType.indexOf('application/json') !== -1) {
+                        result = await response.json();
+                      } else {
+                        let text = await response.text();
+                        throw Error(`Server returned non-JSON (${response.status}): ` + text.substring(0, 100));
+                      }
+
+                      if (response.ok && result.success) {
+                        wn(_e.medId, result.url);
+                        ve({
+                          isOpen: !1,
+                          medId: null,
+                          currentUrl: ``
+                        });
+                      } else {
+                        alert(`Upload failed: ` + (result.error || `Unknown error`));
+                      }
+                    } catch (error) {
+                      console.error(`Upload error:`, error);
+                      alert(`Upload error: ` + error.message);
                     }
-                  } catch (error) {
-                    console.error(`Upload error:`, error);
-                    alert(`Upload error: ` + error.message);
                   }
-                }
-              }} className="w-full text-xs text-[#475569] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 transition-all border border-[#E2E8F0] rounded-xl cursor-pointer" />
-            </div>
-            <div className="relative flex py-2 items-center">
-              <div className="flex-grow border-t border-[#E2E8F0]" />
-              <span className="flex-shrink-0 mx-4 text-[#94A3B8] text-[10px] font-bold uppercase">{`OR`}</span>
-              <div className="flex-grow border-t border-[#E2E8F0]" />
-            </div>
-            <div>
-              <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-2">{`Option 2: Image URL`}</label>
-              <div className="flex gap-2">
-                <input type="text" placeholder="https://example.com/image.jpg" id="imgUrlInput" defaultValue={_e.currentUrl} className="flex-1 border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-[#C2EAF0]" />
-                <button onClick={() => {
-                  let e = document.getElementById(`imgUrlInput`).value;
-                  e && (wn(_e.medId, e), ve({
-                    isOpen: !1,
-                    medId: null,
-                    currentUrl: ``
-                  }));
-                }} className="bg-[#0697A8] hover:bg-[#057A88] text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-md">{`Save URL`}</button>
+                }} className="w-full text-xs text-[#475569] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 transition-all border border-[#E2E8F0] rounded-xl cursor-pointer" />
+              </div>
+              <div className="relative flex py-2 items-center">
+                <div className="flex-grow border-t border-[#E2E8F0]" />
+                <span className="flex-shrink-0 mx-4 text-[#94A3B8] text-[10px] font-bold uppercase">{`OR`}</span>
+                <div className="flex-grow border-t border-[#E2E8F0]" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-[#64748B] uppercase tracking-wider mb-2">{`Option 2: Image URL`}</label>
+                <div className="flex gap-2">
+                  <input type="text" placeholder="https://example.com/image.jpg" id="imgUrlInput" defaultValue={_e.currentUrl} className="flex-1 border border-[#E2E8F0] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-[#C2EAF0]" />
+                  <button onClick={() => {
+                    let e = document.getElementById(`imgUrlInput`).value;
+                    e && (wn(_e.medId, e), ve({
+                      isOpen: !1,
+                      medId: null,
+                      currentUrl: ``
+                    }));
+                  }} className="bg-[#0697A8] hover:bg-[#057A88] text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-md">{`Save URL`}</button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>}
+        </div>}
 
-      {quickRequestModal.isOpen && quickRequestModal.med && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 px-6 py-5 text-white flex justify-between items-center">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center font-bold">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-bold text-base">{`Request Out-of-Stock Medicine`}</h3>
-                  <p className="text-white/80 text-[11px]">{`Notify Admin to restock this medicine for your pharmacy`}</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setQuickRequestModal({ isOpen: false, med: null, quantity: '100', notes: '' })}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors text-white cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmitQuickRequest} className="p-6 space-y-4">
-              <div className="p-3.5 bg-amber-50/70 border border-amber-200/60 rounded-2xl flex items-start gap-3">
-                <div className="w-12 h-12 rounded-xl bg-white border border-amber-200/70 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                  {quickRequestModal.med.imageUrl ? (
-                    <img src={quickRequestModal.med.imageUrl} alt={quickRequestModal.med.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <svg className="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+        {quickRequestModal.isOpen && quickRequestModal.med && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200">
+              <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 px-6 py-5 text-white flex justify-between items-center">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center font-bold">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-bold text-sm text-[#1D2A3B] truncate">{quickRequestModal.med.name || quickRequestModal.med.product_name}</h4>
-                    <span className="text-[9px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-bold">{`Out of stock`}</span>
                   </div>
-                  <p className="text-xs text-[#64748B] mt-0.5 truncate">{quickRequestModal.med.generic}</p>
-                  <p className="text-[11px] text-[#94A3B8]">{quickRequestModal.med.manufacturer || quickRequestModal.med.company}</p>
+                  <div>
+                    <h3 className="font-bold text-base">{`Request Out-of-Stock Medicine`}</h3>
+                    <p className="text-white/80 text-[11px]">{`Notify Admin to restock this medicine for your pharmacy`}</p>
+                  </div>
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#475569] mb-1.5">
-                  {`Estimated Quantity Needed (Units / Packs)`} <span className="text-red-500">{`*`}</span>
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  required
-                  value={quickRequestModal.quantity}
-                  onChange={(e) => setQuickRequestModal(prev => ({ ...prev, quantity: e.target.value }))}
-                  placeholder="e.g. 100"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-bold text-[#1D2A3B] focus:outline-none focus:border-amber-500 focus:bg-white transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-[#475569] mb-1.5">
-                  {`Additional Notes / Urgency (Optional)`}
-                </label>
-                <textarea
-                  rows={3}
-                  value={quickRequestModal.notes}
-                  onChange={(e) => setQuickRequestModal(prev => ({ ...prev, notes: e.target.value }))}
-                  placeholder="e.g. Out of stock, need 2 boxes for customer prescription..."
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs focus:outline-none focus:border-amber-500 focus:bg-white transition-colors"
-                />
-              </div>
-
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-[#64748B] flex items-center justify-between">
-                <span>{`Requesting as:`}</span>
-                <span className="font-bold text-[#1D2A3B]">{tn?.name || `Care & Cure Pharmacy Ltd.`}</span>
-              </div>
-
-              <div className="flex gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setQuickRequestModal({ isOpen: false, med: null, quantity: '100', notes: '' })}
-                  className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-[#475569] font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors text-white cursor-pointer"
                 >
-                  {`Cancel`}
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl text-xs shadow-md shadow-orange-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
-                  {`Submit Request`}
+                  ✕
                 </button>
               </div>
-            </form>
+
+              <form onSubmit={handleSubmitQuickRequest} className="p-6 space-y-4">
+                <div className="p-3.5 bg-amber-50/70 border border-amber-200/60 rounded-2xl flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-white border border-amber-200/70 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    {quickRequestModal.med.imageUrl ? (
+                      <img src={quickRequestModal.med.imageUrl} alt={quickRequestModal.med.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <svg className="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                      </svg>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold text-sm text-[#1D2A3B] truncate">{quickRequestModal.med.name || quickRequestModal.med.product_name}</h4>
+                      <span className="text-[9px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded-full font-bold">{`Out of stock`}</span>
+                    </div>
+                    <p className="text-xs text-[#64748B] mt-0.5 truncate">{quickRequestModal.med.generic}</p>
+                    <p className="text-[11px] text-[#94A3B8]">{quickRequestModal.med.manufacturer || quickRequestModal.med.company}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#475569] mb-1.5">
+                    {`Estimated Quantity Needed (Units / Packs)`} <span className="text-red-500">{`*`}</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    required
+                    value={quickRequestModal.quantity}
+                    onChange={(e) => setQuickRequestModal(prev => ({ ...prev, quantity: e.target.value }))}
+                    placeholder="e.g. 100"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-bold text-[#1D2A3B] focus:outline-none focus:border-amber-500 focus:bg-white transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-[#475569] mb-1.5">
+                    {`Additional Notes / Urgency (Optional)`}
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={quickRequestModal.notes}
+                    onChange={(e) => setQuickRequestModal(prev => ({ ...prev, notes: e.target.value }))}
+                    placeholder="e.g. Out of stock, need 2 boxes for customer prescription..."
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs focus:outline-none focus:border-amber-500 focus:bg-white transition-colors"
+                  />
+                </div>
+
+                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-[#64748B] flex items-center justify-between">
+                  <span>{`Requesting as:`}</span>
+                  <span className="font-bold text-[#1D2A3B]">{tn?.name || `Care & Cure Pharmacy Ltd.`}</span>
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setQuickRequestModal({ isOpen: false, med: null, quantity: '100', notes: '' })}
+                    className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-[#475569] font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                  >
+                    {`Cancel`}
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl text-xs shadow-md shadow-orange-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                    {`Submit Request`}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )}
       </main>
     </div>
     {invoicesToPrint && invoicesToPrint.length > 0 && (
@@ -11933,9 +11906,9 @@ export default function App() {
 
                 if (buyerRow) {
                   const storedPass = (buyerRow.password || '').trim();
-                  const passMatches = storedPass === cleanPass || 
-                                      storedPass.toLowerCase() === cleanPass.toLowerCase() || 
-                                      !storedPass;
+                  const passMatches = storedPass === cleanPass ||
+                    storedPass.toLowerCase() === cleanPass.toLowerCase() ||
+                    !storedPass;
 
                   if (passMatches) {
                     // Auto-heal password if was empty, missing, or differed only by casing
@@ -11966,7 +11939,7 @@ export default function App() {
                     try {
                       const saved = JSON.parse(localStorage.getItem('dg_users') || '[]');
                       localStorage.setItem('dg_users', JSON.stringify([...saved.filter(u => u.email.toLowerCase() !== cleanEmail), n]));
-                    } catch {}
+                    } catch { }
                   }
                 } else {
                   // Fallback: Check if the pharmacy was registered in pharmacy_registrations
@@ -12025,7 +11998,7 @@ export default function App() {
                     try {
                       const saved = JSON.parse(localStorage.getItem('dg_users') || '[]');
                       localStorage.setItem('dg_users', JSON.stringify([...saved.filter(u => u.email.toLowerCase() !== cleanEmail), n]));
-                    } catch {}
+                    } catch { }
                   }
                 }
               } catch (err) {
@@ -12110,7 +12083,7 @@ export default function App() {
                   try {
                     const saved = JSON.parse(localStorage.getItem('dg_users') || '[]');
                     localStorage.setItem('dg_users', JSON.stringify(saved.map(u => u.email.toLowerCase() === cleanEmail ? { ...u, status: 'Approved' } : u)));
-                  } catch {}
+                  } catch { }
                 }
               } catch (err) {
                 console.log('Supabase buyer status check error:', err);
@@ -12132,7 +12105,7 @@ export default function App() {
                     const { data: admRow } = await supabase.from('admin_users').select('email').ilike('email', cleanEmail).maybeSingle();
                     if (admRow) emailFound = true;
                   }
-                } catch {}
+                } catch { }
               }
 
               if (emailFound) {
@@ -12211,31 +12184,31 @@ export default function App() {
         }} className="space-y-4">
           <div>
             <label className="block text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-1.5">{`Email Address`}</label>
-            <input 
-              type="email" 
-              required={!0} 
-              value={qe} 
-              onChange={e => { Je(e.target.value); setLoginError(''); }} 
+            <input
+              type="email"
+              required={!0}
+              value={qe}
+              onChange={e => { Je(e.target.value); setLoginError(''); }}
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck="false"
-              placeholder="Enter your email" 
-              className="w-full px-4 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-slate-800 placeholder-slate-300" 
+              placeholder="Enter your email"
+              className="w-full px-4 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-slate-800 placeholder-slate-300"
             />
           </div>
           <div>
             <label className="block text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-1.5">{`Password`}</label>
             <div className="relative">
-              <input 
-                type={showPassword ? "text" : "password"} 
-                required={!0} 
-                value={Ye} 
-                onChange={e => { Xe(e.target.value); setLoginError(''); }} 
+              <input
+                type={showPassword ? "text" : "password"}
+                required={!0}
+                value={Ye}
+                onChange={e => { Xe(e.target.value); setLoginError(''); }}
                 autoCapitalize="none"
                 autoCorrect="off"
                 spellCheck="false"
-                placeholder="••••••••" 
-                className="w-full pl-4 pr-10 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-slate-800 placeholder-slate-300" 
+                placeholder="••••••••"
+                className="w-full pl-4 pr-10 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-slate-800 placeholder-slate-300"
               />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none">
                 {showPassword ? (
@@ -12264,8 +12237,8 @@ export default function App() {
             </div>
           )}
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loginLoading}
             className="w-full bg-[#1A56DB] hover:bg-[#1A56DB]/90 text-white font-bold py-3.5 rounded-xl shadow-md shadow-blue-500/10 transition-all text-xs cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2 mt-2"
           >
@@ -12396,7 +12369,7 @@ export default function App() {
             const filtered = prev.filter(u => u.email.toLowerCase() !== emailToCheck);
             try {
               localStorage.setItem('dg_users', JSON.stringify(filtered));
-            } catch {}
+            } catch { }
             return filtered;
           });
 
@@ -12432,7 +12405,7 @@ export default function App() {
             const next = [...prev, n];
             try {
               localStorage.setItem('dg_users', JSON.stringify(next));
-            } catch {}
+            } catch { }
             return next;
           });
 
@@ -12539,75 +12512,75 @@ export default function App() {
           {/* 1. Pharmacy Name */}
           <div>
             <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Pharmacy / Shop Name *`}</label>
-            <input 
-              type="text" 
-              value={Ze} 
-              onChange={e => Qe(e.target.value)} 
-              placeholder="e.g. Lazz Pharma" 
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400" 
+            <input
+              type="text"
+              value={Ze}
+              onChange={e => Qe(e.target.value)}
+              placeholder="e.g. Lazz Pharma"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400"
             />
           </div>
 
           {/* 2. Owner Full Name */}
           <div>
             <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Owner / Contact Person Full Name *`}</label>
-            <input 
-              type="text" 
-              value={$e} 
-              onChange={e => et(e.target.value)} 
-              placeholder="e.g. Lutfur Rahman" 
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400" 
+            <input
+              type="text"
+              value={$e}
+              onChange={e => et(e.target.value)}
+              placeholder="e.g. Lutfur Rahman"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400"
             />
           </div>
 
           {/* 3. Email Address */}
           <div>
             <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Email Address *`}</label>
-            <input 
-              type="email" 
-              value={tt} 
-              onChange={e => nt(e.target.value)} 
+            <input
+              type="email"
+              value={tt}
+              onChange={e => nt(e.target.value)}
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck="false"
-              placeholder="contact@pharmacy.com" 
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400" 
+              placeholder="contact@pharmacy.com"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400"
             />
           </div>
 
           {/* 4. Phone Number */}
           <div>
             <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Phone Number *`}</label>
-            <input 
-              type="tel" 
-              value={rt} 
-              onChange={e => it(e.target.value)} 
-              placeholder="+88017XXXXXXXX" 
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400" 
+            <input
+              type="tel"
+              value={rt}
+              onChange={e => it(e.target.value)}
+              placeholder="+88017XXXXXXXX"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400"
             />
           </div>
 
           {/* 5. DGDA Drug License Number */}
           <div>
             <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`DGDA Drug License Number *`}</label>
-            <input 
-              type="text" 
-              value={at} 
-              onChange={e => ot(e.target.value)} 
-              placeholder="e.g. DGDA-2026-9912" 
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-mono placeholder-slate-400" 
+            <input
+              type="text"
+              value={at}
+              onChange={e => ot(e.target.value)}
+              placeholder="e.g. DGDA-2026-9912"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-mono placeholder-slate-400"
             />
           </div>
 
           {/* 6. Trade License Number */}
           <div>
             <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Trade License Number *`}</label>
-            <input 
-              type="text" 
-              value={st} 
-              onChange={e => ct(e.target.value)} 
-              placeholder="e.g. TR-MIR-11920" 
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-mono placeholder-slate-400" 
+            <input
+              type="text"
+              value={st}
+              onChange={e => ct(e.target.value)}
+              placeholder="e.g. TR-MIR-11920"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 font-mono placeholder-slate-400"
             />
           </div>
 
@@ -12623,39 +12596,39 @@ export default function App() {
             <div className="space-y-3.5">
               <div>
                 <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Address Line 1 *`}</label>
-                <input 
-                  type="text" 
-                  value={regAddressLine1} 
-                  onChange={e => setRegAddressLine1(e.target.value)} 
-                  placeholder="e.g. House #12, Road #4" 
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400" 
+                <input
+                  type="text"
+                  value={regAddressLine1}
+                  onChange={e => setRegAddressLine1(e.target.value)}
+                  placeholder="e.g. House #12, Road #4"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400"
                 />
               </div>
               <div>
                 <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Address Line 2 (Optional)`}</label>
-                <input 
-                  type="text" 
-                  value={regAddressLine2} 
-                  onChange={e => setRegAddressLine2(e.target.value)} 
-                  placeholder="e.g. Block-D, Sector-3" 
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400" 
+                <input
+                  type="text"
+                  value={regAddressLine2}
+                  onChange={e => setRegAddressLine2(e.target.value)}
+                  placeholder="e.g. Block-D, Sector-3"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400"
                 />
               </div>
               <div>
                 <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`City / Area *`}</label>
-                <input 
-                  type="text" 
-                  value={regCity} 
-                  onChange={e => setRegCity(e.target.value)} 
-                  placeholder="e.g. Uttara / Banani" 
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400" 
+                <input
+                  type="text"
+                  value={regCity}
+                  onChange={e => setRegCity(e.target.value)}
+                  placeholder="e.g. Uttara / Banani"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400"
                 />
               </div>
               <div>
                 <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Division *`}</label>
-                <select 
-                  value={regDivision} 
-                  onChange={e => setRegDivision(e.target.value)} 
+                <select
+                  value={regDivision}
+                  onChange={e => setRegDivision(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800"
                 >
                   <option value="Dhaka">{`Dhaka`}</option>
@@ -12670,14 +12643,14 @@ export default function App() {
               </div>
               <div>
                 <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Postal Code *`}</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  value={regPostalCode} 
-                  onChange={e => setRegPostalCode(e.target.value.replace(/\D/g, ''))} 
-                  placeholder="e.g. 1230" 
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400" 
+                  value={regPostalCode}
+                  onChange={e => setRegPostalCode(e.target.value.replace(/\D/g, ''))}
+                  placeholder="e.g. 1230"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400"
                 />
               </div>
             </div>
@@ -12689,12 +12662,12 @@ export default function App() {
               <span>{`DGDA Drug License PDF Copy *`}</span>
               <span className="text-[10px] text-slate-400 font-normal">{`Max 5 MB (PDF)`}</span>
             </label>
-            <input 
-              type="file" 
-              id="drugLicensePdfInput" 
-              accept="application/pdf,.pdf" 
-              onChange={handleDrugLicenseUpload} 
-              className="hidden" 
+            <input
+              type="file"
+              id="drugLicensePdfInput"
+              accept="application/pdf,.pdf"
+              onChange={handleDrugLicenseUpload}
+              className="hidden"
             />
             {dt && dt !== `uploaded_drug_license.pdf` ? (
               <div className="p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-2xl flex items-center justify-between gap-3">
@@ -12718,9 +12691,9 @@ export default function App() {
                   <a href={dt} target="_blank" rel="noopener noreferrer" className="px-2.5 py-1.5 bg-white border border-emerald-200 hover:bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-lg transition-colors">
                     {`View`}
                   </a>
-                  <button 
-                    type="button" 
-                    onClick={() => document.getElementById('drugLicensePdfInput').click()} 
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('drugLicensePdfInput').click()}
                     className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold rounded-lg transition-colors cursor-pointer"
                   >
                     {`Change`}
@@ -12728,8 +12701,8 @@ export default function App() {
                 </div>
               </div>
             ) : (
-              <div 
-                onClick={() => !pdfUploading && document.getElementById('drugLicensePdfInput').click()} 
+              <div
+                onClick={() => !pdfUploading && document.getElementById('drugLicensePdfInput').click()}
                 className={`p-4 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all ${pdfUploading ? 'border-blue-300 bg-blue-50/40 cursor-wait' : 'border-slate-200 hover:border-[#1A56DB] bg-slate-50/50 hover:bg-white'}`}
               >
                 {pdfUploading ? (
@@ -12766,39 +12739,39 @@ export default function App() {
           {/* 9. Create Password */}
           <div>
             <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Create Password * (Min 6 characters)`}</label>
-            <input 
-              type={showRegPassword ? "text" : "password"} 
-              value={regPassword} 
-              onChange={e => setRegPassword(e.target.value)} 
+            <input
+              type={showRegPassword ? "text" : "password"}
+              value={regPassword}
+              onChange={e => setRegPassword(e.target.value)}
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck="false"
-              placeholder="Create password" 
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400" 
+              placeholder="Create password"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400"
             />
           </div>
 
           {/* 10. Confirm Password */}
           <div>
             <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Confirm Password *`}</label>
-            <input 
-              type={showRegPassword ? "text" : "password"} 
-              value={regConfirmPassword} 
-              onChange={e => setRegConfirmPassword(e.target.value)} 
+            <input
+              type={showRegPassword ? "text" : "password"}
+              value={regConfirmPassword}
+              onChange={e => setRegConfirmPassword(e.target.value)}
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck="false"
-              placeholder="Re-type password" 
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400" 
+              placeholder="Re-type password"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400"
             />
           </div>
 
           <div className="flex items-center gap-2 pt-1">
-            <input 
-              type="checkbox" 
-              id="showRegPass" 
-              checked={showRegPassword} 
-              onChange={() => setShowRegPassword(!showRegPassword)} 
+            <input
+              type="checkbox"
+              id="showRegPass"
+              checked={showRegPassword}
+              onChange={() => setShowRegPassword(!showRegPassword)}
               className="rounded border-[#CBD5E1] text-[#0697A8] focus:ring-[#0697A8] w-4 h-4 cursor-pointer"
             />
             <label htmlFor="showRegPass" className="text-xs text-slate-600 font-medium cursor-pointer select-none">
@@ -12813,8 +12786,8 @@ export default function App() {
               <span className="font-semibold leading-tight">{regError}</span>
             </div>
           )}
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={regSubmitting || pdfUploading}
             className="w-full bg-[#1A56DB] hover:bg-[#1A56DB]/90 text-white font-bold py-3.5 rounded-xl shadow-md transition-all text-xs cursor-pointer disabled:opacity-60 flex items-center justify-center gap-2 mt-2"
           >
@@ -12878,8 +12851,8 @@ export default function App() {
     {showForgotModal && (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
         <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-100 relative">
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={() => { setShowForgotModal(false); setForgotMsg(null); setForgotEmail(''); }}
             className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
           >
@@ -12944,24 +12917,24 @@ export default function App() {
           }} className="space-y-4">
             <div>
               <label className="block text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-1.5">{`Registered Email`}</label>
-              <input 
-                type="email" 
-                required 
-                value={forgotEmail} 
-                onChange={(e) => setForgotEmail(e.target.value)} 
+              <input
+                type="email"
+                required
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
                 placeholder="pharmacy@domain.com"
                 className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800"
               />
             </div>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={forgotLoading}
               className="w-full bg-[#1A56DB] hover:bg-[#1A56DB]/90 text-white font-bold py-3 rounded-xl text-xs transition-all cursor-pointer shadow-md disabled:opacity-50"
             >
               {forgotLoading ? 'Processing...' : 'Send Password Reset Link'}
             </button>
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => { setShowForgotModal(false); setForgotMsg(null); setForgotEmail(''); }}
               className="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 rounded-xl text-xs transition-all cursor-pointer"
             >
