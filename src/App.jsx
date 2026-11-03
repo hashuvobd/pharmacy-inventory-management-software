@@ -2505,7 +2505,8 @@ export default function App() {
     [specialDiscounts, setSpecialDiscounts] = useState({}),
     [coupons, setCoupons] = useState([]),
     [couponInput, setCouponInput] = useState(``),
-    [appliedCoupon, setAppliedCoupon] = useState(null);
+    [appliedCoupon, setAppliedCoupon] = useState(null),
+    [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
   // Delivery Zones & Delivery Men state
   const [deliveryMen, setDeliveryMen] = useState(() => {
@@ -3037,6 +3038,8 @@ export default function App() {
 
         const mergedMap = new Map();
 
+        const normBuyerStatus = s => (s === 'Pending Verification' ? 'Pending' : (s || 'Pending'));
+
         (regData || []).forEach(r => {
           const key = (r.email || r.id || '').toLowerCase();
           mergedMap.set(key, {
@@ -3057,7 +3060,7 @@ export default function App() {
             phone: r.phone || 'N/A',
             tradeLicense: r.trade_license || 'N/A',
             drugLicenseFile: r.drug_license_file,
-            status: r.status || 'Pending',
+            status: normBuyerStatus(r.status),
             creditLimit: 50000,
             outstandingBalance: 0
           });
@@ -3069,7 +3072,7 @@ export default function App() {
             const existing = mergedMap.get(key);
             mergedMap.set(key, {
               ...existing,
-              status: b.status || existing.status,
+              status: normBuyerStatus(b.status || existing.status),
               creditLimit: b.credit_limit ?? existing.creditLimit,
               outstandingBalance: b.outstanding_balance ?? existing.outstandingBalance
             });
@@ -3092,7 +3095,7 @@ export default function App() {
               phone: b.phone || 'N/A',
               tradeLicense: b.trade_license || 'N/A',
               drugLicenseFile: b.drug_license_file,
-              status: b.status || 'Approved',
+              status: normBuyerStatus(b.status || 'Approved'),
               creditLimit: b.credit_limit ?? 50000,
               outstandingBalance: b.outstanding_balance ?? 0
             });
@@ -4840,40 +4843,83 @@ export default function App() {
       });
     },
     fn = async () => {
-      if (on.length === 0) return;
+      if (on.length === 0 || isPlacingOrder) return;
       if (!deliveryLocation) {
         setLocationError(true);
         document.getElementById('map-container')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        alert("Please select or pin your delivery location on the map before placing the order.");
         return;
       }
       setLocationError(false);
-      const currentYear = new Date().getFullYear();
-      const prefix = `DG-${currentYear}-`;
-      const matches = b.filter(o => o.id.startsWith(prefix));
-      let nextSerial = 0;
-      if (matches.length > 0) {
-        const serials = matches.map(o => {
-          const part = o.id.substring(prefix.length);
-          const num = parseInt(part, 10);
-          return isNaN(num) ? -1 : num;
-        });
-        nextSerial = Math.max(...serials) + 1;
-      }
-      let e = `${prefix}${String(nextSerial).padStart(4, '0')}`,
-        t = {
-          id: e,
-          buyerId: n?.pharmacyId || n?.id || '',
+      setIsPlacingOrder(true);
+
+      try {
+        const currentYear = new Date().getFullYear();
+        const prefix = `DG-${currentYear}-`;
+
+        // 1. Determine next order serial (query Supabase and local state)
+        let nextSerial = 1;
+        try {
+          const { data: dbOrders } = await supabase
+            .from('orders')
+            .select('id')
+            .like('id', `${prefix}%`)
+            .order('id', { ascending: false })
+            .limit(1);
+          if (dbOrders && dbOrders.length > 0) {
+            const part = dbOrders[0].id.substring(prefix.length);
+            const num = parseInt(part, 10);
+            if (!isNaN(num)) nextSerial = Math.max(nextSerial, num + 1);
+          }
+        } catch (dbErr) {
+          console.warn("Could not query highest order id from database:", dbErr);
+        }
+
+        const matches = (b || []).filter(o => o && typeof o.id === 'string' && o.id.startsWith(prefix));
+        if (matches.length > 0) {
+          const serials = matches.map(o => {
+            const part = o.id.substring(prefix.length);
+            const num = parseInt(part, 10);
+            return isNaN(num) ? -1 : num;
+          });
+          nextSerial = Math.max(nextSerial, Math.max(...serials) + 1);
+        }
+
+        const orderId = `${prefix}${String(nextSerial).padStart(4, '0')}`;
+
+        // 2. Resolve buyer's UUID (Supabase orders.buyer_id expects UUID, not PHARM-PEND-xxx)
+        const isUuid = (str) => typeof str === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+        let buyerDbUuid = null;
+        if (isUuid(n?.buyerUuid)) {
+          buyerDbUuid = n.buyerUuid;
+        } else if (isUuid(n?.id)) {
+          buyerDbUuid = n.id;
+        } else if (n?.email) {
+          try {
+            const { data: bRow } = await supabase.from('buyers').select('id').ilike('email', n.email.trim()).maybeSingle();
+            if (bRow && isUuid(bRow.id)) {
+              buyerDbUuid = bRow.id;
+            }
+          } catch (bLookupErr) {
+            console.warn("Could not resolve buyer UUID:", bLookupErr);
+          }
+        }
+
+        const orderDateStr = new Date().toISOString().split('T')[0];
+        const newOrder = {
+          id: orderId,
+          buyerId: buyerDbUuid || n?.pharmacyId || n?.id || '',
           buyerEmail: n?.email || '',
-          buyerName: tn.name,
-          buyerAddress: tn.address,
-          addressLine1: tn.addressLine1,
-          addressLine2: tn.addressLine2,
-          city: tn.city,
-          division: tn.division,
-          postalCode: tn.postalCode,
-          location: tn.address,
-          phone: tn.phone,
-          date: new Date().toISOString().split(`T`)[0],
+          buyerName: tn?.name || n?.name || 'Registered Pharmacy',
+          buyerAddress: tn?.address || n?.address || '',
+          addressLine1: tn?.addressLine1 || n?.addressLine1 || '',
+          addressLine2: tn?.addressLine2 || n?.addressLine2 || '',
+          city: tn?.city || n?.city || '',
+          division: tn?.division || n?.division || '',
+          postalCode: tn?.postalCode || n?.postalCode || '',
+          location: tn?.address || n?.address || '',
+          phone: tn?.phone || n?.phone || '',
+          date: orderDateStr,
           totalAmount: sn.finalTotal,
           subtotal: sn.subtotal,
           tax: sn.tax,
@@ -4887,7 +4933,7 @@ export default function App() {
           locationCoordinates: deliveryLocation,
           items: on.map(e => ({
             id: e.id,
-            name: e.name,
+            name: e.name || e.product_name || '',
             manufacturer: e.manufacturer || '',
             mrp: Number(e.pack_mrp || e.mrp || 0),
             quantity: e.quantity,
@@ -4896,62 +4942,77 @@ export default function App() {
           }))
         };
 
-      // SUPABASE INSERT
-      let { error: orderError } = await supabase.from('orders').insert({
-        id: e,
-        buyer_name: tn.name,
-        buyer_id: n?.pharmacyId || n?.id || null,
-        phone: tn.phone || n?.phone || null,
-        buyer_address: tn.address || null,
-        address_line1: tn.addressLine1 || null,
-        address_line2: tn.addressLine2 || null,
-        city: tn.city || null,
-        division: tn.division || null,
-        postal_code: tn.postalCode || null,
-        order_date: t.date,
-        total_amount: sn.finalTotal,
-        status: `Pending Verification`,
-        payment_status: `Pending (COD)`,
-        payment_method: `Cash on Delivery (COD)`
-      });
+        // 3. Insert order into Supabase
+        const { error: orderError } = await supabase.from('orders').insert({
+          id: orderId,
+          buyer_name: newOrder.buyerName,
+          buyer_id: isUuid(buyerDbUuid) ? buyerDbUuid : null,
+          phone: newOrder.phone || null,
+          buyer_address: newOrder.buyerAddress || null,
+          address_line1: newOrder.addressLine1 || null,
+          address_line2: newOrder.addressLine2 || null,
+          city: newOrder.city || null,
+          division: newOrder.division || null,
+          postal_code: newOrder.postalCode || null,
+          order_date: orderDateStr,
+          total_amount: sn.finalTotal,
+          status: `Pending Verification`,
+          payment_status: `Pending (COD)`,
+          payment_method: `Cash on Delivery (COD)`
+        });
 
-      if (orderError) {
-        alert("Failed to place order: " + orderError.message);
-        return;
+        if (orderError) {
+          console.error("Failed to insert order into Supabase:", orderError);
+          alert("Failed to place order: " + (orderError.message || JSON.stringify(orderError)));
+          return;
+        }
+
+        // 4. Insert order items into Supabase
+        const orderItems = on.map(item => ({
+          order_id: orderId,
+          medicine_id: String(item.id || ''),
+          product_name: item.name || item.product_name || 'Medicine',
+          quantity: item.quantity,
+          unit_price: item.wholesalePrice,
+          special_discount: item.itemSpecialDiscount || 0
+        }));
+
+        const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
+        if (itemsError) {
+          console.error("Failed to insert order items: ", itemsError);
+        }
+
+        // 5. Update local medicine stock and orders list
+        h(prev => prev.map(med => {
+          const cartItem = on.find(ci => String(ci.id) === String(med.id));
+          return cartItem ? {
+            ...med,
+            stock: Math.max(0, (med.stock || 0) - cartItem.quantity)
+          } : med;
+        }));
+        x(prev => [newOrder, ...prev]);
+
+        // 6. Push local notification and trigger confirmation popup
+        const orderNotification = {
+          id: Date.now(),
+          text: `Successfully placed B2B Order ${orderId} totaling ৳${sn.finalTotal.toFixed(2)}. Pending marketplace verification.`,
+          date: `Just now`,
+          read: false
+        };
+        w(prev => [orderNotification, ...prev]);
+        be({});
+        Se(false);
+        Ne({
+          isOpen: true,
+          orderId: orderId,
+          order: newOrder
+        });
+      } catch (err) {
+        console.error("Order placement exception:", err);
+        alert("Failed to place order: " + (err.message || String(err)));
+      } finally {
+        setIsPlacingOrder(false);
       }
-
-      let orderItems = on.map(item => ({
-        order_id: e,
-        medicine_id: String(item.id),
-        product_name: item.name,
-        quantity: item.quantity,
-        unit_price: item.wholesalePrice,
-        special_discount: item.itemSpecialDiscount || 0
-      }));
-
-      let { error: itemsError } = await supabase.from('order_items').insert(orderItems);
-      if (itemsError) {
-        console.error("Failed to insert order items: ", itemsError);
-      }
-
-      h(e => e.map(e => {
-        let t = on.find(t => t.id === e.id);
-        return t ? {
-          ...e,
-          stock: Math.max(0, e.stock - t.quantity)
-        } : e;
-      })), x(e => [t, ...e]);
-      let n = {
-        id: Date.now(),
-        text: `Successfully placed B2B Order ${e} totaling ৳${sn.finalTotal.toFixed(2)}. Pending marketplace verification.`,
-        date: `Just now`,
-        read: !1
-      };
-      w(e => [n, ...e]), be({}), Se(!1), Ne({
-        isOpen: !0,
-        orderId: e,
-        order: t
-      });
     },
     pn = e => {
       se(e), O !== `search` && k(`search`);
@@ -4962,19 +5023,19 @@ export default function App() {
     hn = m.filter(e => e.expiryMonths < 6).length,
     gn = m.filter(e => e.stock > 0 && e.stock <= 100).length,
     _n = async e => {
-      D(t => t.map(t => t.id === e ? {
+      D(t => t.map(t => (t.id === e || t.pharmacyId === e) ? {
         ...t,
         status: `Approved`
       } : t));
       a(t => {
-        const next = t.map(t => t.pharmacyId === e ? {
+        const next = t.map(t => (t.pharmacyId === e || t.id === e) ? {
           ...t,
           status: `Approved`
         } : t);
         try { localStorage.setItem('dg_users', JSON.stringify(next)); } catch { }
         return next;
       });
-      let t = E.find(t => t.id === e);
+      let t = E.find(t => t.id === e || t.pharmacyId === e);
       let n = {
         id: Date.now(),
         text: `Admin Approved New Pharmacy Access: ${t?.name || e} (License ${t?.licenseNumber || ''}) has been activated.`,
@@ -4987,14 +5048,15 @@ export default function App() {
         ownerIdVerify: !1,
         physicalStoreCheck: !1
       }), Et(``);
+      T(`Pharmacy "${t?.name || e}" has been approved and activated!`);
 
       try {
         await supabase.from('pharmacy_registrations').update({ status: 'Approved' }).eq('id', e);
         if (t?.email) {
-          await supabase.from('buyers').update({ status: 'Approved' }).eq('email', t.email);
-        } else {
-          await supabase.from('buyers').update({ status: 'Approved' }).eq('pharmacy_id', e);
+          await supabase.from('buyers').update({ status: 'Approved' }).ilike('email', t.email);
         }
+        await supabase.from('buyers').update({ status: 'Approved' }).eq('pharmacy_id', e);
+        await supabase.from('buyers').update({ status: 'Approved' }).eq('id', e);
       } catch (err) {
         console.error('Error updating approval status in Supabase:', err);
       }
@@ -5007,49 +5069,66 @@ export default function App() {
       });
     },
     vn = async e => {
-      if (!xt.trim()) {
+      const reason = xt.trim() || 'Access revoked by administrator';
+      if (!xt.trim() && !Ct) {
         wt(!0);
+        T("Please enter a reason or click again to confirm.");
         return;
       }
-      D(t => t.map(t => t.id === e ? {
+      D(t => t.map(t => (t.id === e || t.pharmacyId === e) ? {
         ...t,
         status: `Rejected`,
-        rejectionReason: xt
+        rejectionReason: reason
       } : t));
       a(t => {
-        const next = t.map(t => t.pharmacyId === e ? {
+        const next = t.map(t => (t.pharmacyId === e || t.id === e) ? {
           ...t,
           status: `Rejected`,
-          rejectionReason: xt
+          rejectionReason: reason
         } : t);
         try { localStorage.setItem('dg_users', JSON.stringify(next)); } catch { }
         return next;
       });
-      let t = E.find(t => t.id === e);
+      let t = E.find(t => t.id === e || t.pharmacyId === e);
       let n = {
         id: Date.now(),
-        text: `Admin Rejected Pharmacy Registration: ${t?.name || e} due to: "${xt}".`,
+        text: `Admin Rejected/Revoked Pharmacy Registration: ${t?.name || e} due to: "${reason}".`,
         date: `Just now`,
         read: !1
       };
       w(e => [n, ...e]), _t(null), St(``), wt(!1), Et(``);
+      T(`Access for "${t?.name || e}" has been rejected/revoked.`);
 
       try {
         await supabase.from('pharmacy_registrations').update({ status: 'Rejected' }).eq('id', e);
         if (t?.email) {
-          await supabase.from('buyers').update({ status: 'Rejected' }).eq('email', t.email);
-        } else {
-          await supabase.from('buyers').update({ status: 'Rejected' }).eq('pharmacy_id', e);
+          await supabase.from('buyers').update({ status: 'Rejected' }).ilike('email', t.email);
         }
+        await supabase.from('buyers').update({ status: 'Rejected' }).eq('pharmacy_id', e);
+        await supabase.from('buyers').update({ status: 'Rejected' }).eq('id', e);
       } catch (err) {
         console.error('Error updating rejection status in Supabase:', err);
       }
+
+      // If revoked buyer is in active session, clear session
+      try {
+        const s = localStorage.getItem('dg_session');
+        if (s) {
+          const parsed = JSON.parse(s);
+          const sessEmail = parsed.currentUser?.email ? parsed.currentUser.email.trim().toLowerCase() : '';
+          const targetEmail = t?.email ? t.email.trim().toLowerCase() : '';
+          if ((targetEmail && sessEmail === targetEmail) || parsed.currentUser?.pharmacyId === e) {
+            localStorage.removeItem('dg_session');
+          }
+        }
+      } catch { }
+
       logAdminActivity({
         category: 'BUYER_APPROVAL',
         action: 'PHARMACY_REJECTED',
-        details: `Rejected pharmacy registration: ${t?.name || e} (${t?.email || 'N/A'}) - Reason: "${xt}"`,
+        details: `Rejected/Revoked pharmacy registration: ${t?.name || e} (${t?.email || 'N/A'}) - Reason: "${reason}"`,
         targetId: e,
-        metadata: { rejectionReason: xt, name: t?.name, email: t?.email }
+        metadata: { rejectionReason: reason, name: t?.name, email: t?.email }
       });
     },
     handleDeleteBuyer = async buyer => {
@@ -5754,7 +5833,7 @@ export default function App() {
                   <span>{`Pending Approvals`}</span>
                 </div>
                 <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full font-bold">
-                  {E.filter(e => e.status === `Pending`).length}
+                  {E.filter(e => e.status === `Pending` || e.status === `Pending Verification`).length}
                 </span>
               </button>
             )}
@@ -6991,7 +7070,7 @@ export default function App() {
                   <div>
                     <span className="text-[10px] font-bold text-[#64748B] dark:text-slate-400 uppercase tracking-wider block">{`Pending Queue`}</span>
                     <span className="text-xl font-black text-amber-600">
-                      {E.filter(e => e.status === `Pending`).length}
+                      {E.filter(e => e.status === `Pending` || e.status === `Pending Verification`).length}
                       {` Applications`}
                     </span>
                   </div>
@@ -7031,7 +7110,7 @@ export default function App() {
               <div className="flex border-b border-[#E2E8F0] dark:border-slate-700 gap-4 text-xs font-semibold select-none overflow-x-auto whitespace-nowrap scrollbar-none pb-0.5">
                 {[
                   { id: 'All', label: 'All Buyers', count: E.length },
-                  { id: 'Pending', label: 'Pending Verification', count: E.filter(e => e.status === 'Pending').length },
+                  { id: 'Pending', label: 'Pending Verification', count: E.filter(e => e.status === 'Pending' || e.status === 'Pending Verification').length },
                   { id: 'Approved', label: 'Approved & Active', count: E.filter(e => e.status === 'Approved').length },
                   { id: 'Rejected', label: 'Rejected / Flagged', count: E.filter(e => e.status === 'Rejected').length }
                 ].map(tab => (
@@ -7059,7 +7138,9 @@ export default function App() {
               {/* Filter and render table */}
               {(() => {
                 const filteredBuyers = E.filter(e => {
-                  if (buyerFilterTab !== 'All' && e.status !== buyerFilterTab) return false;
+                  if (buyerFilterTab === 'Pending') {
+                    if (e.status !== 'Pending' && e.status !== 'Pending Verification') return false;
+                  } else if (buyerFilterTab !== 'All' && e.status !== buyerFilterTab) return false;
                   if (!buyerSearchQuery.trim()) return true;
                   const q = buyerSearchQuery.toLowerCase();
                   return (
@@ -7164,13 +7245,13 @@ export default function App() {
                                         ? `bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-300`
                                         : `bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 animate-pulse`
                                     }`}>
-                                    {e.status}
+                                    {e.status === 'Pending' ? 'Pending Verification' : e.status}
                                   </span>
                                 </td>
                                 <td className="px-5 py-4 text-right" onClick={ev => ev.stopPropagation()}>
-                                  {e.status === `Pending` ? (
+                                  {(e.status === `Pending` || e.status === `Pending Verification`) ? (
                                     <div className="flex items-center justify-end gap-2 flex-nowrap whitespace-nowrap">
-                                      <button onClick={() => _n(e.id)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg text-[10px] shadow-sm transition-all whitespace-nowrap flex-shrink-0 cursor-pointer">{`Approve & Activate`}</button>
+                                      <button onClick={() => _n(e.id)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-lg text-[10px] shadow-sm transition-all whitespace-nowrap flex-shrink-0 cursor-pointer">{`Approve`}</button>
                                       <button onClick={() => { _t(e); wt(!0); }} className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-100 font-bold px-3 py-1.5 rounded-lg text-[10px] transition-all whitespace-nowrap flex-shrink-0 cursor-pointer">{`Reject`}</button>
                                       <button
                                         onClick={() => handleDeleteBuyer(e)}
@@ -7276,7 +7357,7 @@ export default function App() {
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
                                 </svg>
                               </button>
-                              {e.status === `Pending` ? (
+                              {(e.status === `Pending` || e.status === `Pending Verification`) ? (
                                 <div className="flex gap-2 items-center">
                                   <button onClick={() => _n(e.id)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-2 rounded-xl text-xs shadow-sm transition-all cursor-pointer">{`Approve`}</button>
                                   <button onClick={() => { _t(e); wt(!0); }} className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-100 font-bold px-3 py-2 rounded-xl text-xs transition-all cursor-pointer">{`Reject`}</button>
@@ -10444,15 +10525,28 @@ export default function App() {
               </div>}
             </div>
             <div className="p-6 border-t border-[#E2E8F0] bg-slate-50 flex flex-col sm:flex-row gap-3">
-              {gt.status === `Pending` ? <>
+              {(gt.status === `Pending` || gt.status === `Pending Verification`) ? <>
                 <button onClick={() => vn(gt.id)} className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition-colors text-center cursor-pointer">
-                  {Ct ? `Confirm Rejection` : `Reject / Request Info`}
+                  {Ct ? `Confirm Rejection` : `Reject`}
                 </button>
-                <button onClick={() => _n(gt.id)} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors text-center cursor-pointer">{`Approve & Activate Shop`}</button>
-              </> : <div className="flex-1 text-center py-2.5 font-bold text-[#64748B] bg-slate-100 rounded-xl">
-                {`Verification Processed: `}
-                {gt.status}
-              </div>}
+                <button onClick={() => _n(gt.id)} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors text-center cursor-pointer">{`Approve`}</button>
+              </> : (
+                <div className="flex-1 flex items-center justify-between gap-2">
+                  <div className="flex-1 text-center py-2.5 font-bold text-[#64748B] bg-slate-100 rounded-xl">
+                    {`Verification Processed: `}
+                    {gt.status}
+                  </div>
+                  {gt.status === `Approved` ? (
+                    <button onClick={() => vn(gt.id)} className="px-3 py-2.5 text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl font-bold text-xs cursor-pointer transition-colors whitespace-nowrap">
+                      {Ct ? `Confirm Revoke` : `Revoke`}
+                    </button>
+                  ) : (
+                    <button onClick={() => _n(gt.id)} className="px-3 py-2.5 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl font-bold text-xs cursor-pointer transition-colors whitespace-nowrap">
+                      Re-activate
+                    </button>
+                  )}
+                </div>
+              )}
               <button
                 onClick={() => handleDeleteBuyer(gt)}
                 className="px-4 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
@@ -10948,10 +11042,26 @@ export default function App() {
                     </span>
                   </div>
                 </div>
-                <button onClick={fn} disabled={on.length === 0} className="w-full bg-[#0697A8] hover:bg-[#057A88] disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-2.5 md:py-3 rounded-xl text-xs shadow-md cursor-pointer transition-all">
-                  {`Place Order (৳`}
-                  {sn.finalTotal.toFixed(2)}
-                  {`)`}
+                <button
+                  onClick={fn}
+                  disabled={on.length === 0 || isPlacingOrder}
+                  className="w-full bg-[#0697A8] hover:bg-[#057A88] disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-2.5 md:py-3 rounded-xl text-xs shadow-md cursor-pointer transition-all flex items-center justify-center gap-2"
+                >
+                  {isPlacingOrder ? (
+                    <>
+                      <svg className="w-4 h-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      <span>Placing Order...</span>
+                    </>
+                  ) : (
+                    <>
+                      {`Place Order (৳`}
+                      {sn.finalTotal.toFixed(2)}
+                      {`)`}
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -11928,6 +12038,7 @@ export default function App() {
                       name: buyerRow.name || 'Verified Pharmacy',
                       ownerName: buyerRow.owner_name || buyerRow.contact_person,
                       pharmacyId: buyerRow.pharmacy_id,
+                      buyerUuid: buyerRow.id,
                       licenseNumber: buyerRow.license_number,
                       phone: buyerRow.phone,
                       location: buyerRow.address,
@@ -12074,15 +12185,15 @@ export default function App() {
               }
             }
 
-            if (n && n.role === 'buyer' && n.status !== 'Approved') {
+            if (n && n.role === 'buyer') {
               try {
                 const { data: bCheck } = await supabase.from('buyers').select('status').ilike('email', cleanEmail).maybeSingle();
-                if (bCheck?.status === 'Approved') {
-                  n.status = 'Approved';
-                  a(prev => prev.map(u => u.email.toLowerCase() === cleanEmail ? { ...u, status: 'Approved' } : u));
+                if (bCheck?.status) {
+                  n.status = bCheck.status;
+                  a(prev => prev.map(u => u.email.toLowerCase() === cleanEmail ? { ...u, status: bCheck.status } : u));
                   try {
                     const saved = JSON.parse(localStorage.getItem('dg_users') || '[]');
-                    localStorage.setItem('dg_users', JSON.stringify(saved.map(u => u.email.toLowerCase() === cleanEmail ? { ...u, status: 'Approved' } : u)));
+                    localStorage.setItem('dg_users', JSON.stringify(saved.map(u => u.email.toLowerCase() === cleanEmail ? { ...u, status: bCheck.status } : u)));
                   } catch { }
                 }
               } catch (err) {
@@ -12118,7 +12229,7 @@ export default function App() {
             }
 
             if (n.role === 'buyer') {
-              if (n.status === 'Pending') {
+              if (n.status === 'Pending' || n.status === 'Pending Verification') {
                 r(n);
                 t('awaiting_approval');
               } else if (n.status === 'Rejected') {
@@ -12483,7 +12594,7 @@ export default function App() {
               pharmacy_id: n.pharmacyId,
               trade_license: n.tradeLicense,
               drug_license_file: n.drugLicenseFile,
-              status: 'Pending Verification',
+              status: 'Pending',
               credit_limit: 50000,
               outstanding_balance: 0
             }], { onConflict: 'email' });
