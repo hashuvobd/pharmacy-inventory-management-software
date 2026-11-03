@@ -4296,6 +4296,70 @@ export default function App() {
     }
   }, [f, n, mt, adminRoles]);
 
+  // Validate active buyer session against Supabase database. If buyer was deleted or revoked, terminate session immediately.
+  useEffect(() => {
+    if (e === 'authenticated' && f === 'buyer' && n?.email) {
+      const checkBuyerSessionValidity = async () => {
+        try {
+          const cleanEmail = n.email.trim().toLowerCase();
+          const { data: bRow, error: bErr } = await supabase
+            .from('buyers')
+            .select('status, id')
+            .ilike('email', cleanEmail)
+            .maybeSingle();
+
+          if (bErr) return;
+
+          if (!bRow) {
+            // Check if pending registration exists
+            const { data: regRow } = await supabase
+              .from('pharmacy_registrations')
+              .select('status')
+              .ilike('email', cleanEmail)
+              .maybeSingle();
+
+            if (!regRow) {
+              // Completely deleted from database!
+              try { localStorage.removeItem('dg_session'); } catch { }
+              try { await supabase.auth.signOut(); } catch { }
+              a(prev => prev.filter(u => u.email.toLowerCase() !== cleanEmail));
+              r(null);
+              t('login');
+              setLoginError('This buyer account has been deleted and no longer has access to the portal.');
+              return;
+            } else if (regRow.status === 'Rejected') {
+              try { localStorage.removeItem('dg_session'); } catch { }
+              try { await supabase.auth.signOut(); } catch { }
+              r(null);
+              t('login');
+              setLoginError('Your registration application was rejected.');
+              return;
+            } else if (regRow.status === 'Pending' || regRow.status === 'Pending Verification') {
+              t('awaiting_approval');
+              return;
+            }
+          } else {
+            // Buyer found in buyers table
+            if (bRow.status === 'Rejected') {
+              try { localStorage.removeItem('dg_session'); } catch { }
+              try { await supabase.auth.signOut(); } catch { }
+              r(null);
+              t('login');
+              setLoginError('Your buyer account access has been revoked.');
+              return;
+            } else if (bRow.status === 'Pending' || bRow.status === 'Pending Verification') {
+              t('awaiting_approval');
+              return;
+            }
+          }
+        } catch (sessErr) {
+          console.error('Session validation error:', sessErr);
+        }
+      };
+      checkBuyerSessionValidity();
+    }
+  }, [e, f, n?.email]);
+
   // Compute delivery zone for the current buyer based on their city or address
   const buyerZone = getDeliveryZone(tn.city || n?.city || tn.buyerAddress || tn.address || tn.location || n?.address || '');
   const buyerDeliveryMen = buyerZone ? getDeliveryMenForZone(buyerZone) : [];
@@ -12187,14 +12251,37 @@ export default function App() {
 
             if (n && n.role === 'buyer') {
               try {
-                const { data: bCheck } = await supabase.from('buyers').select('status').ilike('email', cleanEmail).maybeSingle();
-                if (bCheck?.status) {
+                const { data: bCheck } = await supabase.from('buyers').select('status, id, name').ilike('email', cleanEmail).maybeSingle();
+                if (bCheck) {
                   n.status = bCheck.status;
-                  a(prev => prev.map(u => u.email.toLowerCase() === cleanEmail ? { ...u, status: bCheck.status } : u));
+                  n.buyerUuid = bCheck.id;
+                  a(prev => prev.map(u => u.email.toLowerCase() === cleanEmail ? { ...u, status: bCheck.status, buyerUuid: bCheck.id } : u));
                   try {
                     const saved = JSON.parse(localStorage.getItem('dg_users') || '[]');
-                    localStorage.setItem('dg_users', JSON.stringify(saved.map(u => u.email.toLowerCase() === cleanEmail ? { ...u, status: bCheck.status } : u)));
+                    localStorage.setItem('dg_users', JSON.stringify(saved.map(u => u.email.toLowerCase() === cleanEmail ? { ...u, status: bCheck.status, buyerUuid: bCheck.id } : u)));
                   } catch { }
+                } else {
+                  // Not found in buyers table. Check pharmacy_registrations
+                  const { data: regCheck } = await supabase.from('pharmacy_registrations').select('status, rejection_reason').ilike('email', cleanEmail).maybeSingle();
+                  if (regCheck) {
+                    n.status = regCheck.status;
+                    if (regCheck.rejection_reason) n.rejectionReason = regCheck.rejection_reason;
+                  } else {
+                    // DELETED: Buyer does not exist in buyers AND does not exist in pharmacy_registrations!
+                    console.warn(`Buyer ${cleanEmail} does not exist in database (deleted). Purging local cache.`);
+                    a(prev => prev.filter(u => u.email.toLowerCase() !== cleanEmail));
+                    try {
+                      const saved = JSON.parse(localStorage.getItem('dg_users') || '[]');
+                      localStorage.setItem('dg_users', JSON.stringify(saved.filter(u => u.email.toLowerCase() !== cleanEmail)));
+                    } catch { }
+                    try {
+                      localStorage.removeItem('dg_session');
+                      await supabase.auth.signOut();
+                    } catch { }
+                    setLoginError('This buyer account has been deleted and no longer has access to the portal.');
+                    setLoginLoading(false);
+                    return;
+                  }
                 }
               } catch (err) {
                 console.log('Supabase buyer status check error:', err);
@@ -12232,8 +12319,16 @@ export default function App() {
               if (n.status === 'Pending' || n.status === 'Pending Verification') {
                 r(n);
                 t('awaiting_approval');
+                setLoginLoading(false);
+                return;
               } else if (n.status === 'Rejected') {
-                setLoginError(`Your registration has been rejected. Reason: ${n.rejectionReason || 'Compliance audit failure.'}`);
+                try {
+                  localStorage.removeItem('dg_session');
+                  await supabase.auth.signOut();
+                } catch { }
+                setLoginError(`Your registration or access has been rejected or revoked. Reason: ${n.rejectionReason || 'Compliance audit / Administrative action.'}`);
+                setLoginLoading(false);
+                return;
               } else if (n.status === 'Approved') {
                 r(n);
                 t('authenticated');
@@ -12243,6 +12338,12 @@ export default function App() {
                 Je('');
                 Xe('');
                 setLoginError('');
+                setLoginLoading(false);
+                return;
+              } else {
+                setLoginError('Your buyer account is not active or authorized.');
+                setLoginLoading(false);
+                return;
               }
             } else if (n.role === 'admin') {
               r(n);
