@@ -5853,12 +5853,33 @@ export default function App() {
       };
       w(e => [i, ...e]), T(`Successfully processed return claim for ${e.name}. Issued refund of ৳${t} to buyer ledger.`);
     };
+
+  const navigateHome = () => {
+    l(false);
+    _t(null);
+    setShowPdfPreview(false);
+    if (f === 'buyer') {
+      mn();
+      k('dashboard');
+    } else if (f === 'admin') {
+      const defaultTab = hasPermission('approvals.view') ? 'approvals' : 'inventory';
+      ht(defaultTab);
+    }
+  };
+
   return e === `authenticated` ? <>
     <div className={`print:hidden flex h-screen bg-[#F8FAFC] font-sans text-[#1D2A3B] overflow-hidden antialiased ${o ? `dark` : ``}`}>
       {c && <div onClick={() => l(!1)} className="fixed inset-0 bg-[#1D2A3B]/40 backdrop-blur-xs z-40 md:hidden" />}
       <aside className={`fixed md:static inset-y-0 left-0 w-68 bg-white border-r border-[#E2E8F0] flex flex-col z-50 select-none flex-shrink-0 transform transition-transform duration-300 ${c ? `translate-x-0` : `-translate-x-full md:translate-x-0`}`}>
         <div className="h-20 flex items-center justify-between px-6 border-b border-[#E2E8F0]">
-          <div>
+          <div
+            onClick={navigateHome}
+            role="button"
+            tabIndex={0}
+            onKeyDown={evt => { if (evt.key === 'Enter' || evt.key === ' ') { evt.preventDefault(); navigateHome(); } }}
+            className="cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
+            title="Go to Home"
+          >
             <img src={logoUrl} className="h-10 md:h-12 lg:h-13 w-auto object-contain transition-all" alt="Logo" />
           </div>
           <button onClick={() => l(!1)} className="md:hidden p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer" title="Close Menu">
@@ -6215,7 +6236,14 @@ export default function App() {
       </aside>
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
         <header className="h-20 bg-white dark:bg-[#1D2A3B] border-b border-[#E2E8F0] dark:border-[#1D2A3B] flex items-center justify-between px-4 md:px-8 z-50 flex-shrink-0 gap-4">
-          <div className="flex md:hidden items-center gap-2 flex-shrink-0">
+          <div
+            onClick={navigateHome}
+            role="button"
+            tabIndex={0}
+            onKeyDown={evt => { if (evt.key === 'Enter' || evt.key === ' ') { evt.preventDefault(); navigateHome(); } }}
+            className="flex md:hidden items-center gap-2 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
+            title="Go to Home"
+          >
             <img src={logoUrl} className="h-[38px] w-auto object-contain" alt="Logo" />
           </div>
           <div className="hidden md:block flex-1 max-w-[480px]">
