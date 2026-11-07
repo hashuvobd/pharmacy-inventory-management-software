@@ -3,7 +3,8 @@ import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { Html5Qrcode } from "html5-qrcode";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
-const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, onSelectProduct, viewMode, specialDiscounts, onRequestMedicine, isRequested }) => {
+const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, onSelectProduct, viewMode, specialDiscounts, onRequestMedicine, isRequested, wishlist = [], onToggleWishlist }) => {
+  const isWishlisted = Boolean(med && (wishlist.includes(String(med.id)) || (med.brandId && wishlist.includes(String(med.brandId))) || (med.name && wishlist.includes(String(med.name)))));
   const cartQty = cart[med.id] || 0;
   const [inputQty, setInputQty] = useState(1);
   const basePrice = Number(med.unit_price || med.price || med.wholesalePrice || 0);
@@ -38,6 +39,23 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, onSelectProduct, view
                   {medType}
                 </span>
               )}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleWishlist && onToggleWishlist(med);
+                }}
+                className={`p-1 rounded-md transition-colors cursor-pointer ${
+                  isWishlisted
+                    ? 'text-rose-600 bg-rose-50 hover:bg-rose-100'
+                    : 'text-slate-400 hover:text-rose-500 hover:bg-rose-50'
+                }`}
+                title={isWishlisted ? "Remove from Wishlist" : "Save to Wishlist"}
+              >
+                <svg className="w-4 h-4" fill={isWishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth={isWishlisted ? "0" : "2"} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </button>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -170,17 +188,36 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, onSelectProduct, view
           </div>
         )}
 
-        {/* Info Icon Button on Top-Right */}
+        {/* Info Icon Button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             onSelectProduct ? onSelectProduct(med) : onOpenMonograph(med);
           }}
-          className="absolute top-2 right-2 p-1.5 bg-white/90 hover:bg-white text-slate-500 hover:text-[#0697A8] rounded-lg shadow-sm border border-slate-100 backdrop-blur-sm transition-all hover:scale-105 active:scale-95 cursor-pointer z-10"
-          title="View Medicine Details"
+          className="absolute top-2 right-10 p-1.5 bg-white/90 hover:bg-white text-slate-500 hover:text-[#0697A8] rounded-full shadow-xs border border-slate-100 backdrop-blur-sm transition-all hover:scale-105 active:scale-95 cursor-pointer z-10"
+          title="View Medicine Info"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+
+        {/* Wishlist Heart Button on Top-Right */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleWishlist && onToggleWishlist(med);
+          }}
+          className={`absolute top-2 right-2 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow-xs transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-xs z-10 ${
+            isWishlisted
+              ? 'bg-rose-50 text-rose-600 border border-rose-200'
+              : 'bg-white/85 text-slate-400 hover:text-rose-500 hover:bg-white border border-slate-200/80'
+          }`}
+          title={isWishlisted ? "Remove from Wishlist" : "Save to Wishlist"}
+        >
+          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill={isWishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth={isWishlisted ? "0" : "2"} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
         </button>
       </div>
@@ -307,6 +344,8 @@ const ProductDetailsView = ({
   product,
   catalog = [],
   cart = {},
+  wishlist = [],
+  onToggleWishlist,
   onAddToCart,
   onBuyNow,
   onBack,
@@ -318,6 +357,7 @@ const ProductDetailsView = ({
   onOpenFullscreenImage
 }) => {
   const [qty, setQty] = useState(1);
+  const isWishlisted = Boolean(product && (wishlist.includes(String(product.id)) || (product.brandId && wishlist.includes(String(product.brandId))) || (product.name && wishlist.includes(String(product.name)))));
 
   const basePrice = Number(product.wholesalePrice || product.unit_price || product.price || 0);
   const oldPrice = Number(product.pack_mrp || product.mrp || 0);
@@ -409,6 +449,20 @@ const ProductDetailsView = ({
           </button>
           <button
             type="button"
+            onClick={() => onToggleWishlist && onToggleWishlist(product)}
+            className={`p-2 rounded-xl transition-all cursor-pointer ${
+              isWishlisted
+                ? 'text-rose-600 bg-rose-50 hover:bg-rose-100'
+                : 'text-slate-600 hover:text-rose-500 hover:bg-rose-50'
+            }`}
+            title={isWishlisted ? "Remove from Wishlist" : "Save to Wishlist"}
+          >
+            <svg className="w-5 h-5" fill={isWishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth={isWishlisted ? "0" : "2"} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </button>
+          <button
+            type="button"
             onClick={onOpenCart}
             className="relative p-2 text-slate-600 hover:text-[#0697A8] hover:bg-[#E0F5F7] rounded-xl transition-colors cursor-pointer"
             title="Cart"
@@ -469,6 +523,25 @@ const ProductDetailsView = ({
                     </span>
                   </div>
                 )}
+
+                {/* Wishlist Button on Top-Right of Main Image */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleWishlist && onToggleWishlist(product);
+                  }}
+                  className={`absolute top-3 right-3 w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-md z-10 ${
+                    isWishlisted
+                      ? 'bg-rose-50 text-rose-600 border border-rose-200'
+                      : 'bg-white/90 text-slate-400 hover:text-rose-500 hover:bg-white border border-slate-200'
+                  }`}
+                  title={isWishlisted ? "Remove from Wishlist" : "Save to Wishlist"}
+                >
+                  <svg className="w-5 h-5" fill={isWishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth={isWishlisted ? "0" : "2"} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </button>
 
                 {/* Discount Badge */}
                 {discountPercent > 0 && (
@@ -718,6 +791,7 @@ const ProductDetailsView = ({
                 const altOldPrice = Number(alt.pack_mrp || alt.mrp || 0);
                 const altDiscountAmt = Math.max(0, altOldPrice - altBasePrice);
                 const altDiscountPercent = altOldPrice > 0 && altDiscountAmt > 0 ? Math.round((altDiscountAmt / altOldPrice) * 100) : 0;
+                const isAltWishlisted = Boolean(alt && (wishlist.includes(String(alt.id)) || (alt.brandId && wishlist.includes(String(alt.brandId))) || (alt.name && wishlist.includes(String(alt.name)))));
 
                 return (
                   <div
@@ -736,6 +810,24 @@ const ProductDetailsView = ({
                           </svg>
                         )}
                       </div>
+                      {/* Wishlist Heart Button on top-left of image (matching screenshot) */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onToggleWishlist && onToggleWishlist(alt);
+                        }}
+                        className={`absolute top-2 left-2 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow-xs transition-all hover:scale-110 active:scale-95 cursor-pointer backdrop-blur-xs z-10 ${
+                          isAltWishlisted
+                            ? 'bg-rose-50 text-rose-600 border border-rose-200'
+                            : 'bg-white/85 text-slate-400 hover:text-rose-500 hover:bg-white border border-slate-200/80'
+                        }`}
+                        title={isAltWishlisted ? "Remove from Wishlist" : "Save to Wishlist"}
+                      >
+                        <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill={isAltWishlisted ? "currentColor" : "none"} stroke="currentColor" strokeWidth={isAltWishlisted ? "0" : "2"} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                      </button>
                       {/* Discount Badge on bottom-right of image (just like the screenshot!) */}
                       {altDiscountPercent > 0 && (
                         <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-amber-500 text-white rounded-md text-[10px] font-black shadow-xs leading-none">
@@ -4137,6 +4229,17 @@ export default function App() {
     [selectedProduct, setSelectedProduct] = useState(null),
     [productHistory, setProductHistory] = useState([]),
     [fullscreenImage, setFullscreenImage] = useState(null),
+    [wishlist, setWishlist] = useState(() => {
+      try {
+        const lastUser = typeof window !== 'undefined' ? localStorage.getItem('last_user_id') : null;
+        const key = lastUser ? `pharmacy_wishlist_${lastUser}` : 'pharmacy_wishlist_default';
+        const saved = localStorage.getItem(key);
+        return saved ? JSON.parse(saved) : [];
+      } catch {
+        return [];
+      }
+    }),
+    [showOnlyWishlist, setShowOnlyWishlist] = useState(false),
     [ce, le] = useState([]),
     [N, ue] = useState([]),
     [de, fe] = useState(`all`),
@@ -4952,6 +5055,10 @@ export default function App() {
   };
   let nn = useMemo(() => (Array.isArray(m) ? m : []).filter(e => {
     if (!e || e.is_deactivated) return !1;
+    if (showOnlyWishlist) {
+      let eId = String(e.id || e.brandId || e.name);
+      if (!wishlist.includes(eId) && !wishlist.includes(String(e.brandId)) && !wishlist.includes(String(e.name))) return !1;
+    }
     if (oe.trim()) {
       let t = oe.toLowerCase();
       if (!(String(e.name || ``).toLowerCase().includes(t) || String(e.generic || ``).toLowerCase().includes(t) || String(e.brandId || ``).toLowerCase().includes(t) || String(e.manufacturer || ``).toLowerCase().includes(t))) return !1;
@@ -4982,10 +5089,10 @@ export default function App() {
       return i && !a ? -1 : !i && a ? 1 : n.localeCompare(r);
     }
     return he === `priceAsc` ? (e.wholesalePrice || 0) - (t.wholesalePrice || 0) : he === `priceDesc` ? (t.wholesalePrice || 0) - (e.wholesalePrice || 0) : he === `expiry` ? (e.expiryMonths || 0) - (t.expiryMonths || 0) : he === `stock` ? (t.stock || 0) - (e.stock || 0) : 0;
-  }), [m, oe, ce, N, de, pe, he]);
+  }), [m, oe, ce, N, de, pe, he, showOnlyWishlist, wishlist]);
   useEffect(() => {
     re(1);
-  }, [oe, ce, N, de, pe, he]);
+  }, [oe, ce, N, de, pe, he, showOnlyWishlist]);
 
   useEffect(() => {
     if (!m || m.length === 0) {
@@ -5492,6 +5599,27 @@ export default function App() {
       k(tab);
       l(!1);
     },
+    handleToggleWishlist = med => {
+      if (!med) return;
+      let medId = String(med.id || med.brandId || med.name);
+      let medName = med.name || 'Medicine';
+      setWishlist(prev => {
+        let exists = prev.includes(medId);
+        let next;
+        if (exists) {
+          next = prev.filter(id => id !== medId);
+          T(`Removed ${medName} from Wishlist`);
+        } else {
+          next = [...prev, medId];
+          T(`Saved ${medName} to Wishlist ❤️`);
+        }
+        try {
+          let userKey = n?.id ? `pharmacy_wishlist_${n.id}` : 'pharmacy_wishlist_default';
+          localStorage.setItem(userKey, JSON.stringify(next));
+        } catch {}
+        return next;
+      });
+    },
     ln = (e, t) => {
       let medId = typeof e === "object" && e !== null ? (e.id || e.brandId || e.name) : e;
       let n = m.find(item => String(item.id) === String(medId) || String(item.name) === String(medId) || String(item.brandId) === String(medId));
@@ -5751,7 +5879,7 @@ export default function App() {
       se(e), O !== `search` && k(`search`);
     },
     mn = () => {
-      se(``), le([]), ue([]), fe(`all`), me(`all`), ge(`name`), setOffersCompany("");
+      se(``), le([]), ue([]), fe(`all`), me(`all`), ge(`name`), setOffersCompany(""), setShowOnlyWishlist(false);
     },
     hn = m.filter(e => e.expiryMonths < 6).length,
     gn = m.filter(e => e.stock > 0 && e.stock <= 100).length,
@@ -6487,15 +6615,30 @@ export default function App() {
             </button>
             <button onClick={() => {
               handleTabSwitch(`search`);
-            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `search` && !selectedProduct ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
+              setShowOnlyWishlist(false);
+            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `search` && !showOnlyWishlist && !selectedProduct ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
               <div className="flex items-center gap-3">
-                <svg className={`w-4 h-4 ${O === `search` && !selectedProduct ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 ${O === `search` && !showOnlyWishlist && !selectedProduct ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <span>{`Search Medicines`}</span>
               </div>
               <span className="text-[10px] bg-[#C2EAF0] text-[#057A88] px-1.5 py-0.5 rounded-full font-bold">
                 {m.length}
+              </span>
+            </button>
+            <button onClick={() => {
+              handleTabSwitch(`search`);
+              setShowOnlyWishlist(true);
+            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `search` && showOnlyWishlist && !selectedProduct ? `bg-rose-50 text-rose-600 shadow-sm font-bold` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
+              <div className="flex items-center gap-3">
+                <svg className={`w-4 h-4 ${O === `search` && showOnlyWishlist && !selectedProduct ? `text-rose-600` : `text-[#94A3B8]`}`} fill={O === `search` && showOnlyWishlist && !selectedProduct ? "currentColor" : "none"} stroke="currentColor" strokeWidth={O === `search` && showOnlyWishlist && !selectedProduct ? "0" : "2"} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                <span>{`My Wishlist`}</span>
+              </div>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${wishlist.length > 0 ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-500'}`}>
+                {wishlist.length}
               </span>
             </button>
             <button onClick={() => {
@@ -6941,6 +7084,8 @@ export default function App() {
                 product={selectedProduct}
                 catalog={m}
                 cart={ye}
+                wishlist={wishlist}
+                onToggleWishlist={handleToggleWishlist}
                 onAddToCart={addToCartQuiet}
                 onBuyNow={buyNowProduct}
                 onBack={handleBackProduct}
@@ -7205,7 +7350,7 @@ export default function App() {
                     return displayedOffers.length > 0 ? (
                       <div className={ie === `grid` ? `grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-5` : `flex flex-col gap-4`}>
                         {displayedOffers.map(med => (
-                          <Sa key={med.id} med={med} cart={ye} handleAddToCart={cn} onOpenMonograph={je} onSelectProduct={handleSelectProduct} viewMode={ie} specialDiscounts={specialDiscounts} onRequestMedicine={handleOpenQuickRequest} isRequested={isMedicineRequested(med)} />
+                          <Sa key={med.id} med={med} cart={ye} wishlist={wishlist} onToggleWishlist={handleToggleWishlist} handleAddToCart={cn} onOpenMonograph={je} onSelectProduct={handleSelectProduct} viewMode={ie} specialDiscounts={specialDiscounts} onRequestMedicine={handleOpenQuickRequest} isRequested={isMedicineRequested(med)} />
                         ))}
                       </div>
                     ) : (
@@ -7328,6 +7473,28 @@ export default function App() {
                           </svg>
                         </button>
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowOnlyWishlist(prev => !prev)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                          showOnlyWishlist
+                            ? 'bg-rose-500 text-white shadow-xs'
+                            : 'bg-slate-50 hover:bg-rose-50 text-[#475569] hover:text-rose-600 border border-[#E2E8F0]'
+                        }`}
+                        title={showOnlyWishlist ? "Show All Medicines" : "Filter Saved Wishlist Medicines"}
+                      >
+                        <svg className="w-3.5 h-3.5" fill={showOnlyWishlist ? "currentColor" : "none"} stroke="currentColor" strokeWidth={showOnlyWishlist ? "0" : "2"} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        <span>Wishlist</span>
+                        {wishlist.length > 0 && (
+                          <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black leading-none ${
+                            showOnlyWishlist ? 'bg-white text-rose-600' : 'bg-rose-100 text-rose-700'
+                          }`}>
+                            {wishlist.length}
+                          </span>
+                        )}
+                      </button>
                       <select value={ce[0] || ""} onChange={e => le(e.target.value ? [e.target.value] : [])} className="hidden md:block bg-slate-50 border border-[#E2E8F0] rounded-xl px-2.5 py-1.5 text-xs text-[#475569] font-semibold focus:outline-none focus:border-blue-500">
                         <option value="">{`All Companies`}</option>
                         {Gt.map(c => <option key={c} value={c}>{c}</option>)}
@@ -7352,13 +7519,26 @@ export default function App() {
                     </div>
                   ) : nn.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center p-8 bg-white rounded-2xl border border-[#E2E8F0]">
-                      <h3 className="text-sm font-bold text-[#1D2A3B]">{`No Medicines Found`}</h3>
-                      <p className="text-xs text-[#64748B] mt-1 max-w-sm">{`No items matched the criteria. Try resetting the filters.`}</p>
-                      <button onClick={mn} className="mt-4 bg-[#E0F5F7] text-[#0697A8] px-4 py-2 rounded-xl text-xs font-bold hover:bg-[#C2EAF0]">{`Reset All Filters`}</button>
+                      <div className="w-14 h-14 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mb-3">
+                        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-sm font-bold text-[#1D2A3B]">
+                        {showOnlyWishlist ? `Your Wishlist is Empty` : `No Medicines Found`}
+                      </h3>
+                      <p className="text-xs text-[#64748B] mt-1 max-w-sm">
+                        {showOnlyWishlist
+                          ? `You haven't saved any medicines yet. Click the heart icon on any medicine card or product details page to save it for quick reordering.`
+                          : `No items matched the criteria. Try resetting the filters.`}
+                      </p>
+                      <button onClick={mn} className="mt-4 bg-[#E0F5F7] text-[#0697A8] px-4 py-2 rounded-xl text-xs font-bold hover:bg-[#C2EAF0]">
+                        {showOnlyWishlist ? `Browse All Medicines` : `Reset All Filters`}
+                      </button>
                     </div>
                   ) : (
                     <div className={ie === `grid` ? `grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-5` : `flex flex-col gap-4`}>
-                      {an.map((e, idx) => e ? <Sa key={e.id || idx} med={e} cart={ye || {}} handleAddToCart={cn} onOpenMonograph={je} onSelectProduct={handleSelectProduct} viewMode={ie} specialDiscounts={specialDiscounts || {}} onRequestMedicine={handleOpenQuickRequest} isRequested={isMedicineRequested(e)} /> : null)}
+                      {an.map((e, idx) => e ? <Sa key={e.id || idx} med={e} cart={ye || {}} wishlist={wishlist} onToggleWishlist={handleToggleWishlist} handleAddToCart={cn} onOpenMonograph={je} onSelectProduct={handleSelectProduct} viewMode={ie} specialDiscounts={specialDiscounts || {}} onRequestMedicine={handleOpenQuickRequest} isRequested={isMedicineRequested(e)} /> : null)}
                     </div>
                   )}
                   {rn.length > 0 && <div className="mt-6 flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl border border-[#E2E8F0] shadow-sm gap-4">
