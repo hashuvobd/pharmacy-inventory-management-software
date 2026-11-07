@@ -3084,7 +3084,10 @@ export default function App() {
               ...existing,
               status: normBuyerStatus(b.status || existing.status),
               creditLimit: b.credit_limit ?? existing.creditLimit,
-              outstandingBalance: b.outstanding_balance ?? existing.outstandingBalance
+              outstandingBalance: b.outstanding_balance ?? existing.outstandingBalance,
+              drugLicenseFile: b.drug_license_file || existing.drugLicenseFile,
+              tradeLicense: (b.trade_license && b.trade_license !== 'N/A') ? b.trade_license : existing.tradeLicense,
+              licenseNumber: (b.license_number && b.license_number !== 'N/A') ? b.license_number : existing.licenseNumber
             });
           } else {
             mergedMap.set(key, {
@@ -4061,6 +4064,42 @@ export default function App() {
     },
     [mt, ht] = useState(`approvals`),
     [gt, _t] = useState(null),
+    [showPdfPreview, setShowPdfPreview] = useState(false),
+    getDocUrl = file => {
+      if (!file) return null;
+      const str = String(file).trim();
+      if (!str || str === 'uploaded_drug_license.pdf' || str === 'trade_license_copy.pdf') {
+        return null;
+      }
+      if (str.startsWith('http://') || str.startsWith('https://') || str.startsWith('blob:') || str.startsWith('data:')) {
+        return str;
+      }
+      if (str.toLowerCase().endsWith('.pdf') || str.includes('.')) {
+        if (str.startsWith('/')) return `https://dgpharma.shop${str}`;
+        if (str.startsWith('uploads/')) return `https://dgpharma.shop/${str}`;
+        return `https://dgpharma.shop/uploads/${str}`;
+      }
+      return null;
+    },
+    handleDownloadDoc = (url, fallbackName) => {
+      if (!url) {
+        T('No document file attached.');
+        return;
+      }
+      try {
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.download = fallbackName || 'document.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        T('Opening document for download...');
+      } catch {
+        window.open(url, '_blank');
+      }
+    },
     [I, vt] = useState(null),
     [yt, bt] = useState({
       licenseGov: !1,
@@ -5153,7 +5192,7 @@ export default function App() {
         date: `Just now`,
         read: !1
       };
-      w(e => [n, ...e]), _t(null), bt({
+      w(e => [n, ...e]), _t(null), setShowPdfPreview(false), bt({
         licenseGov: !1,
         addressMatch: !1,
         ownerIdVerify: !1,
@@ -5207,7 +5246,7 @@ export default function App() {
         date: `Just now`,
         read: !1
       };
-      w(e => [n, ...e]), _t(null), St(``), wt(!1), Et(``);
+      w(e => [n, ...e]), _t(null), setShowPdfPreview(false), St(``), wt(!1), Et(``);
       T(`Access for "${t?.name || e}" has been rejected/revoked.`);
 
       try {
@@ -7434,27 +7473,25 @@ export default function App() {
                                   {e.location}
                                 </td>
                                 <td className="px-5 py-4 text-center" onClick={ev => ev.stopPropagation()}>
-                                  {e.drugLicenseFile ? (
-                                    <a
-                                      href={e.drugLicenseFile.startsWith('http') ? e.drugLicenseFile : `#preview-${e.drugLicenseFile}`}
-                                      target={e.drugLicenseFile.startsWith('http') ? "_blank" : "_self"}
-                                      rel="noreferrer"
-                                      onClick={t => {
-                                        if (!e.drugLicenseFile.startsWith('http')) {
-                                          t.preventDefault();
-                                          T(`License file: ${e.drugLicenseFile}`);
-                                        }
-                                      }}
-                                      className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-900 hover:bg-red-100 rounded-lg text-[10px] font-bold transition-all"
-                                    >
-                                      <svg className="w-3.5 h-3.5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                                      </svg>
-                                      <span>{`License.pdf`}</span>
-                                    </a>
-                                  ) : (
-                                    <span className="text-[10px] text-slate-400 italic">None</span>
-                                  )}
+                                  {(() => {
+                                    const docUrl = getDocUrl(e.drugLicenseFile);
+                                    return docUrl ? (
+                                      <a
+                                        href={docUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-100 dark:border-red-900 hover:bg-red-100 rounded-lg text-[10px] font-bold transition-all cursor-pointer"
+                                        title="Open License PDF in new tab"
+                                      >
+                                        <svg className="w-3.5 h-3.5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                          <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                                        </svg>
+                                        <span>License.pdf</span>
+                                      </a>
+                                    ) : (
+                                      <span className="text-[10px] text-slate-400 italic">{e.drugLicenseFile ? 'No Link' : 'None'}</span>
+                                    );
+                                  })()}
                                 </td>
                                 <td className="px-5 py-4">
                                   <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${e.status === `Approved`
@@ -7563,9 +7600,25 @@ export default function App() {
                                 <span className="text-[9px] text-[#94A3B8] block uppercase font-bold tracking-wider">{`Location`}</span>
                                 <span className="font-semibold truncate block">{e.location}</span>
                               </div>
-                              <div className="col-span-2">
-                                <span className="text-[9px] text-[#94A3B8] block uppercase font-bold tracking-wider">{`Drug License Number`}</span>
-                                <span className="font-mono font-semibold">{e.licenseNumber}</span>
+                              <div className="col-span-2 flex items-center justify-between gap-2">
+                                <div>
+                                  <span className="text-[9px] text-[#94A3B8] block uppercase font-bold tracking-wider">{`Drug License Number`}</span>
+                                  <span className="font-mono font-semibold">{e.licenseNumber}</span>
+                                </div>
+                                {getDocUrl(e.drugLicenseFile) && (
+                                  <a
+                                    href={getDocUrl(e.drugLicenseFile)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={ev => ev.stopPropagation()}
+                                    className="inline-flex items-center gap-1 px-2.5 py-1 bg-red-50 text-red-700 border border-red-100 hover:bg-red-100 rounded-lg text-[10px] font-bold transition-all shrink-0 cursor-pointer"
+                                  >
+                                    <span>View PDF</span>
+                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                    </svg>
+                                  </a>
+                                )}
                               </div>
                             </div>
                             <div className="pt-3 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center gap-2 flex-wrap">
@@ -10601,7 +10654,7 @@ export default function App() {
         </div>}
         {f === `admin` && gt && <div className="fixed inset-0 z-50 flex justify-end font-sans">
           <div onClick={() => {
-            _t(null), wt(!1);
+            _t(null), wt(!1), setShowPdfPreview(false);
           }} className="absolute inset-0 bg-[#1D2A3B]/40 backdrop-blur-xs" />
           <div className="relative w-full max-w-md md:w-128 bg-white h-full shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300">
             <div className="px-6 py-5 border-b border-[#E2E8F0] flex justify-between items-center bg-slate-50">
@@ -10613,7 +10666,7 @@ export default function App() {
                 </p>
               </div>
               <button onClick={() => {
-                _t(null), wt(!1);
+                _t(null), wt(!1), setShowPdfPreview(false);
               }} className="text-[#64748B] hover:text-[#1D2A3B] p-1 rounded-lg hover:bg-slate-100">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
@@ -10673,33 +10726,187 @@ export default function App() {
                   </div>
                 </div>
               </div>
-              <div className="space-y-2">
-                <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Verification Attachments`}</span>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 bg-white border border-[#E2E8F0] rounded-xl flex items-center justify-between shadow-xs">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-red-50 text-red-600 rounded-lg flex items-center justify-center font-bold text-xs">{`PDF`}</div>
-                      <div>
-                        <span className="font-bold block text-[11px] text-[#1D2A3B]">{`Drug License`}</span>
-                        <span className="text-[9px] text-[#94A3B8] font-mono truncate max-w-[100px] block">
-                          {gt.drugLicenseFile}
+              {(() => {
+                const drugLicenseUrl = getDocUrl(gt.drugLicenseFile);
+                const tradeLicenseUrl = getDocUrl(gt.tradeLicenseFile || gt.trade_license_file);
+
+                return (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Verification Attachments`}</span>
+                      {drugLicenseUrl && (
+                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          PDF Attached
                         </span>
+                      )}
+                    </div>
+
+                    {/* Drug License Document Card */}
+                    <div className="p-3.5 bg-white border border-[#E2E8F0] rounded-xl shadow-xs space-y-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-9 h-9 bg-red-50 text-red-600 rounded-xl flex items-center justify-center font-black text-xs shrink-0 border border-red-100">
+                            PDF
+                          </div>
+                          <div className="min-w-0">
+                            <span className="font-bold block text-xs text-[#1D2A3B] truncate">
+                              DGDA Drug License Copy
+                            </span>
+                            <span className="text-[10px] text-[#94A3B8] font-mono truncate block max-w-[220px]" title={gt.drugLicenseFile || 'No file attached'}>
+                              {gt.drugLicenseFile ? (gt.drugLicenseFile.split('/').pop() || gt.drugLicenseFile) : 'No file attached'}
+                            </span>
+                          </div>
+                        </div>
+                        {drugLicenseUrl ? (
+                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full shrink-0">
+                            Verified File
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full shrink-0">
+                            No Link
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Action buttons */}
+                      <div className="pt-2 border-t border-slate-100 flex items-center gap-2 flex-wrap">
+                        {drugLicenseUrl ? (
+                          <>
+                            <a
+                              href={drugLicenseUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[#0697A8] hover:bg-[#057A88] text-white rounded-lg font-bold text-xs shadow-xs transition-all cursor-pointer"
+                            >
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                              <span>Open PDF in New Tab</span>
+                            </a>
+                            <button
+                              type="button"
+                              onClick={() => setShowPdfPreview(!showPdfPreview)}
+                              className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg font-bold text-xs transition-all cursor-pointer border ${showPdfPreview ? 'bg-slate-200 text-slate-800 border-slate-300' : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'}`}
+                            >
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                              <span>{showPdfPreview ? 'Hide' : 'Quick Preview'}</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDownloadDoc(drugLicenseUrl, `Drug_License_${gt.licenseNumber || gt.id}.pdf`)}
+                              className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors cursor-pointer"
+                              title="Download PDF"
+                            >
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                              </svg>
+                            </button>
+                          </>
+                        ) : (
+                          <div className="w-full text-center py-2 text-[11px] text-amber-700 bg-amber-50 rounded-lg">
+                            {gt.drugLicenseFile ? `File reference: ${gt.drugLicenseFile} (No valid HTTP URL attached)` : 'No PDF file was uploaded during registration'}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Embedded Live PDF Preview */}
+                      {drugLicenseUrl && showPdfPreview && (
+                        <div className="mt-3 rounded-xl border border-slate-200 overflow-hidden bg-slate-50 shadow-inner">
+                          <div className="px-3 py-2 bg-slate-100 border-b border-slate-200 flex items-center justify-between text-[11px]">
+                            <span className="font-bold text-slate-700 flex items-center gap-1.5">
+                              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                              Live Document Preview
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <a
+                                href={drugLicenseUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[#0697A8] hover:underline font-bold flex items-center gap-1"
+                              >
+                                Fullscreen ↗
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() => setShowPdfPreview(false)}
+                                className="text-slate-400 hover:text-slate-600 font-bold ml-1 cursor-pointer"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          </div>
+                          <div className="w-full h-80 bg-white relative">
+                            <iframe
+                              src={drugLicenseUrl}
+                              title="Drug License PDF Preview"
+                              className="w-full h-full border-0"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Trade License Card */}
+                    <div className="p-3 bg-white border border-[#E2E8F0] rounded-xl shadow-xs">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-8 h-8 bg-[#E0F5F7] text-[#0697A8] rounded-xl flex items-center justify-center font-black text-xs shrink-0 border border-teal-100">
+                            {tradeLicenseUrl ? 'PDF' : 'CODE'}
+                          </div>
+                          <div className="min-w-0">
+                            <span className="font-bold block text-xs text-[#1D2A3B] truncate">Trade License</span>
+                            <span className="text-[10px] text-slate-500 font-mono truncate block">
+                              {gt.tradeLicense && gt.tradeLicense !== 'N/A' ? `Code: ${gt.tradeLicense}` : 'No code registered'}
+                            </span>
+                          </div>
+                        </div>
+                        {tradeLicenseUrl ? (
+                          <div className="flex items-center gap-1.5">
+                            <a
+                              href={tradeLicenseUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-2.5 py-1.5 bg-[#0697A8] hover:bg-[#057A88] text-white rounded-lg font-bold text-xs transition-colors inline-flex items-center gap-1 cursor-pointer"
+                            >
+                              <span>View PDF</span>
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              </svg>
+                            </a>
+                            <button
+                              type="button"
+                              onClick={() => handleDownloadDoc(tradeLicenseUrl, `Trade_License_${gt.id}.pdf`)}
+                              className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg"
+                              title="Download Trade License"
+                            >
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                              </svg>
+                            </button>
+                          </div>
+                        ) : (
+                          gt.tradeLicense && gt.tradeLicense !== 'N/A' && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(gt.tradeLicense);
+                                T('Trade license code copied to clipboard!');
+                              }}
+                              className="px-2.5 py-1 text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-[10px] font-bold cursor-pointer"
+                            >
+                              Copy Code
+                            </button>
+                          )
+                        )}
                       </div>
                     </div>
-                    <button onClick={() => T(`Downloading ${gt.drugLicenseFile}...`)} className="text-[#94A3B8] hover:text-[#475569]" title="Download Document">{`⬇️`}</button>
                   </div>
-                  <div className="p-3 bg-white border border-[#E2E8F0] rounded-xl flex items-center justify-between shadow-xs">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-[#E0F5F7] text-[#0697A8] rounded-lg flex items-center justify-center font-bold text-xs">{`PDF`}</div>
-                      <div>
-                        <span className="font-bold block text-[11px] text-[#1D2A3B]">{`Trade License`}</span>
-                        <span className="text-[9px] text-[#94A3B8] font-mono truncate max-w-[100px] block">{`trade_license_copy.pdf`}</span>
-                      </div>
-                    </div>
-                    <button onClick={() => T(`Downloading trade_license_copy.pdf...`)} className="text-[#94A3B8] hover:text-[#475569]" title="Download Document">{`⬇️`}</button>
-                  </div>
-                </div>
-              </div>
+                );
+              })()}
               <div className="border-t border-[#E2E8F0] pt-4 space-y-3">
                 <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`DGDA Compliance Audit Checklist`}</span>
                 <div className="space-y-2 text-[#475569]">
