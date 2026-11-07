@@ -2506,7 +2506,17 @@ export default function App() {
     [coupons, setCoupons] = useState([]),
     [couponInput, setCouponInput] = useState(``),
     [appliedCoupon, setAppliedCoupon] = useState(null),
-    [isPlacingOrder, setIsPlacingOrder] = useState(false);
+    [isPlacingOrder, setIsPlacingOrder] = useState(false),
+    [useCustomAddress, setUseCustomAddress] = useState(false),
+    [customAddress, setCustomAddress] = useState({
+      addressLine1: '',
+      addressLine2: '',
+      city: '',
+      division: 'Dhaka',
+      postalCode: '',
+      phone: ''
+    }),
+    [addressError, setAddressError] = useState('');
 
   // Delivery Zones & Delivery Men state
   const [deliveryMen, setDeliveryMen] = useState(() => {
@@ -4908,13 +4918,48 @@ export default function App() {
     },
     fn = async () => {
       if (on.length === 0 || isPlacingOrder) return;
-      if (!deliveryLocation) {
-        setLocationError(true);
-        document.getElementById('map-container')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        alert("Please select or pin your delivery location on the map before placing the order.");
-        return;
+
+      // 1. Resolve Delivery Address (Default Registered vs Custom Added)
+      let resolvedAddressLine1 = '';
+      let resolvedAddressLine2 = '';
+      let resolvedCity = '';
+      let resolvedDivision = 'Dhaka';
+      let resolvedPostalCode = '';
+      let resolvedPhone = tn.phone || n?.phone || '';
+      let resolvedFullAddress = '';
+
+      if (useCustomAddress) {
+        if (!customAddress.addressLine1 || !customAddress.addressLine1.trim()) {
+          setAddressError('Please enter Address Line 1 for delivery.');
+          return;
+        }
+        if (!customAddress.city || !customAddress.city.trim()) {
+          setAddressError('Please enter City / Area for delivery.');
+          return;
+        }
+        setAddressError('');
+        resolvedAddressLine1 = customAddress.addressLine1.trim();
+        resolvedAddressLine2 = (customAddress.addressLine2 || '').trim();
+        resolvedCity = customAddress.city.trim();
+        resolvedDivision = (customAddress.division || 'Dhaka').trim();
+        resolvedPostalCode = (customAddress.postalCode || '').trim();
+        resolvedPhone = (customAddress.phone || '').trim() || tn.phone || n?.phone || '';
+        resolvedFullAddress = [
+          resolvedAddressLine1,
+          resolvedAddressLine2,
+          resolvedCity,
+          (resolvedDivision && resolvedPostalCode ? `${resolvedDivision} - ${resolvedPostalCode}` : resolvedDivision || resolvedPostalCode)
+        ].filter(Boolean).join(', ');
+      } else {
+        resolvedAddressLine1 = tn.addressLine1 || n?.addressLine1 || '';
+        resolvedAddressLine2 = tn.addressLine2 || n?.addressLine2 || '';
+        resolvedCity = tn.city || n?.city || '';
+        resolvedDivision = tn.division || n?.division || 'Dhaka';
+        resolvedPostalCode = tn.postalCode || n?.postalCode || '';
+        resolvedPhone = tn.phone || n?.phone || '';
+        resolvedFullAddress = tn.address || getFullAddress(n) || 'Default Registered Address';
       }
-      setLocationError(false);
+
       setIsPlacingOrder(true);
 
       try {
@@ -4975,14 +5020,14 @@ export default function App() {
           buyerId: buyerDbUuid || n?.pharmacyId || n?.id || '',
           buyerEmail: n?.email || '',
           buyerName: tn?.name || n?.name || 'Registered Pharmacy',
-          buyerAddress: tn?.address || n?.address || '',
-          addressLine1: tn?.addressLine1 || n?.addressLine1 || '',
-          addressLine2: tn?.addressLine2 || n?.addressLine2 || '',
-          city: tn?.city || n?.city || '',
-          division: tn?.division || n?.division || '',
-          postalCode: tn?.postalCode || n?.postalCode || '',
-          location: tn?.address || n?.address || '',
-          phone: tn?.phone || n?.phone || '',
+          buyerAddress: resolvedFullAddress,
+          addressLine1: resolvedAddressLine1,
+          addressLine2: resolvedAddressLine2,
+          city: resolvedCity,
+          division: resolvedDivision,
+          postalCode: resolvedPostalCode,
+          location: resolvedFullAddress,
+          phone: resolvedPhone,
           date: orderDateStr,
           totalAmount: sn.finalTotal,
           subtotal: sn.subtotal,
@@ -4994,7 +5039,7 @@ export default function App() {
           status: `Pending Verification`,
           paymentStatus: `Pending (COD)`,
           paymentMethod: `Cash on Delivery (COD)`,
-          locationCoordinates: deliveryLocation,
+          locationCoordinates: null,
           items: on.map(e => ({
             id: e.id,
             name: e.name || e.product_name || '',
@@ -5011,13 +5056,13 @@ export default function App() {
           id: orderId,
           buyer_name: newOrder.buyerName,
           buyer_id: isUuid(buyerDbUuid) ? buyerDbUuid : null,
-          phone: newOrder.phone || null,
-          buyer_address: newOrder.buyerAddress || null,
-          address_line1: newOrder.addressLine1 || null,
-          address_line2: newOrder.addressLine2 || null,
-          city: newOrder.city || null,
-          division: newOrder.division || null,
-          postal_code: newOrder.postalCode || null,
+          phone: resolvedPhone || null,
+          buyer_address: resolvedFullAddress || null,
+          address_line1: resolvedAddressLine1 || null,
+          address_line2: resolvedAddressLine2 || null,
+          city: resolvedCity || null,
+          division: resolvedDivision || null,
+          postal_code: resolvedPostalCode || null,
           order_date: orderDateStr,
           total_amount: sn.finalTotal,
           status: `Pending Verification`,
@@ -10952,86 +10997,191 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-                <div className="border-t border-[#E2E8F0] pt-3 space-y-2">
-                  <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Delivery Location`}</span>
-                  <div className="flex flex-col gap-2 mb-2">
-                    <input
-                      type="text"
-                      placeholder="Search for an area..."
-                      className="w-full min-w-0 text-xs border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0697A8]"
-                      id="mapSearchInput"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          const q = e.target.value;
-                          if (q) {
-                            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`)
-                              .then(res => res.json())
-                              .then(data => {
-                                if (data && data.length > 0) {
-                                  setDeliveryLocation({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) });
-                                }
-                              });
-                          }
-                        }
-                      }}
-                    />
-                    <div className="flex gap-2 w-full">
+                <div className="border-t border-[#E2E8F0] pt-3 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider block">{`Delivery Address`}</span>
+                    {useCustomAddress && (
                       <button
                         type="button"
-                        className="flex-1 bg-[#0697A8] hover:bg-[#057A88] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors"
                         onClick={() => {
-                          const q = document.getElementById('mapSearchInput').value;
-                          if (q) {
-                            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`)
-                              .then(res => res.json())
-                              .then(data => {
-                                if (data && data.length > 0) {
-                                  setDeliveryLocation({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) });
-                                  setLocationError(false);
-                                }
-                              });
-                          }
+                          setUseCustomAddress(false);
+                          setAddressError('');
                         }}
+                        className="text-[11px] font-bold text-[#0697A8] hover:underline cursor-pointer"
                       >
-                        Search
+                        {`← Use Default Address`}
                       </button>
+                    )}
+                  </div>
+
+                  {!useCustomAddress ? (
+                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <div>
+                            <span className="text-xs font-bold text-[#1D2A3B] block">{`Default Registered Address`}</span>
+                            <span className="text-[10px] text-slate-500 font-medium block">{`Used during shop registration`}</span>
+                          </div>
+                        </div>
+                        <span className="bg-emerald-50 text-emerald-700 text-[9px] font-bold px-1.5 py-0.5 rounded border border-emerald-200 shrink-0">
+                          {`Selected`}
+                        </span>
+                      </div>
+
+                      <div className="bg-white rounded-lg p-2.5 border border-slate-200 text-xs text-slate-700 space-y-1">
+                        <p className="font-semibold text-slate-800">
+                          {tn.name || n?.name || 'Registered Pharmacy'}
+                        </p>
+                        <p className="text-slate-600 text-[11px] leading-relaxed">
+                          {getFullAddress(n) || tn.address || 'Registered Pharmacy Address'}
+                        </p>
+                        <div className="flex items-center gap-3 pt-1 text-[10px] text-slate-500 font-mono">
+                          <span>📞 {tn.phone || n?.phone || 'N/A'}</span>
+                          {(tn.city || n?.city) && <span>📍 {tn.city || n?.city}</span>}
+                        </div>
+                      </div>
+
                       <button
                         type="button"
-                        className="flex-1 bg-slate-200 hover:bg-slate-300 text-[#1D2A3B] px-3 py-1.5 rounded-lg text-xs font-bold transition-colors whitespace-nowrap"
                         onClick={() => {
-                          if ("geolocation" in navigator) {
-                            navigator.geolocation.getCurrentPosition((position) => {
-                              setDeliveryLocation({
-                                lat: position.coords.latitude,
-                                lng: position.coords.longitude
-                              });
-                              setLocationError(false);
-                            }, (error) => {
-                              console.error("Error getting location:", error);
-                              alert("Unable to retrieve your location. Please check browser permissions.");
-                            });
-                          } else {
-                            alert("Geolocation is not supported by your browser.");
-                          }
+                          setUseCustomAddress(true);
+                          setAddressError('');
                         }}
-                        title="Get current location"
+                        className="w-full py-2 bg-white hover:bg-slate-100 border border-slate-200 text-[#0697A8] hover:text-[#057A88] rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
                       >
-                        📍 Locate Me
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span>{`Deliver to a Different Address`}</span>
                       </button>
                     </div>
-                  </div>
-                  <div id="map-container" className={`h-48 w-full rounded-xl overflow-hidden border z-10 relative transition-colors ${locationError ? 'border-red-500 shadow-[0_0_0_2px_rgba(239,68,68,0.2)]' : 'border-[#E2E8F0]'}`}>
-                    {locationError && <div className="absolute top-0 inset-x-0 bg-red-500 text-white text-xs text-center py-1 font-bold z-[1000] shadow-sm">Please select a delivery location!</div>}
-                    <MapContainer attributionControl={false} center={[23.8103, 90.4125]} zoom={13} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
-                      <TileLayer
-                        attribution=""
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      />
-                      <LocationMarker position={deliveryLocation} setPosition={(pos) => { setDeliveryLocation(pos); setLocationError(false); }} />
-                    </MapContainer>
-                  </div>
-                  <span className="text-[9px] text-[#64748B] block mt-1">{`Click on the map to pin your exact delivery location.`}</span>
+                  ) : (
+                    <div className="bg-slate-50 border border-[#0697A8]/30 rounded-xl p-3 space-y-2.5 animate-in fade-in duration-150">
+                      <div className="flex items-center justify-between pb-1 border-b border-slate-200">
+                        <span className="text-xs font-bold text-[#1D2A3B] flex items-center gap-1.5">
+                          <span>📍</span>
+                          <span>{`New Delivery Location`}</span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUseCustomAddress(false);
+                            setAddressError('');
+                          }}
+                          className="text-[11px] text-slate-500 hover:text-slate-700 font-bold cursor-pointer"
+                        >
+                          {`Cancel`}
+                        </button>
+                      </div>
+
+                      {addressError && (
+                        <div className="text-[11px] bg-red-50 text-red-600 px-2.5 py-1.5 rounded-lg border border-red-200 font-semibold flex items-center gap-1.5">
+                          <svg className="w-3.5 h-3.5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span>{addressError}</span>
+                        </div>
+                      )}
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                          {`Address Line 1 / Street`} <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. House #12, Road #4, Sector 3"
+                          value={customAddress.addressLine1}
+                          onChange={(e) => {
+                            setCustomAddress(prev => ({ ...prev, addressLine1: e.target.value }));
+                            setAddressError('');
+                          }}
+                          className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-800 outline-none focus:border-[#0697A8] focus:ring-1 focus:ring-[#0697A8]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                          {`Address Line 2 (Optional)`}
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Flat 4B, Landmark (optional)"
+                          value={customAddress.addressLine2}
+                          onChange={(e) => setCustomAddress(prev => ({ ...prev, addressLine2: e.target.value }))}
+                          className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-800 outline-none focus:border-[#0697A8] focus:ring-1 focus:ring-[#0697A8]"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                            {`City / Area`} <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Uttara / Dhanmondi"
+                            value={customAddress.city}
+                            onChange={(e) => {
+                              setCustomAddress(prev => ({ ...prev, city: e.target.value }));
+                              setAddressError('');
+                            }}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-800 outline-none focus:border-[#0697A8] focus:ring-1 focus:ring-[#0697A8]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                            {`Division`}
+                          </label>
+                          <select
+                            value={customAddress.division}
+                            onChange={(e) => setCustomAddress(prev => ({ ...prev, division: e.target.value }))}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 outline-none focus:border-[#0697A8]"
+                          >
+                            <option value="Dhaka">Dhaka</option>
+                            <option value="Chittagong">Chittagong</option>
+                            <option value="Rajshahi">Rajshahi</option>
+                            <option value="Khulna">Khulna</option>
+                            <option value="Barisal">Barisal</option>
+                            <option value="Sylhet">Sylhet</option>
+                            <option value="Rangpur">Rangpur</option>
+                            <option value="Mymensingh">Mymensingh</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                            {`Postal Code`}
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="e.g. 1230"
+                            value={customAddress.postalCode}
+                            onChange={(e) => setCustomAddress(prev => ({ ...prev, postalCode: e.target.value }))}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-800 outline-none focus:border-[#0697A8]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">
+                            {`Contact Phone`}
+                          </label>
+                          <input
+                            type="text"
+                            placeholder={tn.phone || n?.phone || "017XXXXXXXX"}
+                            value={customAddress.phone}
+                            onChange={(e) => setCustomAddress(prev => ({ ...prev, phone: e.target.value }))}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-800 outline-none focus:border-[#0697A8]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="p-3.5 md:p-6 border-t border-[#E2E8F0] bg-slate-50 space-y-3 flex-shrink-0">
