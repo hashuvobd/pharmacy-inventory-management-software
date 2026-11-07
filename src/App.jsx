@@ -3,7 +3,7 @@ import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { Html5Qrcode } from "html5-qrcode";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
-const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDiscounts, onRequestMedicine, isRequested }) => {
+const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, onSelectProduct, viewMode, specialDiscounts, onRequestMedicine, isRequested }) => {
   const cartQty = cart[med.id] || 0;
   const [inputQty, setInputQty] = useState(1);
   const basePrice = Number(med.unit_price || med.price || med.wholesalePrice || 0);
@@ -16,11 +16,14 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
 
   if (viewMode === 'list') {
     return (
-      <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 hover:shadow-md transition-shadow relative">
+      <div
+        onClick={() => onSelectProduct ? onSelectProduct(med) : onOpenMonograph(med)}
+        className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 hover:shadow-md transition-shadow relative cursor-pointer group"
+      >
         <div className="flex items-center gap-4 w-full sm:w-auto">
           <div className="relative flex-shrink-0">
             {med.imageUrl ? (
-              <img src={med.imageUrl} alt={med.name} className="w-16 h-16 object-cover rounded-lg bg-slate-50 border border-slate-100" />
+              <img src={med.imageUrl} alt={med.name} className="w-16 h-16 object-cover rounded-lg bg-slate-50 border border-slate-100 group-hover:scale-105 transition-transform" />
             ) : (
               <div className="w-16 h-16 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center">
                 <svg className="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
@@ -29,14 +32,17 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-bold text-[#1D2A3B]">{med.name}</h3>
+              <h3 className="font-bold text-[#1D2A3B] group-hover:text-[#0697A8] transition-colors">{med.name}</h3>
               {medType && (
                 <span className="text-[10px] font-bold text-[#0697A8] bg-[#E0F5F7] px-2 py-0.5 rounded-md border border-[#0697A8]/20 leading-none">
                   {medType}
                 </span>
               )}
               <button
-                onClick={() => onOpenMonograph(med)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectProduct ? onSelectProduct(med) : onOpenMonograph(med);
+                }}
                 className="p-1 text-slate-400 hover:text-[#0697A8] hover:bg-[#E0F5F7] rounded-md transition-colors cursor-pointer"
                 title="View Medicine Info"
               >
@@ -64,16 +70,17 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
           </div>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto mt-3 sm:mt-0">
+        <div className="flex items-center gap-2 w-full sm:w-auto mt-3 sm:mt-0" onClick={(e) => e.stopPropagation()}>
           {med.stock > 0 ? (
             cartQty > 0 ? (
               <div className="flex items-center gap-2 bg-[#E0F5F7] rounded-xl px-2.5 py-1 border border-[#0697A8]/20">
-                <button onClick={() => handleAddToCart(med, -1)} className="w-6 h-6 rounded-md bg-white text-[#0697A8] shadow-sm flex items-center justify-center font-bold hover:bg-slate-50 cursor-pointer">-</button>
+                <button onClick={(e) => { e.stopPropagation(); handleAddToCart(med, -1); }} className="w-6 h-6 rounded-md bg-white text-[#0697A8] shadow-sm flex items-center justify-center font-bold hover:bg-slate-50 cursor-pointer">-</button>
                 <input
                   type="number"
                   min="1"
                   max={med.stock}
                   value={cartQty}
+                  onClick={(e) => e.stopPropagation()}
                   onChange={(e) => {
                     const val = parseInt(e.target.value);
                     if (!isNaN(val)) {
@@ -82,7 +89,7 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
                   }}
                   className="w-10 text-center font-bold text-[#0697A8] text-xs bg-transparent focus:outline-none focus:bg-white rounded"
                 />
-                <button onClick={() => handleAddToCart(med, 1)} className="w-6 h-6 rounded-md bg-white text-[#0697A8] shadow-sm flex items-center justify-center font-bold hover:bg-slate-50 cursor-pointer" disabled={cartQty >= med.stock}>+</button>
+                <button onClick={(e) => { e.stopPropagation(); handleAddToCart(med, 1); }} className="w-6 h-6 rounded-md bg-white text-[#0697A8] shadow-sm flex items-center justify-center font-bold hover:bg-slate-50 cursor-pointer" disabled={cartQty >= med.stock}>+</button>
               </div>
             ) : (
               <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -91,6 +98,7 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
                   min="1"
                   max={med.stock}
                   value={inputQty}
+                  onClick={(e) => e.stopPropagation()}
                   onChange={(e) => {
                     const val = parseInt(e.target.value);
                     setInputQty(isNaN(val) ? 1 : Math.max(1, Math.min(med.stock, val)));
@@ -98,7 +106,7 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
                   className="w-16 h-9 px-2 text-center text-xs font-bold text-[#1D2A3B] bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:border-[#0697A8]"
                   title="Enter Quantity"
                 />
-                <button onClick={() => handleAddToCart(med, inputQty)} className="flex-1 sm:flex-none px-4 py-2 bg-[#0697A8] text-white rounded-xl text-xs font-bold hover:bg-[#057A88] transition-colors shadow-sm shadow-[#0697A8]/20 flex items-center gap-1.5 cursor-pointer">
+                <button onClick={(e) => { e.stopPropagation(); handleAddToCart(med, inputQty); }} className="flex-1 sm:flex-none px-4 py-2 bg-[#0697A8] text-white rounded-xl text-xs font-bold hover:bg-[#057A88] transition-colors shadow-sm shadow-[#0697A8]/20 flex items-center gap-1.5 cursor-pointer">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                   Add
                 </button>
@@ -107,7 +115,7 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
           ) : (
             <button
               type="button"
-              onClick={() => onRequestMedicine && onRequestMedicine(med)}
+              onClick={(e) => { e.stopPropagation(); onRequestMedicine && onRequestMedicine(med); }}
               disabled={isRequested}
               className={`flex-1 sm:flex-none px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${isRequested
                   ? 'bg-amber-50 text-amber-700 border border-amber-200 cursor-default'
@@ -126,7 +134,10 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
   }
 
   return (
-    <div className="bg-white p-3.5 md:p-4 rounded-2xl border border-slate-200 hover:shadow-xl hover:shadow-[#0697A8]/5 transition-all duration-300 group flex flex-col h-full relative">
+    <div
+      onClick={() => onSelectProduct ? onSelectProduct(med) : onOpenMonograph(med)}
+      className="bg-white p-3.5 md:p-4 rounded-2xl border border-slate-200 hover:shadow-xl hover:shadow-[#0697A8]/5 transition-all duration-300 group flex flex-col h-full relative cursor-pointer"
+    >
       {cartQty > 0 && (
         <div className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 bg-[#0697A8] text-white rounded-full flex items-center justify-center text-[10px] font-bold shadow-md z-20">
           {cartQty}
@@ -163,7 +174,7 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onOpenMonograph(med);
+            onSelectProduct ? onSelectProduct(med) : onOpenMonograph(med);
           }}
           className="absolute top-2 right-2 p-1.5 bg-white/90 hover:bg-white text-slate-500 hover:text-[#0697A8] rounded-lg shadow-sm border border-slate-100 backdrop-blur-sm transition-all hover:scale-105 active:scale-95 cursor-pointer z-10"
           title="View Medicine Details"
@@ -207,12 +218,12 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
         </div>
 
         {/* Quantity Field + Add Button */}
-        <div className="mt-3 flex gap-2 items-center">
+        <div className="mt-3 flex gap-2 items-center" onClick={(e) => e.stopPropagation()}>
           {med.stock > 0 ? (
             cartQty > 0 ? (
               <div className="w-full flex items-center justify-between bg-[#E0F5F7] rounded-xl px-1.5 py-0.5 border border-[#0697A8]/20">
                 <button
-                  onClick={() => handleAddToCart(med, -1)}
+                  onClick={(e) => { e.stopPropagation(); handleAddToCart(med, -1); }}
                   className="w-7 h-7 rounded-lg flex items-center justify-center text-[#0697A8] hover:bg-white/80 transition-colors font-bold text-base cursor-pointer"
                 >
                   -
@@ -223,6 +234,7 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
                     min="1"
                     max={med.stock}
                     value={cartQty}
+                    onClick={(e) => e.stopPropagation()}
                     onChange={(e) => {
                       const val = parseInt(e.target.value);
                       if (!isNaN(val)) {
@@ -234,7 +246,7 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
                   <span className="text-[9px] text-[#0697A8]/70 font-semibold hidden sm:inline">in cart</span>
                 </div>
                 <button
-                  onClick={() => handleAddToCart(med, 1)}
+                  onClick={(e) => { e.stopPropagation(); handleAddToCart(med, 1); }}
                   className="w-7 h-7 rounded-lg flex items-center justify-center text-[#0697A8] hover:bg-white/80 transition-colors font-bold text-base cursor-pointer disabled:opacity-40"
                   disabled={cartQty >= med.stock}
                 >
@@ -249,6 +261,7 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
                     min="1"
                     max={med.stock}
                     value={inputQty}
+                    onClick={(e) => e.stopPropagation()}
                     onChange={(e) => {
                       const val = parseInt(e.target.value);
                       setInputQty(isNaN(val) ? 1 : Math.max(1, Math.min(med.stock, val)));
@@ -258,7 +271,7 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
                   />
                 </div>
                 <button
-                  onClick={() => handleAddToCart(med, inputQty)}
+                  onClick={(e) => { e.stopPropagation(); handleAddToCart(med, inputQty); }}
                   className="flex-1 h-8 sm:h-9 bg-[#0697A8] hover:bg-[#057A88] text-white rounded-xl text-xs font-bold transition-all shadow-sm shadow-[#0697A8]/20 flex items-center justify-center gap-1.5 active:scale-[0.98] cursor-pointer"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -271,7 +284,7 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
           ) : (
             <button
               type="button"
-              onClick={() => onRequestMedicine && onRequestMedicine(med)}
+              onClick={(e) => { e.stopPropagation(); onRequestMedicine && onRequestMedicine(med); }}
               disabled={isRequested}
               className={`w-full h-8 sm:h-9 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${isRequested
                   ? 'bg-amber-50 text-amber-700 border border-amber-200 cursor-default'
@@ -283,6 +296,513 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, viewMode, specialDisc
               </svg>
               {isRequested ? 'Requested ✓' : 'Request'}
             </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ProductDetailsView = ({
+  product,
+  catalog = [],
+  cart = {},
+  onAddToCart,
+  onBuyNow,
+  onBack,
+  onSelectAlternative,
+  onOpenSearch,
+  onOpenCart,
+  cartCount = 0,
+  onRequestMedicine,
+  onOpenFullscreenImage
+}) => {
+  const [qty, setQty] = useState(1);
+
+  const basePrice = Number(product.wholesalePrice || product.unit_price || product.price || 0);
+  const oldPrice = Number(product.pack_mrp || product.mrp || 0);
+  const discountAmt = Math.max(0, oldPrice - basePrice);
+  const discountPercent = oldPrice > 0 && discountAmt > 0
+    ? Math.round((discountAmt / oldPrice) * 100)
+    : 0;
+
+  const deliveryDateStr = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 2);
+    return d.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+  }, []);
+
+  const alternativeBrands = useMemo(() => {
+    if (!product || !catalog || !catalog.length) return [];
+    const activeGeneric = (product.generic || '').trim().toLowerCase();
+    const activeCompany = (product.manufacturer || product.company || '').trim().toLowerCase();
+    const activeId = String(product.id);
+
+    if (activeGeneric) {
+      // Prioritize same generic from other companies
+      const sameGenericDiffCompany = catalog.filter(item => {
+        if (String(item.id) === activeId) return false;
+        const gen = (item.generic || '').trim().toLowerCase();
+        const comp = (item.manufacturer || item.company || '').trim().toLowerCase();
+        return gen === activeGeneric && comp !== activeCompany;
+      });
+
+      if (sameGenericDiffCompany.length > 0) {
+        return sameGenericDiffCompany.slice(0, 12);
+      }
+
+      // Same generic from any company
+      const sameGenericAny = catalog.filter(item => {
+        if (String(item.id) === activeId) return false;
+        const gen = (item.generic || '').trim().toLowerCase();
+        return gen === activeGeneric;
+      });
+
+      if (sameGenericAny.length > 0) {
+        return sameGenericAny.slice(0, 12);
+      }
+    }
+
+    // Fallback: same category from other companies
+    const activeCat = (product.category || product.dosageForm || '').trim().toLowerCase();
+    if (activeCat && activeCat !== 'medicine' && activeCat !== 'other') {
+      return catalog.filter(item => {
+        if (String(item.id) === activeId) return false;
+        const cat = (item.category || item.dosageForm || '').trim().toLowerCase();
+        const comp = (item.manufacturer || item.company || '').trim().toLowerCase();
+        return cat === activeCat && comp !== activeCompany;
+      }).slice(0, 8);
+    }
+
+    return [];
+  }, [product, catalog]);
+
+  return (
+    <div className="flex-1 flex flex-col overflow-hidden bg-[#F8FAFC]">
+      {/* Top Header Bar (matching screenshot) */}
+      <div className="bg-white border-b border-[#E2E8F0] px-4 md:px-8 py-3.5 flex items-center justify-between sticky top-0 z-30 shadow-xs flex-shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <button
+            type="button"
+            onClick={onBack}
+            className="p-1.5 -ml-1.5 rounded-xl text-slate-700 hover:text-[#0697A8] hover:bg-[#E0F5F7] transition-all cursor-pointer flex items-center gap-1 font-bold text-sm"
+            title="Back"
+          >
+            <svg className="w-6 h-6 text-slate-800 hover:text-[#0697A8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          </button>
+          <h1 className="text-base sm:text-lg font-black text-[#1D2A3B] tracking-tight">
+            Product Details
+          </h1>
+        </div>
+        <div className="flex items-center gap-2 sm:gap-3">
+          <button
+            type="button"
+            onClick={onOpenSearch}
+            className="p-2 text-slate-600 hover:text-[#0697A8] hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+            title="Search Medicines"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={onOpenCart}
+            className="relative p-2 text-slate-600 hover:text-[#0697A8] hover:bg-[#E0F5F7] rounded-xl transition-colors cursor-pointer"
+            title="Cart"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-[#0697A8] text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-xs">
+                {cartCount}
+              </span>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Scrollable Page Body */}
+      <div className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 space-y-8">
+        {/* Main Product Showcase Card */}
+        <div className="bg-white rounded-3xl border border-[#E2E8F0] shadow-sm p-4 sm:p-6 md:p-8">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 items-start">
+            
+            {/* Left: Product Image */}
+            <div className="md:col-span-5 flex flex-col items-center">
+              <div
+                onClick={() => product.imageUrl && onOpenFullscreenImage && onOpenFullscreenImage(product.imageUrl)}
+                className={`relative w-full aspect-square bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl border border-slate-200 overflow-hidden flex items-center justify-center group ${product.imageUrl ? 'cursor-zoom-in' : ''}`}
+                title={product.imageUrl ? "Click to view full image" : ""}
+              >
+                {product.imageUrl ? (
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300"
+                  />
+                ) : (
+                  <div className="text-center p-6 text-slate-300">
+                    <svg className="w-20 h-20 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                    <span className="text-xs font-semibold text-slate-400 mt-2 block">No image available</span>
+                  </div>
+                )}
+
+                {/* Stock Badge */}
+                {product.stock > 0 ? (
+                  <div className="absolute top-3 left-3 px-2.5 py-1 bg-white/95 backdrop-blur-sm rounded-xl border border-slate-100 shadow-xs">
+                    <span className="text-xs font-bold text-emerald-600 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      In Stock ({product.stock} available)
+                    </span>
+                  </div>
+                ) : (
+                  <div className="absolute top-3 left-3 px-2.5 py-1 bg-rose-500/95 text-white backdrop-blur-sm rounded-xl shadow-xs">
+                    <span className="text-xs font-bold flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-white" />
+                      Out of Stock
+                    </span>
+                  </div>
+                )}
+
+                {/* Discount Badge */}
+                {discountPercent > 0 && (
+                  <div className="absolute bottom-3 left-3 px-2.5 py-1 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl shadow-md text-xs font-black tracking-tight">
+                    {discountPercent}% OFF
+                  </div>
+                )}
+
+                {/* Full View Icon Hint */}
+                {product.imageUrl && (
+                  <div className="absolute bottom-3 right-3 px-2 py-1 bg-black/60 text-white rounded-lg backdrop-blur-xs text-[10px] font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 pointer-events-none">
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                    </svg>
+                    Full View
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right: Info, Price, Buttons */}
+            <div className="md:col-span-7 flex flex-col space-y-4">
+              <div>
+                <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                  {product.dosageForm && (
+                    <span className="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-[#E0F5F7] text-[#0697A8] border border-[#0697A8]/20">
+                      {product.dosageForm}
+                    </span>
+                  )}
+                  {product.strength && (
+                    <span className="px-2.5 py-0.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">
+                      {product.strength}
+                    </span>
+                  )}
+                  {product.packSize && (
+                    <span className="px-2.5 py-0.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">
+                      Pack: {product.packSize}
+                    </span>
+                  )}
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-[#1D2A3B] tracking-tight leading-tight">
+                  {product.name}
+                </h2>
+                {product.generic && (
+                  <p className="text-sm text-slate-600 mt-1 font-medium flex items-center gap-1.5">
+                    <span className="text-slate-400 font-normal">Generic:</span>
+                    <span className="text-[#0697A8] font-bold">{product.generic}</span>
+                  </p>
+                )}
+                {product.manufacturer && (
+                  <p className="text-xs text-slate-500 mt-0.5 font-medium">
+                    Manufactured by: <span className="font-semibold text-slate-700">{product.manufacturer}</span>
+                  </p>
+                )}
+              </div>
+
+              {/* Price Box */}
+              <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 flex items-baseline justify-between flex-wrap gap-3">
+                <div>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Wholesale Rate</span>
+                  <div className="flex items-baseline gap-2.5 mt-0.5">
+                    <span className="text-3xl font-black text-[#0697A8]">৳{basePrice.toFixed(2)}</span>
+                    {oldPrice > basePrice && (
+                      <span className="text-sm text-slate-400 line-through decoration-slate-300 font-medium">
+                        MRP ৳{oldPrice.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {discountAmt > 0 && (
+                  <div className="text-right">
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-lg">
+                      Save ৳{discountAmt.toFixed(2)} / unit
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Delivery info (matching screenshot) */}
+              <div className="space-y-2 py-1 text-xs text-slate-600">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🚚</span>
+                  <span>Delivery by <strong className="text-slate-800">{deliveryDateStr}</strong></span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-base">⚡</span>
+                  <span>Express delivery available</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🛡️</span>
+                  <span>DGDA Certified Wholesale Distribution</span>
+                </div>
+              </div>
+
+              {/* Buttons and Quantity */}
+              <div className="pt-2 border-t border-slate-100 space-y-3">
+                {product.stock > 0 ? (
+                  <div className="space-y-3">
+                    {/* Quantity Selector */}
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-bold text-slate-600">Quantity:</span>
+                      <div className="flex items-center bg-slate-100 rounded-xl border border-slate-200 p-0.5">
+                        <button
+                          type="button"
+                          onClick={() => setQty(Math.max(1, qty - 1))}
+                          className="w-9 h-9 rounded-lg bg-white shadow-xs text-slate-700 hover:text-[#0697A8] font-black text-base flex items-center justify-center transition-colors cursor-pointer"
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          min="1"
+                          max={product.stock}
+                          value={qty}
+                          onChange={e => {
+                            const v = parseInt(e.target.value);
+                            setQty(isNaN(v) ? 1 : Math.max(1, Math.min(product.stock, v)));
+                          }}
+                          className="w-14 text-center font-bold text-sm text-slate-800 bg-transparent focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setQty(Math.min(product.stock, qty + 1))}
+                          disabled={qty >= product.stock}
+                          className="w-9 h-9 rounded-lg bg-white shadow-xs text-slate-700 hover:text-[#0697A8] font-black text-base flex items-center justify-center transition-colors cursor-pointer disabled:opacity-40"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <span className="text-xs text-slate-400">
+                        Total: <strong className="text-[#0697A8]">৳{(basePrice * qty).toFixed(2)}</strong>
+                      </span>
+                    </div>
+
+                    {/* Add to Cart & Buy Now Buttons */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => onAddToCart && onAddToCart(product, qty)}
+                        className="w-full py-3.5 px-6 bg-[#0697A8] hover:bg-[#057A88] text-white font-bold rounded-2xl shadow-md shadow-[#0697A8]/20 transition-all flex items-center justify-center gap-2 active:scale-[0.98] cursor-pointer text-sm"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <span>Add to cart</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onBuyNow && onBuyNow(product, qty)}
+                        className="w-full py-3.5 px-6 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold rounded-2xl shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 active:scale-[0.98] cursor-pointer text-sm"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <span>Buy Now</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-medium">
+                      This medicine is currently out of stock. You can request restocking or check alternative brands below.
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => onRequestMedicine && onRequestMedicine(product)}
+                      className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer text-sm"
+                    >
+                      Request Restocking
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Monograph / Clinical Information Accordion */}
+        <div className="bg-white rounded-3xl border border-[#E2E8F0] shadow-sm p-5 sm:p-6 space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 className="font-bold text-sm text-[#1D2A3B] flex items-center gap-2">
+              <svg className="w-4 h-4 text-[#0697A8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Clinical Details & Prescribing Monograph
+            </h3>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">DGDA Medical Index</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <span className="font-bold text-[10px] uppercase text-[#0697A8] tracking-wider block mb-1">Indications</span>
+              <p className="text-slate-600 leading-relaxed">
+                {product.indications || "Indicated for targeted therapeutic treatment according to certified prescription."}
+              </p>
+            </div>
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <span className="font-bold text-[10px] uppercase text-slate-500 tracking-wider block mb-1">Dosage & Administration</span>
+              <p className="text-slate-600 leading-relaxed">
+                {product.dosageAdministration || "As directed by registered physician. Dosage depends on age and clinical condition."}
+              </p>
+            </div>
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <span className="font-bold text-[10px] uppercase text-red-500 tracking-wider block mb-1">Side Effects</span>
+              <p className="text-slate-600 leading-relaxed">
+                {product.sideEffects || "Mild gastrointestinal discomfort, headache, or nausea may occasionally occur."}
+              </p>
+            </div>
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <span className="font-bold text-[10px] uppercase text-amber-600 tracking-wider block mb-1">Contraindications</span>
+              <p className="text-slate-600 leading-relaxed">
+                {product.contraindications || "Hypersensitivity to active generic compound or excipients."}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Lower Section: Alternative Brands */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-bold">
+                🔀
+              </div>
+              <div>
+                <h3 className="text-lg font-black text-[#1D2A3B] tracking-tight">
+                  Alternative Brands
+                </h3>
+                <p className="text-xs text-slate-500">
+                  {product.generic ? (
+                    <>Same active generic formulation (<strong className="text-slate-700">{product.generic}</strong>) from alternate brands</>
+                  ) : (
+                    <>Related medicines from other companies</>
+                  )}
+                </p>
+              </div>
+            </div>
+            <span className="text-xs font-bold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-full shadow-xs">
+              {alternativeBrands.length} brands
+            </span>
+          </div>
+
+          {alternativeBrands.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+              {alternativeBrands.map(alt => {
+                const altBasePrice = Number(alt.wholesalePrice || alt.unit_price || alt.price || 0);
+                const altOldPrice = Number(alt.pack_mrp || alt.mrp || 0);
+                const altDiscountAmt = Math.max(0, altOldPrice - altBasePrice);
+                const altDiscountPercent = altOldPrice > 0 && altDiscountAmt > 0 ? Math.round((altDiscountAmt / altOldPrice) * 100) : 0;
+
+                return (
+                  <div
+                    key={alt.id}
+                    onClick={() => onSelectAlternative && onSelectAlternative(alt)}
+                    className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 hover:shadow-xl hover:border-[#0697A8]/30 transition-all duration-300 flex flex-col justify-between cursor-pointer group relative"
+                  >
+                    {/* Image Area */}
+                    <div className="relative mb-2.5">
+                      <div className="aspect-square bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-100 overflow-hidden flex items-center justify-center">
+                        {alt.imageUrl ? (
+                          <img src={alt.imageUrl} alt={alt.name} className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform" />
+                        ) : (
+                          <svg className="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                          </svg>
+                        )}
+                      </div>
+                      {/* Discount Badge on bottom-right of image (just like the screenshot!) */}
+                      {altDiscountPercent > 0 && (
+                        <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-amber-500 text-white rounded-md text-[10px] font-black shadow-xs leading-none">
+                          {altDiscountPercent}%
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Details */}
+                    <div className="flex-1 flex flex-col">
+                      <h4 className="font-bold text-xs sm:text-sm text-[#1D2A3B] line-clamp-2 group-hover:text-[#0697A8] transition-colors leading-snug">
+                        {alt.name}
+                      </h4>
+                      <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                        {alt.manufacturer && (
+                          <span className="text-[10px] text-slate-500 font-medium truncate max-w-[110px]" title={alt.manufacturer}>
+                            {alt.manufacturer}
+                          </span>
+                        )}
+                        {alt.dosageForm && (
+                          <span className="text-[9px] font-bold text-amber-700 bg-amber-50 px-1 py-0.2 rounded border border-amber-200">
+                            {alt.dosageForm}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Pricing */}
+                      <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-baseline gap-2">
+                        <span className="text-sm sm:text-base font-black text-[#0697A8]">
+                          ৳{altBasePrice.toFixed(2)}
+                        </span>
+                        {altOldPrice > altBasePrice && (
+                          <span className="text-[11px] text-slate-400 line-through">
+                            ৳{altOldPrice.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Button */}
+                      <div className="mt-3" onClick={e => e.stopPropagation()}>
+                        {alt.stock > 0 ? (
+                          <button
+                            type="button"
+                            onClick={() => onAddToCart && onAddToCart(alt, 1)}
+                            className="w-full py-2 bg-[#E0F5F7] hover:bg-[#0697A8] text-[#0697A8] hover:text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            <span>Add to cart</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => onRequestMedicine && onRequestMedicine(alt)}
+                            className="w-full py-2 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl text-xs font-bold transition-colors cursor-pointer border border-amber-200"
+                          >
+                            <span>Pre Order</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl border border-dashed border-slate-200 p-8 text-center text-slate-400">
+              <p className="text-xs font-semibold">No other alternative brands currently listed for this formulation.</p>
+            </div>
           )}
         </div>
       </div>
@@ -3614,6 +4134,9 @@ export default function App() {
     [oe, se] = useState(``),
     [searchFocusedDesktop, setSearchFocusedDesktop] = useState(false),
     [searchFocusedMobile, setSearchFocusedMobile] = useState(false),
+    [selectedProduct, setSelectedProduct] = useState(null),
+    [productHistory, setProductHistory] = useState([]),
+    [fullscreenImage, setFullscreenImage] = useState(null),
     [ce, le] = useState([]),
     [N, ue] = useState([]),
     [de, fe] = useState(`all`),
@@ -4909,6 +5432,66 @@ export default function App() {
         Se(!0);
       }
     },
+    addToCartQuiet = (med, qty = 1) => {
+      if (!med) return;
+      let medId = typeof med === "object" && med !== null ? (med.id || med.brandId || med.name) : med;
+      let delta = typeof qty === "number" ? qty : 1;
+      let targetMed = m.find(item => String(item.id) === String(medId) || String(item.name) === String(medId) || String(item.brandId) === String(medId)) || med;
+      let targetId = targetMed.id || medId;
+      let maxStock = targetMed.stock !== undefined ? targetMed.stock : 99999;
+      be(prev => {
+        let currentQty = prev[targetId] || 0;
+        let newQty = currentQty + delta;
+        if (newQty <= 0) {
+          let updated = { ...prev };
+          delete updated[targetId];
+          return updated;
+        }
+        let capped = Math.min(newQty, maxStock);
+        return { ...prev, [targetId]: capped };
+      });
+      if (typeof T === "function") {
+        T(`Added ${delta}x ${targetMed.name || 'item'} to cart!`);
+      }
+    },
+    buyNowProduct = (med, qty = 1) => {
+      addToCartQuiet(med, qty);
+      Se(true);
+    },
+    handleSelectProduct = med => {
+      setProductHistory([]);
+      setSelectedProduct(med);
+      try {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {}
+    },
+    handleSelectAlternative = altMed => {
+      if (selectedProduct) {
+        setProductHistory(prev => [...prev, selectedProduct]);
+      }
+      setSelectedProduct(altMed);
+      try {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {}
+    },
+    handleBackProduct = () => {
+      if (productHistory && productHistory.length > 0) {
+        const prev = productHistory[productHistory.length - 1];
+        setProductHistory(prevHist => prevHist.slice(0, -1));
+        setSelectedProduct(prev);
+        try {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (err) {}
+      } else {
+        setSelectedProduct(null);
+      }
+    },
+    handleTabSwitch = tab => {
+      setSelectedProduct(null);
+      setProductHistory([]);
+      k(tab);
+      l(!1);
+    },
     ln = (e, t) => {
       let medId = typeof e === "object" && e !== null ? (e.id || e.brandId || e.name) : e;
       let n = m.find(item => String(item.id) === String(medId) || String(item.name) === String(medId) || String(item.brandId) === String(medId));
@@ -5860,6 +6443,8 @@ export default function App() {
     setShowPdfPreview(false);
     if (f === 'buyer') {
       mn();
+      setSelectedProduct(null);
+      setProductHistory([]);
       k('dashboard');
     } else if (f === 'admin') {
       const defaultTab = hasPermission('approvals.view') ? 'approvals' : 'inventory';
@@ -5891,20 +6476,20 @@ export default function App() {
         {f === `buyer` ? <>
           <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1.5">
             <button onClick={() => {
-              k(`dashboard`), l(!1);
-            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `dashboard` ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
+              handleTabSwitch(`dashboard`);
+            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `dashboard` && !selectedProduct ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
               <div className="flex items-center gap-3">
-                <svg className={`w-4 h-4 ${O === `dashboard` ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 ${O === `dashboard` && !selectedProduct ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
                 <span>{`Dashboard Home`}</span>
               </div>
             </button>
             <button onClick={() => {
-              k(`search`), l(!1);
-            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `search` ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
+              handleTabSwitch(`search`);
+            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `search` && !selectedProduct ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
               <div className="flex items-center gap-3">
-                <svg className={`w-4 h-4 ${O === `search` ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 ${O === `search` && !selectedProduct ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
                 <span>{`Search Medicines`}</span>
@@ -5914,20 +6499,20 @@ export default function App() {
               </span>
             </button>
             <button onClick={() => {
-              k(`offers`), l(!1);
-            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `offers` ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
+              handleTabSwitch(`offers`);
+            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `offers` && !selectedProduct ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
               <div className="flex items-center gap-3">
-                <svg className={`w-4 h-4 ${O === `offers` ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 ${O === `offers` && !selectedProduct ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
                 </svg>
                 <span>{`Latest Offers`}</span>
               </div>
             </button>
             <button onClick={() => {
-              k(`orders`), l(!1);
-            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `orders` ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
+              handleTabSwitch(`orders`);
+            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `orders` && !selectedProduct ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
               <div className="flex items-center gap-3">
-                <svg className={`w-4 h-4 ${O === `orders` ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 ${O === `orders` && !selectedProduct ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                 </svg>
                 <span>{`Order History`}</span>
@@ -5937,30 +6522,30 @@ export default function App() {
               </span>
             </button>
             <button onClick={() => {
-              k(`returns`), l(!1);
-            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `returns` ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
+              handleTabSwitch(`returns`);
+            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `returns` && !selectedProduct ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
               <div className="flex items-center gap-3">
-                <svg className={`w-4 h-4 ${O === `returns` ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 ${O === `returns` && !selectedProduct ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
                 </svg>
                 <span>{`Returns`}</span>
               </div>
             </button>
             <button onClick={() => {
-              k(`support`), l(!1);
-            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `support` ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
+              handleTabSwitch(`support`);
+            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `support` && !selectedProduct ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
               <div className="flex items-center gap-3">
-                <svg className={`w-4 h-4 ${O === `support` ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 ${O === `support` && !selectedProduct ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
                 <span>{`Support Helpdesk`}</span>
               </div>
             </button>
             <button onClick={() => {
-              k(`request`), l(!1);
-            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `request` ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
+              handleTabSwitch(`request`);
+            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `request` && !selectedProduct ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
               <div className="flex items-center gap-3">
-                <svg className={`w-4 h-4 ${O === `request` ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 ${O === `request` && !selectedProduct ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span>{`Request Medicine`}</span>
@@ -5981,10 +6566,10 @@ export default function App() {
               </div>
             </button>
             <button onClick={() => {
-              k(`profile`), l(!1);
-            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `profile` ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
+              handleTabSwitch(`profile`);
+            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${O === `profile` && !selectedProduct ? `bg-[#E0F5F7] text-[#0697A8] shadow-sm` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
               <div className="flex items-center gap-3">
-                <svg className={`w-4 h-4 ${O === `profile` ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 ${O === `profile` && !selectedProduct ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 <span>{`My Profile`}</span>
@@ -6286,6 +6871,7 @@ export default function App() {
                           e.preventDefault();
                           pn(item.name);
                           setSearchFocusedDesktop(false);
+                          handleSelectProduct(item);
                         }}
                         className="px-3.5 py-2.5 hover:bg-[#E0F5F7] dark:hover:bg-slate-800 cursor-pointer flex items-center justify-between transition-colors bg-white dark:bg-slate-900 group"
                       >
@@ -6350,7 +6936,24 @@ export default function App() {
         </header>
         <div className="flex-1 overflow-hidden flex relative">
           {f === `buyer` && <div className="flex-1 flex overflow-hidden">
-            {O === `dashboard` && <div className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 space-y-6">
+            {selectedProduct ? (
+              <ProductDetailsView
+                product={selectedProduct}
+                catalog={m}
+                cart={ye}
+                onAddToCart={addToCartQuiet}
+                onBuyNow={buyNowProduct}
+                onBack={handleBackProduct}
+                onSelectAlternative={handleSelectAlternative}
+                onOpenSearch={() => { setSelectedProduct(null); k('search'); }}
+                onOpenCart={() => Se(true)}
+                cartCount={sn.totalItems}
+                onRequestMedicine={handleOpenQuickRequest}
+                onOpenFullscreenImage={imgUrl => setFullscreenImage(imgUrl)}
+              />
+            ) : (
+              <>
+                {O === `dashboard` && <div className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 space-y-6">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-2">
                 <div>
                   <h2 className="text-2xl font-bold text-[#1D2A3B] tracking-tight">{`Approved B2B Buyer Dashboard`}</h2>
@@ -6602,7 +7205,7 @@ export default function App() {
                     return displayedOffers.length > 0 ? (
                       <div className={ie === `grid` ? `grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-5` : `flex flex-col gap-4`}>
                         {displayedOffers.map(med => (
-                          <Sa key={med.id} med={med} cart={ye} handleAddToCart={cn} onOpenMonograph={je} viewMode={ie} specialDiscounts={specialDiscounts} onRequestMedicine={handleOpenQuickRequest} isRequested={isMedicineRequested(med)} />
+                          <Sa key={med.id} med={med} cart={ye} handleAddToCart={cn} onOpenMonograph={je} onSelectProduct={handleSelectProduct} viewMode={ie} specialDiscounts={specialDiscounts} onRequestMedicine={handleOpenQuickRequest} isRequested={isMedicineRequested(med)} />
                         ))}
                       </div>
                     ) : (
@@ -6670,6 +7273,7 @@ export default function App() {
                                   e.preventDefault();
                                   se(item.name);
                                   setSearchFocusedMobile(false);
+                                  handleSelectProduct(item);
                                 }}
                                 className="px-3.5 py-2.5 hover:bg-[#E0F5F7] dark:hover:bg-slate-800 active:bg-[#C2EAF0] cursor-pointer flex items-center justify-between transition-colors bg-white dark:bg-slate-900"
                               >
@@ -6754,7 +7358,7 @@ export default function App() {
                     </div>
                   ) : (
                     <div className={ie === `grid` ? `grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-5` : `flex flex-col gap-4`}>
-                      {an.map((e, idx) => e ? <Sa key={e.id || idx} med={e} cart={ye || {}} handleAddToCart={cn} onOpenMonograph={je} viewMode={ie} specialDiscounts={specialDiscounts || {}} onRequestMedicine={handleOpenQuickRequest} isRequested={isMedicineRequested(e)} /> : null)}
+                      {an.map((e, idx) => e ? <Sa key={e.id || idx} med={e} cart={ye || {}} handleAddToCart={cn} onOpenMonograph={je} onSelectProduct={handleSelectProduct} viewMode={ie} specialDiscounts={specialDiscounts || {}} onRequestMedicine={handleOpenQuickRequest} isRequested={isMedicineRequested(e)} /> : null)}
                     </div>
                   )}
                   {rn.length > 0 && <div className="mt-6 flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-xl border border-[#E2E8F0] shadow-sm gap-4">
@@ -7303,6 +7907,8 @@ export default function App() {
                 creditLimit={tn.creditLimit}
                 outstandingBalance={tn.outstandingBalance}
               />
+            )}
+              </>
             )}
           </div>}
           {f === `admin` && <div className="flex-1 flex overflow-hidden">
@@ -10073,19 +10679,19 @@ export default function App() {
         </div>}
         {f === `buyer` && <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-[#E2E8F0] shadow-[0_-4px_20px_rgb(0,0,0,0.06)]">
           <div className="flex items-center justify-around h-14">
-            <button onClick={() => k(`search`)} className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${O === `search` ? `text-[#0697A8]` : `text-[#94A3B8]`}`}>
+            <button onClick={() => handleTabSwitch(`search`)} className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${O === `search` && !selectedProduct ? `text-[#0697A8]` : `text-[#94A3B8]`}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
               <span className="text-[9px] font-bold">{`Products`}</span>
             </button>
-            <button onClick={() => k(`offers`)} className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${O === `offers` ? `text-[#0697A8]` : `text-[#94A3B8]`}`}>
+            <button onClick={() => handleTabSwitch(`offers`)} className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${O === `offers` && !selectedProduct ? `text-[#0697A8]` : `text-[#94A3B8]`}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
               </svg>
               <span className="text-[9px] font-bold">{`Offers`}</span>
             </button>
-            <button onClick={() => k(`orders`)} className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${O === `orders` ? `text-[#0697A8]` : `text-[#94A3B8]`}`}>
+            <button onClick={() => handleTabSwitch(`orders`)} className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${O === `orders` && !selectedProduct ? `text-[#0697A8]` : `text-[#94A3B8]`}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
               </svg>
@@ -10102,7 +10708,7 @@ export default function App() {
               </div>
               <span className="text-[9px] font-bold">{`Cart`}</span>
             </button>
-            <button onClick={() => k(`support`)} className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${O === `support` ? `text-[#0697A8]` : `text-[#94A3B8]`}`}>
+            <button onClick={() => handleTabSwitch(`support`)} className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${O === `support` && !selectedProduct ? `text-[#0697A8]` : `text-[#94A3B8]`}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
@@ -12273,6 +12879,32 @@ export default function App() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {fullscreenImage && (
+          <div
+            onClick={() => setFullscreenImage(null)}
+            className="fixed inset-0 z-[1000] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200 cursor-pointer"
+          >
+            <button
+              type="button"
+              onClick={() => setFullscreenImage(null)}
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 w-11 h-11 bg-white/20 hover:bg-white/40 text-white rounded-full flex items-center justify-center text-xl font-bold transition-all shadow-lg cursor-pointer backdrop-blur-sm z-10"
+              title="Close Full Image View"
+            >
+              ✕
+            </button>
+            <div
+              onClick={e => e.stopPropagation()}
+              className="relative max-w-[90vw] max-h-[85vh] flex items-center justify-center cursor-default"
+            >
+              <img
+                src={fullscreenImage}
+                alt="Product Full View"
+                className="max-w-full max-h-[85vh] object-contain rounded-2xl shadow-2xl"
+              />
             </div>
           </div>
         )}
