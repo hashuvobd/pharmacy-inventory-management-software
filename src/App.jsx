@@ -3609,6 +3609,8 @@ export default function App() {
     [ie, j] = useState(`grid`),
     [M, ae] = useState(1),
     [oe, se] = useState(``),
+    [searchFocusedDesktop, setSearchFocusedDesktop] = useState(false),
+    [searchFocusedMobile, setSearchFocusedMobile] = useState(false),
     [ce, le] = useState([]),
     [N, ue] = useState([]),
     [de, fe] = useState(`all`),
@@ -6179,19 +6181,72 @@ export default function App() {
           </div>
           <div className="hidden md:block flex-1 max-w-[480px]">
             {f === `buyer` ? <div className="relative w-full">
-              <input type="text" list="medicine-suggestions-desktop" value={oe} onChange={e => pn(e.target.value)} placeholder="Search by medicine or manufacturer..." className="w-full pl-10 pr-4 py-2.5 bg-[#F1F5F9] border border-transparent rounded-xl text-xs transition-all duration-200 placeholder-[#94A3B8] focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-[#C2EAF0] shadow-inner" />
-              <datalist id="medicine-suggestions-desktop">
-                {oe.length >= 2 && nn.slice(0, 5).map(e => <option key={e.id || e.name} value={e.name}>
-                  {e.generic}
-                  {` (`}
-                  {e.manufacturer}
-                  {`)`}
-                </option>)}
-              </datalist>
+              <input
+                type="text"
+                value={oe}
+                onChange={e => pn(e.target.value)}
+                onFocus={() => setSearchFocusedDesktop(true)}
+                onBlur={() => setTimeout(() => setSearchFocusedDesktop(false), 250)}
+                placeholder="Search by medicine or manufacturer..."
+                className="w-full pl-10 pr-9 py-2.5 bg-[#F1F5F9] border border-transparent rounded-xl text-xs transition-all duration-200 placeholder-[#94A3B8] focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-[#C2EAF0] shadow-inner"
+              />
               <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-              {oe && <button onClick={mn} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#94A3B8] hover:text-[#1D2A3B] font-semibold">{`Clear`}</button>}
+              {oe && (
+                <button
+                  type="button"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    mn();
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#94A3B8] hover:text-[#1D2A3B] font-semibold cursor-pointer"
+                >
+                  {`Clear`}
+                </button>
+              )}
+              {searchFocusedDesktop && oe.trim().length >= 2 && nn.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-[999] overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
+                  <div className="px-3.5 py-1.5 bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <span>{`Suggested Medicines`}</span>
+                    <span className="text-[#0697A8] font-bold">{nn.length} {`found`}</span>
+                  </div>
+                  <div className="max-h-64 overflow-y-auto bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800">
+                    {nn.slice(0, 6).map((item) => (
+                      <div
+                        key={item.id || item.name}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          pn(item.name);
+                          setSearchFocusedDesktop(false);
+                        }}
+                        className="px-3.5 py-2.5 hover:bg-[#E0F5F7] dark:hover:bg-slate-800 cursor-pointer flex items-center justify-between transition-colors bg-white dark:bg-slate-900 group"
+                      >
+                        <div className="min-w-0 pr-2">
+                          <span className="font-bold text-xs text-[#1D2A3B] dark:text-slate-100 group-hover:text-[#0697A8] block truncate">
+                            {item.name}
+                          </span>
+                          <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                            {item.generic && <span className="font-medium text-slate-600 dark:text-slate-300">{item.generic}</span>}
+                            {item.generic && item.manufacturer && <span>•</span>}
+                            {item.manufacturer && <span className="text-slate-400">{item.manufacturer}</span>}
+                          </div>
+                        </div>
+                        <div className="shrink-0 text-right">
+                          <span className="text-xs font-bold text-[#0697A8] block">
+                            ৳{Number(item.wholesalePrice || item.unit_price || 0).toFixed(2)}
+                          </span>
+                          {item.dosageForm && (
+                            <span className="text-[9px] text-slate-400 block font-medium">
+                              {item.dosageForm}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div> : <div className="flex items-center gap-2 text-xs font-semibold text-[#64748B] min-w-0">
               <span className="text-[#94A3B8] truncate">{`Enterprise Marketplace Control`}</span>
               <svg className="w-3 h-3 text-[#CBD5E1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -6507,21 +6562,75 @@ export default function App() {
             </div>}
             {O === `search` && <div className="flex-1 flex overflow-hidden">
               <div className="flex-1 flex flex-col overflow-hidden bg-slate-50/50">
-                <div className="px-4 md:px-8 py-4 bg-white border-b border-[#E2E8F0] flex flex-col md:flex-row gap-3 justify-between items-stretch md:items-center flex-shrink-0">
+                <div className="px-4 md:px-8 py-4 bg-white border-b border-[#E2E8F0] flex flex-col md:flex-row gap-3 justify-between items-stretch md:items-center flex-shrink-0 relative z-30">
                   <div className="md:hidden flex flex-col gap-2.5 w-full mb-1">
                     <div className="relative w-full">
-                      <input type="text" list="medicine-suggestions-mobile" value={oe} onChange={e => se(e.target.value)} placeholder="Search medicines by name..." className="w-full pl-10 pr-4 py-2.5 bg-[#F1F5F9] border border-transparent rounded-xl text-xs focus:outline-none focus:bg-white focus:border-blue-500" />
-                      <datalist id="medicine-suggestions-mobile">
-                        {oe.length >= 2 && nn.slice(0, 5).map(e => <option key={e.id || e.name} value={e.name}>
-                          {e.generic}
-                          {` (`}
-                          {e.manufacturer}
-                          {`)`}
-                        </option>)}
-                      </datalist>
+                      <input
+                        type="text"
+                        value={oe}
+                        onChange={e => se(e.target.value)}
+                        onFocus={() => setSearchFocusedMobile(true)}
+                        onBlur={() => setTimeout(() => setSearchFocusedMobile(false), 250)}
+                        placeholder="Search medicines by name..."
+                        className="w-full pl-10 pr-10 py-2.5 bg-[#F1F5F9] border border-transparent rounded-xl text-xs focus:outline-none focus:bg-white focus:border-blue-500 transition-all shadow-inner"
+                      />
                       <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
+                      {oe && (
+                        <button
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            se("");
+                          }}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#94A3B8] hover:text-[#1D2A3B] font-semibold cursor-pointer p-1"
+                        >
+                          ✕
+                        </button>
+                      )}
+                      {searchFocusedMobile && oe.trim().length >= 2 && nn.length > 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl z-[999] overflow-hidden divide-y divide-slate-100 dark:divide-slate-800">
+                          <div className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800/70 flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                            <span>Suggested Medicines</span>
+                            <span className="text-[#0697A8] font-bold">{nn.length} found</span>
+                          </div>
+                          <div className="max-h-60 overflow-y-auto bg-white dark:bg-slate-900 divide-y divide-slate-100 dark:divide-slate-800">
+                            {nn.slice(0, 6).map((item) => (
+                              <div
+                                key={item.id || item.name}
+                                onMouseDown={(e) => {
+                                  e.preventDefault();
+                                  se(item.name);
+                                  setSearchFocusedMobile(false);
+                                }}
+                                className="px-3.5 py-2.5 hover:bg-[#E0F5F7] dark:hover:bg-slate-800 active:bg-[#C2EAF0] cursor-pointer flex items-center justify-between transition-colors bg-white dark:bg-slate-900"
+                              >
+                                <div className="min-w-0 pr-2">
+                                  <span className="font-bold text-xs text-[#1D2A3B] dark:text-slate-100 block truncate">
+                                    {item.name}
+                                  </span>
+                                  <div className="flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                                    {item.generic && <span className="font-medium text-slate-600 dark:text-slate-300">{item.generic}</span>}
+                                    {item.generic && item.manufacturer && <span>•</span>}
+                                    {item.manufacturer && <span className="text-slate-400">{item.manufacturer}</span>}
+                                  </div>
+                                </div>
+                                <div className="shrink-0 text-right">
+                                  <span className="text-xs font-bold text-[#0697A8] block">
+                                    ৳{Number(item.wholesalePrice || item.unit_price || 0).toFixed(2)}
+                                  </span>
+                                  {item.dosageForm && (
+                                    <span className="text-[9px] text-slate-400 block font-medium">
+                                      {item.dosageForm}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <select value={ce[0] || ""} onChange={e => le(e.target.value ? [e.target.value] : [])} className="w-full bg-[#F1F5F9] border border-transparent rounded-xl px-3 py-2.5 text-xs text-[#475569] font-bold focus:outline-none focus:bg-white focus:border-blue-500">
                       <option value="">{`All Companies`}</option>
