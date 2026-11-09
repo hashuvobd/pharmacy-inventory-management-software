@@ -9,8 +9,8 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, onSelectProduct, view
   const [inputQty, setInputQty] = useState(1);
   const basePrice = Number(med.unit_price || med.price || med.wholesalePrice || 0);
   const oldPrice = Number(med.pack_mrp || med.mrp || 0);
-  const discountAmt = Math.max(0, oldPrice - basePrice);
-  const discountPercent = oldPrice > 0 && discountAmt > 0
+  const discountAmt = basePrice > 0 ? Math.max(0, oldPrice - basePrice) : 0;
+  const discountPercent = basePrice > 0 && oldPrice > 0 && discountAmt > 0
     ? Math.round((discountAmt / oldPrice) * 100)
     : 0;
   const medType = (med.dosageForm || med.dosage_form || (med.type && med.type !== 'Other' && med.type !== 'Medicine' ? med.type : '') || (med.category && med.category !== 'Other' && med.category !== 'Medicine' ? med.category : '') || (med.type && med.type !== 'Other' ? med.type : '') || '').trim();
@@ -81,16 +81,21 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, onSelectProduct, view
                       {discountPercent}% OFF
                     </span>
                   )}
+                  {med.stock > 0 ? (
+                    <span className="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">In Stock ({med.stock})</span>
+                  ) : (
+                    <span className="text-[10px] bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-medium">Out of Stock</span>
+                  )}
                 </>
               ) : (
-                <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
-                  Price on Request
-                </span>
-              )}
-              {med.stock > 0 ? (
-                <span className="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full font-medium">In Stock ({med.stock})</span>
-              ) : (
-                <span className="text-[10px] bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-medium">Out of Stock</span>
+                <>
+                  <span className="text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
+                    Price on Request
+                  </span>
+                  {med.stock <= 0 && (
+                    <span className="text-[10px] bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-medium">Out of Stock</span>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -198,18 +203,24 @@ const Sa = ({ med, cart, handleAddToCart, onOpenMonograph, onSelectProduct, view
         </div>
 
         {/* Stock Badge on Top-Left */}
-        {med.stock > 0 ? (
-          <div className="absolute top-2 left-2 px-2 py-0.5 bg-white/90 backdrop-blur-sm rounded-lg border border-slate-100 shadow-sm">
-            <span className="text-[10px] font-bold text-green-600 block leading-tight">Stock: {med.stock}</span>
-          </div>
-        ) : (
+        {basePrice > 0 ? (
+          med.stock > 0 ? (
+            <div className="absolute top-2 left-2 px-2 py-0.5 bg-white/90 backdrop-blur-sm rounded-lg border border-slate-100 shadow-sm">
+              <span className="text-[10px] font-bold text-green-600 block leading-tight">Stock: {med.stock}</span>
+            </div>
+          ) : (
+            <div className="absolute top-2 left-2 px-2 py-0.5 bg-red-500/90 backdrop-blur-sm rounded-lg shadow-sm">
+              <span className="text-[10px] font-bold text-white block leading-tight">Out of Stock</span>
+            </div>
+          )
+        ) : med.stock <= 0 ? (
           <div className="absolute top-2 left-2 px-2 py-0.5 bg-red-500/90 backdrop-blur-sm rounded-lg shadow-sm">
             <span className="text-[10px] font-bold text-white block leading-tight">Out of Stock</span>
           </div>
-        )}
+        ) : null}
 
         {/* Discount Badge on Bottom-Left of Image */}
-        {discountPercent > 0 && (
+        {basePrice > 0 && discountPercent > 0 && (
           <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-emerald-600 text-white rounded-lg shadow-sm text-[10px] font-extrabold tracking-tight flex items-center gap-0.5 z-10">
             <span>{discountPercent}% OFF</span>
           </div>
@@ -414,8 +425,8 @@ const ProductDetailsView = ({
 
   const basePrice = Number(product.wholesalePrice || product.unit_price || product.price || 0);
   const oldPrice = Number(product.pack_mrp || product.mrp || 0);
-  const discountAmt = Math.max(0, oldPrice - basePrice);
-  const discountPercent = oldPrice > 0 && discountAmt > 0
+  const discountAmt = basePrice > 0 ? Math.max(0, oldPrice - basePrice) : 0;
+  const discountPercent = basePrice > 0 && oldPrice > 0 && discountAmt > 0
     ? Math.round((discountAmt / oldPrice) * 100)
     : 0;
 
