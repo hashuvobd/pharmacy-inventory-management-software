@@ -1088,37 +1088,35 @@ const getBackups = async () => {
   try {
     const { data, error } = await supabase
       .from('database_backups')
-      .select('id, created_at, backup_type, total_records, tables_summary, backup_data')
+      .select('id, created_at, backup_type, total_records, tables_summary')
       .order('created_at', { ascending: false })
       .limit(30);
 
     if (!error && data && data.length > 0) {
       return data.map(b => {
-        const tables = b.backup_data?.tables || {};
-        const summary = b.tables_summary || b.backup_data?.summary || {
-          medicines: (tables.medicines || b.backup_data?.medicines || []).length,
-          orders: (tables.orders || b.backup_data?.orders || []).length,
-          order_items: (tables.order_items || []).length,
-          buyers: (tables.buyers || b.backup_data?.buyers || []).length,
-          admin_users: (tables.admin_users || []).length,
-          admin_roles: (tables.admin_roles || []).length,
-          delivery_men: (tables.delivery_men || []).length,
-          coupons: (tables.coupons || []).length,
-          special_discounts: (tables.special_discounts || []).length,
-          medicine_requests: (tables.medicine_requests || []).length,
-          auth_users: (tables.auth_users || []).length
+        const summary = b.tables_summary || {
+          medicines: b.total_records || 0,
+          orders: 0,
+          order_items: 0,
+          buyers: 0,
+          admin_users: 0,
+          admin_roles: 0,
+          delivery_men: 0,
+          coupons: 0,
+          special_discounts: 0,
+          medicine_requests: 0,
+          auth_users: 0
         };
-        const meds = tables.medicines || b.backup_data?.medicines || (Array.isArray(b.backup_data) ? b.backup_data : []);
         return {
           id: b.id,
           timestamp: new Date(b.created_at).getTime(),
           date: new Date(b.created_at).toLocaleString(),
           type: b.backup_type || 'automated',
-          itemCount: b.total_records || meds.length,
+          itemCount: b.total_records || summary.medicines || 0,
           summary: summary,
-          tables: tables,
-          data: meds,
-          fullData: b.backup_data
+          tables: {},
+          data: [],
+          fullData: null
         };
       });
     }
@@ -4068,10 +4066,22 @@ export default function App() {
 
       if (rpcErr) {
         console.warn("Postgres RPC restore failed, falling back to direct table restore:", rpcErr);
+        let tables = backupToRestore.tables || {};
+        let medsData = tables.medicines || backupToRestore.data || [];
+        if (medsData.length === 0 && (!tables || Object.keys(tables).length === 0)) {
+          const { data: fullRow } = await supabase
+            .from('database_backups')
+            .select('backup_data')
+            .eq('id', backupToRestore.id)
+            .single();
+          if (fullRow?.backup_data) {
+            tables = fullRow.backup_data.tables || {};
+            medsData = tables.medicines || fullRow.backup_data.medicines || (Array.isArray(fullRow.backup_data) ? fullRow.backup_data : []);
+          }
+        }
         // Fallback for medicines if selected
         if (allTablesToRestore.includes('medicines')) {
           Ke({ percent: 35, rowsProcessed: 1, totalRows: allTablesToRestore.length, eta: 'Restoring medicines...' });
-          const medsData = backupToRestore.tables?.medicines || backupToRestore.data || [];
           const formatted = medsData.map(item => ({
             product_name: item.product_name || item.name || 'Unnamed',
             brandId: item.brandId || item.brand_id || null,
@@ -4091,26 +4101,26 @@ export default function App() {
           }
         }
         // Fallback for buyers if selected
-        if (allTablesToRestore.includes('buyers') && backupToRestore.tables?.buyers) {
+        if (allTablesToRestore.includes('buyers') && tables?.buyers) {
           Ke({ percent: 55, rowsProcessed: 2, totalRows: allTablesToRestore.length, eta: 'Restoring buyers...' });
-          for (const buyer of backupToRestore.tables.buyers) {
+          for (const buyer of tables.buyers) {
             await supabase.from('buyers').upsert(buyer, { onConflict: 'email' });
           }
         }
         // Fallback for delivery_men
-        if (allTablesToRestore.includes('delivery_men') && backupToRestore.tables?.delivery_men) {
+        if (allTablesToRestore.includes('delivery_men') && tables?.delivery_men) {
           await supabase.from('delivery_men').delete().neq('id', 'placeholder');
-          await supabase.from('delivery_men').insert(backupToRestore.tables.delivery_men);
+          await supabase.from('delivery_men').insert(tables.delivery_men);
         }
         // Fallback for coupons
-        if (allTablesToRestore.includes('coupons') && backupToRestore.tables?.coupons) {
+        if (allTablesToRestore.includes('coupons') && tables?.coupons) {
           await supabase.from('coupons').delete().neq('id', 0);
-          await supabase.from('coupons').insert(backupToRestore.tables.coupons);
+          await supabase.from('coupons').insert(tables.coupons);
         }
         // Fallback for special_discounts
-        if (allTablesToRestore.includes('special_discounts') && backupToRestore.tables?.special_discounts) {
+        if (allTablesToRestore.includes('special_discounts') && tables?.special_discounts) {
           await supabase.from('special_discounts').delete().neq('id', 0);
-          await supabase.from('special_discounts').insert(backupToRestore.tables.special_discounts);
+          await supabase.from('special_discounts').insert(tables.special_discounts);
         }
       }
 
@@ -9997,8 +10007,26 @@ export default function App() {
                         <td className="px-5 py-4 text-right">
                           <div className="flex items-center justify-end gap-1.5">
                             <button
-                              onClick={() => {
-                                const exportData = b.fullData || { timestamp: b.date, backup_type: b.type, medicines: b.data };
+                              onClick={async () => {
+                                let exportData = b.fullData;
+                                if (!exportData) {
+                                  T("Preparing backup JSON download...");
+                                  try {
+                                    const { data: fullRow, error: fetchErr } = await supabase
+                                      .from('database_backups')
+                                      .select('backup_data')
+                                      .eq('id', b.id)
+                                      .single();
+                                    if (!fetchErr && fullRow?.backup_data) {
+                                      exportData = fullRow.backup_data;
+                                    }
+                                  } catch (err) {
+                                    console.error("Failed to load backup payload:", err);
+                                  }
+                                }
+                                if (!exportData) {
+                                  exportData = { timestamp: b.date, backup_type: b.type, total_records: b.itemCount, summary: b.summary };
+                                }
                                 const jsonStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
                                 const downloadAnchor = document.createElement('a');
                                 downloadAnchor.setAttribute("href", jsonStr);
