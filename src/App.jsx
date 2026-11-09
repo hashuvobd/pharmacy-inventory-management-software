@@ -6573,7 +6573,7 @@ export default function App() {
       mn();
       setSelectedProduct(null);
       setProductHistory([]);
-      k('dashboard');
+      k('search');
     } else if (f === 'admin') {
       const defaultTab = hasPermission('approvals.view') ? 'approvals' : 'inventory';
       ht(defaultTab);
@@ -6591,7 +6591,7 @@ export default function App() {
             tabIndex={0}
             onKeyDown={evt => { if (evt.key === 'Enter' || evt.key === ' ') { evt.preventDefault(); navigateHome(); } }}
             className="cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
-            title="Go to Home"
+            title={f === 'buyer' ? "Go to Search Medicines" : "Go to Home"}
           >
             <img src={logoUrl} className="h-10 md:h-12 lg:h-13 w-auto object-contain transition-all" alt="Logo" />
           </div>
@@ -6970,7 +6970,7 @@ export default function App() {
             tabIndex={0}
             onKeyDown={evt => { if (evt.key === 'Enter' || evt.key === ' ') { evt.preventDefault(); navigateHome(); } }}
             className="flex md:hidden items-center gap-2 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
-            title="Go to Home"
+            title={f === 'buyer' ? "Go to Search Medicines" : "Go to Home"}
           >
             <img src={logoUrl} className="h-[38px] w-auto object-contain" alt="Logo" />
           </div>
