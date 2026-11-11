@@ -3962,6 +3962,15 @@ export default function App() {
           }));
           setActivityLogs(normalized);
           try { localStorage.setItem('dg_activity_logs', JSON.stringify(normalized)); } catch { }
+          const contactLog = normalized.find(l => l.action === 'Update Support Contact');
+          if (contactLog) {
+            const val = contactLog.metadata?.supportContact || (contactLog.details && contactLog.details.split('to ')[1]?.trim());
+            if (val) {
+              setSupportContact(val);
+              setSupportContactInput(val);
+              try { localStorage.setItem('dg_support_contact', val); } catch { }
+            }
+          }
         }
       } catch (e) {
         console.warn('Could not fetch admin_activity_logs from Supabase:', e);
@@ -4004,6 +4013,14 @@ export default function App() {
           } else if (payload.eventType === 'INSERT') {
             const newRow = payload.new;
             if (newRow) {
+              if (newRow.action === 'Update Support Contact') {
+                const val = newRow.metadata?.supportContact || (newRow.details && newRow.details.split('to ')[1]?.trim());
+                if (val) {
+                  setSupportContact(val);
+                  setSupportContactInput(val);
+                  try { localStorage.setItem('dg_support_contact', val); } catch { }
+                }
+              }
               const normalized = {
                 ...newRow,
                 actor_name: newRow.user_name || newRow.actor_name || 'Admin',
@@ -4811,6 +4828,20 @@ export default function App() {
     [mt, ht] = useState(`approvals`),
     [gt, _t] = useState(null),
     [showPdfPreview, setShowPdfPreview] = useState(false),
+    [supportContact, setSupportContact] = useState(() => {
+      try {
+        return localStorage.getItem('dg_support_contact') || '+880 1711-223344';
+      } catch {
+        return '+880 1711-223344';
+      }
+    }),
+    [supportContactInput, setSupportContactInput] = useState(() => {
+      try {
+        return localStorage.getItem('dg_support_contact') || '+880 1711-223344';
+      } catch {
+        return '+880 1711-223344';
+      }
+    }),
     getDocUrl = file => {
       if (!file) return null;
       const str = String(file).trim();
@@ -5705,6 +5736,11 @@ export default function App() {
       setProductHistory([]);
       setSelectedProduct(med);
       try {
+        if (!window.history.state || window.history.state.dg_modal !== 'product_details') {
+          window.history.pushState({ dg_modal: 'product_details', id: med?.id }, '');
+        }
+      } catch (err) {}
+      try {
         window.scrollTo({ top: 0, behavior: 'instant' });
       } catch (err) {}
     },
@@ -5714,19 +5750,38 @@ export default function App() {
       }
       setSelectedProduct(altMed);
       try {
+        window.history.pushState({ dg_modal: 'product_details', id: altMed?.id }, '');
+      } catch (err) {}
+      try {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (err) {}
     },
-    handleBackProduct = () => {
+    handleBackProduct = (fromPopState = false) => {
       if (productHistory && productHistory.length > 0) {
         const prev = productHistory[productHistory.length - 1];
         setProductHistory(prevHist => prevHist.slice(0, -1));
         setSelectedProduct(prev);
+        if (!fromPopState) {
+          try {
+            if (window.history.state && window.history.state.dg_modal === 'product_details') {
+              window.history.back();
+              return;
+            }
+          } catch (err) {}
+        }
         try {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (err) {}
       } else {
         setSelectedProduct(null);
+        if (!fromPopState) {
+          try {
+            if (window.history.state && window.history.state.dg_modal === 'product_details') {
+              window.history.back();
+              return;
+            }
+          } catch (err) {}
+        }
         const pos = savedScrollPosRef.current;
         if (pos) {
           const restoreScroll = () => {
@@ -5738,7 +5793,11 @@ export default function App() {
               dashboardScrollRef.current.scrollTop = pos.scrollTop;
             }
             if (pos.windowY > 0) {
-              window.scrollTo({ top: pos.windowY, behavior: 'instant' });
+              try {
+                window.scrollTo({ top: pos.windowY, behavior: 'instant' });
+              } catch (e) {
+                window.scrollTo(0, pos.windowY);
+              }
             }
           };
           restoreScroll();
@@ -5751,6 +5810,13 @@ export default function App() {
       }
     },
     handleTabSwitch = tab => {
+      if (selectedProduct) {
+        try {
+          if (window.history.state && window.history.state.dg_modal === 'product_details') {
+            window.history.back();
+          }
+        } catch (err) {}
+      }
       setSelectedProduct(null);
       setProductHistory([]);
       k(tab);
@@ -6752,6 +6818,28 @@ export default function App() {
     prevSelectedProductRef.current = selectedProduct;
   }, [selectedProduct]);
 
+  useEffect(() => {
+    const handlePopState = () => {
+      if (selectedProduct) {
+        handleBackProduct(true);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+
+    window.__handleAndroidBack = () => {
+      if (selectedProduct) {
+        handleBackProduct(false);
+        return true;
+      }
+      return false;
+    };
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      delete window.__handleAndroidBack;
+    };
+  }, [selectedProduct, productHistory]);
+
   const navigateHome = () => {
     l(false);
     _t(null);
@@ -7081,6 +7169,17 @@ export default function App() {
                 </div>
               </button>
             )}
+
+            <button onClick={() => {
+              ht(`support_contact`), l(!1);
+            }} className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${mt === `support_contact` ? `bg-[#E0F5F7] text-[#0697A8] shadow-xs` : `text-[#64748B] hover:bg-slate-50 hover:text-[#1D2A3B]`}`}>
+              <div className="flex items-center gap-3">
+                <svg className={`w-4 h-4 ${mt === `support_contact` ? `text-[#0697A8]` : `text-[#94A3B8]`}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                <span>{`Support Contact`}</span>
+              </div>
+            </button>
           </nav>
         </>}
         <div className={`md:hidden pt-[20px] px-4 border-t border-[#E2E8F0] bg-slate-50/40 flex items-center justify-center ${f === `buyer` ? `pb-[88px]` : `pb-[32px]`}`}>
@@ -11127,6 +11226,161 @@ export default function App() {
                 </div>
               </div>
             )}
+
+            {mt === `support_contact` && (
+              <div className="flex-1 overflow-y-auto bg-slate-50/50 p-4 md:p-8">
+                <div className="max-w-4xl mx-auto space-y-6">
+                  {/* Top Banner Header */}
+                  <div className="bg-white p-6 rounded-2xl md:rounded-[2rem] border border-[#E2E8F0] shadow-xs">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#0697A8] animate-pulse"></span>
+                      <span className="text-[11px] font-black uppercase tracking-wider text-[#0697A8]">Customer Invoicing & Dispatch</span>
+                    </div>
+                    <h2 className="text-2xl font-bold text-[#1D2A3B] tracking-tight">Support Contact Settings</h2>
+                    <p className="text-xs text-[#64748B] mt-0.5">Manage the official customer support and helpline phone number printed at the bottom of all buyer invoices.</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    {/* Settings Form Card */}
+                    <div className="lg:col-span-7 bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-xs space-y-5">
+                      <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
+                        <div className="w-10 h-10 rounded-xl bg-[#E0F5F7] text-[#0697A8] flex items-center justify-center flex-shrink-0">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-bold text-[#1D2A3B]">Support Helpline Number</h3>
+                          <p className="text-[11px] text-[#64748B]">This number appears on all printed and digital buyer invoices.</p>
+                        </div>
+                      </div>
+
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          const val = (supportContactInput || '').trim();
+                          if (!val) {
+                            T('Please enter a valid contact number.');
+                            return;
+                          }
+                          setSupportContact(val);
+                          try {
+                            localStorage.setItem('dg_support_contact', val);
+                          } catch {}
+                          logAdminActivity('SYSTEM_SETTINGS', 'Update Support Contact', `Updated support contact number to ${val}`, 'SUPPORT_CONTACT', { supportContact: val });
+                          T('Support contact number updated successfully!');
+                        }}
+                        className="space-y-4"
+                      >
+                        <div>
+                          <label className="block text-xs font-bold text-[#475569] mb-1.5">
+                            Helpline / Support Contact Number
+                          </label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                              <svg className="w-4 h-4 text-[#0697A8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                              </svg>
+                            </div>
+                            <input
+                              type="text"
+                              required
+                              value={supportContactInput}
+                              onChange={(e) => setSupportContactInput(e.target.value)}
+                              placeholder="+880 1711-223344"
+                              className="w-full bg-slate-50 border border-slate-200 text-xs font-semibold text-[#1D2A3B] rounded-xl pl-10 pr-4 py-2.5 h-[42px] outline-none focus:bg-white focus:border-[#0697A8] focus:ring-2 focus:ring-[#0697A8]/10 transition-all placeholder:text-slate-400"
+                            />
+                          </div>
+                          <p className="text-[11px] text-[#64748B] mt-1.5">
+                            Format example: <code className="bg-slate-100 text-slate-700 px-1 py-0.5 rounded font-mono">+880 1711-223344</code> or <code className="bg-slate-100 text-slate-700 px-1 py-0.5 rounded font-mono">01711-223344</code>
+                          </p>
+                        </div>
+
+                        {/* Quick Presets */}
+                        <div className="flex items-center gap-2 pt-1">
+                          <span className="text-[11px] font-bold text-slate-400">Quick set:</span>
+                          <button
+                            type="button"
+                            onClick={() => setSupportContactInput('+880 1711-223344')}
+                            className="text-[11px] font-semibold text-[#0697A8] hover:underline cursor-pointer bg-teal-50 px-2 py-0.5 rounded-lg border border-teal-100"
+                          >
+                            +880 1711-223344
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSupportContactInput('+880 1700-000000')}
+                            className="text-[11px] font-semibold text-slate-600 hover:underline cursor-pointer bg-slate-100 px-2 py-0.5 rounded-lg"
+                          >
+                            +880 1700-000000
+                          </button>
+                        </div>
+
+                        <div className="pt-2 flex items-center justify-between border-t border-slate-100">
+                          <div className="text-[11px] text-slate-500">
+                            {supportContact ? (
+                              <span>Currently Active: <strong className="text-slate-800 font-mono">{supportContact}</strong></span>
+                            ) : (
+                              <span className="text-amber-600 font-medium">No contact set</span>
+                            )}
+                          </div>
+                          <button
+                            type="submit"
+                            className="bg-[#0697A8] hover:bg-[#057A88] text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-md shadow-[#0697A8]/20 transition-all flex items-center gap-2 cursor-pointer"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>Save Contact Number</span>
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+
+                    {/* Live Invoice Footer Preview Card */}
+                    <div className="lg:col-span-5 bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-xs flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <h3 className="text-xs font-bold text-[#1D2A3B] uppercase tracking-wider">Live Invoice Footer Preview</h3>
+                          </div>
+                          <span className="text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full">Printed View</span>
+                        </div>
+
+                        <div className="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-5 font-sans text-center space-y-3">
+                          <div className="text-[11px] font-bold text-slate-800 uppercase tracking-wider text-left border-b border-slate-200 pb-2">
+                            Terms & Conditions (শর্তাবলী)
+                          </div>
+                          <ol className="list-decimal list-inside space-y-1 text-[11px] text-slate-500 text-left">
+                            <li>দয়া করে মূল্য পরিশোধ করে পণ্য বুঝে নিন।</li>
+                            <li>কোনো প্রোডাক্ট রিটার্ন করলে কোনো ধরনের অফার প্রযোজ্য হবে না।</li>
+                            <li>আমাদের সিল যুক্ত পণ্যের কোনো সমস্যা থাকলে আমরা সমাধান করে দিবো।</li>
+                            <li>ডেলিভারি সম্পর্কিত কোন অভিযোগ বা পরামর্শ থাকলে সাপোর্টে যোগাযোগ করুন।</li>
+                          </ol>
+
+                          <div className="pt-4 border-t border-slate-200 mt-4">
+                            <div className="text-xs text-slate-500 font-medium">
+                              Thank you for doing business with DG Pharma.
+                            </div>
+                            <div className="text-xs font-bold text-slate-700 mt-1 font-mono">
+                              Contact: {supportContactInput.trim() || supportContact || '+880 1711-223344'}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-[#64748B]">
+                        <span>Updates automatically on invoice print</span>
+                        <span className="text-emerald-600 font-bold flex items-center gap-1">
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
+                          Ready to Print
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>}
         </div>
         {f === `buyer` && sn.totalItems > 0 && <div className="hidden md:flex h-16 bg-white border-t border-[#E2E8F0] items-center justify-between px-8 z-20 flex-shrink-0 animate-in slide-in-from-bottom duration-300">
@@ -13588,8 +13842,13 @@ export default function App() {
                 <li>কোনো প্রোডাক্ট রিটার্ন করলে অফার প্রযোজ্য হবে না।</li>
                 <li>সিল যুক্ত পণ্যের সমস্যা থাকলে সমাধান দেওয়া হবে।</li>
               </ol>
-              <div className="mt-8 text-center text-xs text-slate-400">
-                {`Thank you for doing business with DG Pharma.`}
+              <div className="mt-8 text-center text-xs text-slate-500">
+                <div>{`Thank you for doing business with DG Pharma.`}</div>
+                {supportContact && (
+                  <div className="font-semibold text-slate-700 mt-1">
+                    {`Contact: ${supportContact}`}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -13739,8 +13998,13 @@ export default function App() {
                 <li>আমাদের সিল যুক্ত পণ্যের কোনো সমস্যা থাকলে আমরা সমাধান করে দিবো।</li>
                 <li>ডেলিভারি সম্পর্কিত কোন অভিযোগ বা পরামর্শ থাকলে সাপোর্টে যোগাযোগ করুন।</li>
               </ol>
-              <div className="mt-8 text-center text-xs text-slate-400">
-                {`Thank you for doing business with DG Pharma.`}
+              <div className="mt-8 text-center text-xs text-slate-500">
+                <div>{`Thank you for doing business with DG Pharma.`}</div>
+                {supportContact && (
+                  <div className="font-semibold text-slate-700 mt-1">
+                    {`Contact: ${supportContact}`}
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -253,8 +253,26 @@ public class MainActivity extends AppCompatActivity {
             public void handleOnBackPressed() {
                 if (errorView.getVisibility() == View.VISIBLE) {
                     finish();
-                } else if (webView.canGoBack()) {
-                    webView.goBack();
+                    return;
+                }
+
+                // First check if the web application wants to handle the back action (e.g. closing product details)
+                if (webView != null) {
+                    webView.evaluateJavascript(
+                            "(function() { if (window.__handleAndroidBack && window.__handleAndroidBack()) { return 'handled'; } return 'unhandled'; })()",
+                            value -> {
+                                if ("\"handled\"".equals(value)) {
+                                    // Successfully handled inside web application
+                                    return;
+                                }
+                                if (webView.canGoBack()) {
+                                    webView.goBack();
+                                } else {
+                                    setEnabled(false);
+                                    getOnBackPressedDispatcher().onBackPressed();
+                                }
+                            }
+                    );
                 } else {
                     setEnabled(false);
                     getOnBackPressedDispatcher().onBackPressed();
