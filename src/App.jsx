@@ -3940,9 +3940,29 @@ export default function App() {
           }));
           setAdminStaffUsers(formattedStaff);
           try { localStorage.setItem('dg_admin_users', JSON.stringify(formattedStaff)); } catch { }
+
+          // Sync support contact from super admin phone in Supabase
+          const superAdminUser = formattedStaff.find(u => (u.email || '').toLowerCase() === 'admin@dgpharma.shop');
+          if (superAdminUser && superAdminUser.phone && superAdminUser.phone !== '01700000000') {
+            setSupportContact(superAdminUser.phone);
+            setSupportContactInput(superAdminUser.phone);
+            try { localStorage.setItem('dg_support_contact', superAdminUser.phone); } catch { }
+          }
         }
       } catch (e) {
         console.warn('Could not fetch admin_users from Supabase:', e);
+      }
+
+      // Check dedicated system_settings table if configured in Supabase
+      try {
+        const { data: settingRow } = await supabase.from('system_settings').select('value').eq('key', 'support_contact').maybeSingle();
+        if (settingRow && settingRow.value) {
+          setSupportContact(settingRow.value);
+          setSupportContactInput(settingRow.value);
+          try { localStorage.setItem('dg_support_contact', settingRow.value); } catch { }
+        }
+      } catch (e) {
+        // Table might not exist yet, fallback to admin_users / activity logs
       }
 
       // Supabase sync for admin activity logs (Supabase is the single source of truth)
@@ -4039,8 +4059,40 @@ export default function App() {
       )
       .subscribe();
 
+    const usersChannel = supabase
+      .channel('realtime_admin_users_contact')
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'admin_users' },
+        (payload) => {
+          if (payload.new && (payload.new.email || '').toLowerCase() === 'admin@dgpharma.shop' && payload.new.phone) {
+            setSupportContact(payload.new.phone);
+            setSupportContactInput(payload.new.phone);
+            try { localStorage.setItem('dg_support_contact', payload.new.phone); } catch { }
+          }
+        }
+      )
+      .subscribe();
+
+    const settingsChannel = supabase
+      .channel('realtime_system_settings_contact')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'system_settings' },
+        (payload) => {
+          if (payload.new && payload.new.key === 'support_contact' && payload.new.value) {
+            setSupportContact(payload.new.value);
+            setSupportContactInput(payload.new.value);
+            try { localStorage.setItem('dg_support_contact', payload.new.value); } catch { }
+          }
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(usersChannel);
+      supabase.removeChannel(settingsChannel);
     };
   }, []);
 
@@ -11256,7 +11308,7 @@ export default function App() {
                       </div>
 
                       <form
-                        onSubmit={(e) => {
+                        onSubmit={async (e) => {
                           e.preventDefault();
                           const val = (supportContactInput || '').trim();
                           if (!val) {
@@ -11267,8 +11319,22 @@ export default function App() {
                           try {
                             localStorage.setItem('dg_support_contact', val);
                           } catch {}
+
+                          // 1. Sync to Supabase admin_users table (super admin phone)
+                          try {
+                            await supabase.from('admin_users').update({ phone: val, updated_at: new Date().toISOString() }).ilike('email', 'admin@dgpharma.shop');
+                          } catch (err) {
+                            console.warn('Could not sync support contact to admin_users:', err);
+                          }
+
+                          // 2. Sync to Supabase system_settings table if configured
+                          try {
+                            await supabase.from('system_settings').upsert({ key: 'support_contact', value: val, updated_at: new Date().toISOString() });
+                          } catch (err) {}
+
+                          // 3. Record in audit ledger
                           logAdminActivity('SYSTEM_SETTINGS', 'Update Support Contact', `Updated support contact number to ${val}`, 'SUPPORT_CONTACT', { supportContact: val });
-                          T('Support contact number updated successfully!');
+                          T('Support contact number updated & synced to Supabase!');
                         }}
                         className="space-y-4"
                       >
@@ -12584,6 +12650,15 @@ export default function App() {
                   <button onClick={() => yn(I.id, `Returned`)} className={`py-2 rounded-lg border ${I.status === `Returned` ? `bg-rose-600 text-white border-rose-700 shadow-xs` : I.status === `Return Requested` ? `bg-rose-100 text-rose-800 border-rose-300 font-black animate-pulse` : `bg-slate-50 text-[#475569] border-[#E2E8F0] hover:bg-slate-100`}`}>{`5. Returned`}</button>
                 </div>
               </div>
+
+              <div className="mt-4 pt-3 border-t border-slate-200 text-center text-xs text-slate-500">
+                <div>{`Thank you for doing business with DG Pharma.`}</div>
+                {supportContact && (
+                  <div className="font-semibold text-slate-700 mt-0.5 font-mono">
+                    {`Contact: ${supportContact}`}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="p-6 border-t border-[#E2E8F0] bg-slate-50 flex items-center justify-between">
               <div>
@@ -13303,6 +13378,14 @@ export default function App() {
                 );
               })()}
             </div>
+            <div className="mt-4 pt-3 border-t border-slate-100 text-center text-xs text-slate-500">
+              <div>{`Thank you for doing business with DG Pharma.`}</div>
+              {supportContact && (
+                <div className="font-semibold text-slate-700 mt-0.5 font-mono">
+                  {`Contact: ${supportContact}`}
+                </div>
+              )}
+            </div>
           </div>
         </div>}
         {f === `buyer` && Me.isOpen && <div className="fixed inset-0 z-50 flex items-center justify-center p-4 font-sans">
@@ -13727,7 +13810,7 @@ export default function App() {
                   {getFullAddress(activeInvoice) || (n?.name === activeInvoice.buyerName ? getFullAddress(n) : '') || activeInvoice.location || `House #12, Road #4, Block-D, Banani, Dhaka - 1213`}
                 </p>
                 <p className="text-slate-500 text-[11px] mb-1">{`Pharmacy / Organization`}</p>
-                <p className="text-slate-600 font-mono text-xs">{`Contact: ${activeInvoice.phone || (n?.name === activeInvoice.buyerName ? n?.phone : '') || '+8801711223344'}`}</p>
+                <p className="text-slate-600 font-mono text-xs">{`Buyer Phone: ${activeInvoice.phone || activeInvoice.buyerPhone || (n?.name === activeInvoice.buyerName ? n?.phone : '') || 'N/A'}`}</p>
               </div>
               <div className="text-right">
                 <h3 className="font-bold text-slate-800 uppercase tracking-wider border-b border-slate-300 pb-1 mb-2 text-xs">{`Payment Details`}</h3>
@@ -13882,7 +13965,7 @@ export default function App() {
                   {getFullAddress(activeInvoice) || (n?.name === activeInvoice.buyerName ? getFullAddress(n) : '') || activeInvoice.location || `House #12, Road #4, Block-D, Banani, Dhaka - 1213`}
                 </p>
                 <p className="text-slate-500 text-[11px] mb-1">{`Pharmacy / Organization`}</p>
-                <p className="text-slate-600 font-mono text-xs">{`Contact: ${activeInvoice.phone || (n?.name === activeInvoice.buyerName ? n?.phone : '') || '+8801711223344'}`}</p>
+                <p className="text-slate-600 font-mono text-xs">{`Buyer Phone: ${activeInvoice.phone || activeInvoice.buyerPhone || (n?.name === activeInvoice.buyerName ? n?.phone : '') || 'N/A'}`}</p>
               </div>
               <div className="text-right">
                 <h3 className="font-bold text-slate-800 uppercase tracking-wider border-b border-slate-300 pb-1 mb-2 text-xs">{`Payment Details`}</h3>
