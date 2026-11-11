@@ -1160,7 +1160,7 @@ const ProductSlider = () => {
 
 import { supabase } from "./supabaseClient";
 import "./App.css";
-import logoUrl from "./assets/Logo New.png";
+import logoUrl from "./assets/DG-Pharma-Logo.png";
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 
@@ -4485,6 +4485,11 @@ export default function App() {
     [pdfFileName, setPdfFileName] = useState(''),
     [pdfUploadError, setPdfUploadError] = useState(''),
     editingNameRef = useRef({}),
+    catalogScrollRef = useRef(null),
+    offersScrollRef = useRef(null),
+    dashboardScrollRef = useRef(null),
+    savedScrollPosRef = useRef({ tab: '', scrollTop: 0, windowY: 0, page: 1 }),
+    prevSelectedProductRef = useRef(null),
     handleDrugLicenseUpload = async e => {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
@@ -5650,8 +5655,8 @@ export default function App() {
           [targetId]: capped
         };
       });
-      if (delta > 0) {
-        Se(!0);
+      if (delta > 0 && typeof T === "function") {
+        T(`Added ${delta}x ${n.name || 'item'} to cart!`);
       }
     },
     addToCartQuiet = (med, qty = 1) => {
@@ -5681,10 +5686,26 @@ export default function App() {
       Se(true);
     },
     handleSelectProduct = med => {
+      let currentScrollTop = 0;
+      if (O === 'search' && catalogScrollRef.current) {
+        currentScrollTop = catalogScrollRef.current.scrollTop;
+      } else if (O === 'offers' && offersScrollRef.current) {
+        currentScrollTop = offersScrollRef.current.scrollTop;
+      } else if (O === 'dashboard' && dashboardScrollRef.current) {
+        currentScrollTop = dashboardScrollRef.current.scrollTop;
+      }
+      const windowY = window.scrollY || document.documentElement.scrollTop || 0;
+      savedScrollPosRef.current = {
+        tab: O,
+        scrollTop: currentScrollTop,
+        windowY,
+        page: A
+      };
+
       setProductHistory([]);
       setSelectedProduct(med);
       try {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: 'instant' });
       } catch (err) {}
     },
     handleSelectAlternative = altMed => {
@@ -5706,6 +5727,27 @@ export default function App() {
         } catch (err) {}
       } else {
         setSelectedProduct(null);
+        const pos = savedScrollPosRef.current;
+        if (pos) {
+          const restoreScroll = () => {
+            if (pos.tab === 'search' && catalogScrollRef.current) {
+              catalogScrollRef.current.scrollTop = pos.scrollTop;
+            } else if (pos.tab === 'offers' && offersScrollRef.current) {
+              offersScrollRef.current.scrollTop = pos.scrollTop;
+            } else if (pos.tab === 'dashboard' && dashboardScrollRef.current) {
+              dashboardScrollRef.current.scrollTop = pos.scrollTop;
+            }
+            if (pos.windowY > 0) {
+              window.scrollTo({ top: pos.windowY, behavior: 'instant' });
+            }
+          };
+          restoreScroll();
+          requestAnimationFrame(() => {
+            restoreScroll();
+            setTimeout(restoreScroll, 40);
+            setTimeout(restoreScroll, 120);
+          });
+        }
       }
     },
     handleTabSwitch = tab => {
@@ -6680,6 +6722,36 @@ export default function App() {
       w(e => [i, ...e]), T(`Successfully processed return claim for ${e.name}. Issued refund of ৳${t} to buyer ledger.`);
     };
 
+  useEffect(() => {
+    if (prevSelectedProductRef.current && !selectedProduct) {
+      const pos = savedScrollPosRef.current;
+      if (pos) {
+        const restoreScroll = () => {
+          if (pos.tab === 'search' && catalogScrollRef.current) {
+            catalogScrollRef.current.scrollTop = pos.scrollTop;
+          } else if (pos.tab === 'offers' && offersScrollRef.current) {
+            offersScrollRef.current.scrollTop = pos.scrollTop;
+          } else if (pos.tab === 'dashboard' && dashboardScrollRef.current) {
+            dashboardScrollRef.current.scrollTop = pos.scrollTop;
+          }
+          if (pos.windowY > 0) {
+            window.scrollTo({ top: pos.windowY, behavior: 'instant' });
+          }
+        };
+        restoreScroll();
+        const rId = requestAnimationFrame(restoreScroll);
+        const t1 = setTimeout(restoreScroll, 40);
+        const t2 = setTimeout(restoreScroll, 120);
+        return () => {
+          cancelAnimationFrame(rId);
+          clearTimeout(t1);
+          clearTimeout(t2);
+        };
+      }
+    }
+    prevSelectedProductRef.current = selectedProduct;
+  }, [selectedProduct]);
+
   const navigateHome = () => {
     l(false);
     _t(null);
@@ -6705,10 +6777,11 @@ export default function App() {
             role="button"
             tabIndex={0}
             onKeyDown={evt => { if (evt.key === 'Enter' || evt.key === ' ') { evt.preventDefault(); navigateHome(); } }}
-            className="cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
+            className="cursor-pointer hover:opacity-80 transition-opacity focus:outline-none flex flex-col items-center text-center"
             title={f === 'buyer' ? "Go to Search Medicines" : "Go to Home"}
           >
-            <img src={logoUrl} className="h-10 md:h-12 lg:h-13 w-auto object-contain transition-all" alt="Logo" />
+            <img src={logoUrl} className="h-9 md:h-10 w-auto object-contain transition-all mx-auto" alt="DG Pharma Logo" />
+            <span className="text-[9px] font-black tracking-widest text-[#0697A8] uppercase leading-none mt-1 text-center w-full block">BETA VERSION</span>
           </div>
           <button onClick={() => l(!1)} className="md:hidden p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors cursor-pointer" title="Close Menu">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -7084,10 +7157,11 @@ export default function App() {
             role="button"
             tabIndex={0}
             onKeyDown={evt => { if (evt.key === 'Enter' || evt.key === ' ') { evt.preventDefault(); navigateHome(); } }}
-            className="flex md:hidden items-center gap-2 flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
+            className="flex md:hidden flex-col items-center text-center flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
             title={f === 'buyer' ? "Go to Search Medicines" : "Go to Home"}
           >
-            <img src={logoUrl} className="h-[38px] w-auto object-contain" alt="Logo" />
+            <img src={logoUrl} className="h-[28px] w-auto object-contain mx-auto" alt="DG Pharma Logo" />
+            <span className="text-[7px] font-black tracking-widest text-[#0697A8] uppercase leading-none mt-0.5 text-center w-full block">BETA VERSION</span>
           </div>
           <div className="hidden md:block flex-1 max-w-[480px]">
             {f === `buyer` ? <div className="relative w-full">
@@ -7193,27 +7267,9 @@ export default function App() {
           </div>
         </header>
         <div className="flex-1 overflow-hidden flex relative">
-          {f === `buyer` && <div className="flex-1 flex overflow-hidden">
-            {selectedProduct ? (
-              <ProductDetailsView
-                product={selectedProduct}
-                catalog={m}
-                cart={ye}
-                wishlist={wishlist}
-                onToggleWishlist={handleToggleWishlist}
-                onAddToCart={addToCartQuiet}
-                onBuyNow={buyNowProduct}
-                onBack={handleBackProduct}
-                onSelectAlternative={handleSelectAlternative}
-                onOpenSearch={() => { setSelectedProduct(null); k('search'); }}
-                onOpenCart={() => Se(true)}
-                cartCount={sn.totalItems}
-                onRequestMedicine={handleOpenQuickRequest}
-                onOpenFullscreenImage={imgUrl => setFullscreenImage(imgUrl)}
-              />
-            ) : (
-              <>
-                {O === `dashboard` && <div className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 space-y-6">
+          {f === `buyer` && <div className="flex-1 flex overflow-hidden relative">
+            <div className={`flex-1 flex overflow-hidden ${selectedProduct ? "hidden" : ""}`}>
+              {O === `dashboard` && <div ref={dashboardScrollRef} className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 space-y-6">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-2">
                 <div>
                   <h2 className="text-2xl font-bold text-[#1D2A3B] tracking-tight">{`Approved B2B Buyer Dashboard`}</h2>
@@ -7299,89 +7355,185 @@ export default function App() {
                     {oe && <button onClick={mn} className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#94A3B8] hover:text-[#1D2A3B] font-semibold">{`Clear`}</button>}
                   </div>
                   <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
-                    <div className="p-5 border-b border-[#E2E8F0] flex justify-between items-center bg-slate-50/50">
+                    <div className="p-5 border-b border-[#E2E8F0] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-50/50">
                       <div>
-                        <h3 className="text-sm font-bold text-[#1D2A3B]">{`Critical Expiry & Low Stock Watchlist`}</h3>
-                        <p className="text-[11px] text-[#64748B] mt-0.5">{`High priority items requiring buying decisions.`}</p>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-bold text-[#1D2A3B]">{`Recent Order History`}</h3>
+                          <span className="text-[10px] bg-[#E0F5F7] text-[#0697A8] font-bold px-2 py-0.5 rounded-full">
+                            {myOrders.length} {myOrders.length === 1 ? 'Order' : 'Orders'}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-[#64748B] mt-0.5">{`Track your latest wholesale medicine orders and fulfillment status.`}</p>
                       </div>
+                      <button
+                        onClick={() => handleTabSwitch(`orders`)}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0697A8] hover:text-[#057A88] transition-colors cursor-pointer"
+                      >
+                        <span>{`View All Orders`}</span>
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
                     </div>
                     <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse">
+                      <table className="w-full text-left border-collapse min-w-[650px]">
                         <thead>
                           <tr className="bg-slate-50 text-[10px] text-[#64748B] uppercase tracking-wider font-bold border-b border-[#E2E8F0]">
-                            <th className="px-5 py-3.5">{`Medicine`}</th>
-                            <th className="px-5 py-3.5">{`Category`}</th>
-                            <th className="px-5 py-3.5">{`Stock`}</th>
-                            <th className="px-5 py-3.5">{`Expiry / Batch`}</th>
+                            <th className="px-5 py-3.5">{`Order ID`}</th>
+                            <th className="px-5 py-3.5">{`Date`}</th>
+                            <th className="px-5 py-3.5">{`Items`}</th>
+                            <th className="px-5 py-3.5">{`Total Value`}</th>
+                            <th className="px-5 py-3.5">{`Fulfillment Status`}</th>
+                            <th className="px-5 py-3.5">{`Payment`}</th>
                             <th className="px-5 py-3.5 text-right">{`Action`}</th>
                           </tr>
                         </thead>
                         <tbody className="text-xs divide-y divide-slate-100">
-                          {m.filter(e => e.stock <= 100 || e.expiryMonths < 6).slice((M - 1) * 10, M * 10).map((e, _idx) => <tr key={e.id || _idx} className="hover:bg-slate-50/50 transition-colors">
-                            <td className="px-5 py-4">
-                              <div className="font-bold text-[#1D2A3B]">
-                                {e.name}
-                              </div>
-                              <div className="text-[10px] text-[#64748B] font-mono mt-0.5">
-                                {e.generic}
-                              </div>
-                            </td>
-                            <td className="px-5 py-4 text-[#64748B]">
-                              {e.category}
-                            </td>
-                            <td className="px-5 py-4">
-                              <span className={`font-bold ${e.stock === 0 ? `text-red-600` : e.stock <= 50 ? `text-orange-600` : `text-[#1D2A3B]`}`}>
-                                {e.stock}
-                                {` boxes`}
-                              </span>
-                            </td>
-                            <td className="px-5 py-4">
-                              <div className="flex flex-col">
-                                <span className={`font-bold ${e.expiryMonths < 3 ? `text-red-600` : e.expiryMonths <= 6 ? `text-orange-600` : `text-[#64748B]`}`}>
-                                  {e.expiryDate}
-                                  {` (`}
-                                  {e.expiryMonths}
-                                  {`m)`}
-                                </span>
-                                <span className="text-[9px] text-[#94A3B8] font-mono mt-0.5">
-                                  {`Batch: `}
-                                  {e.batch}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="px-5 py-4 text-right">
-                              {e.stock > 0 ? <button onClick={() => cn(e.id, e.moq)} className="bg-[#E0F5F7] text-[#0697A8] border border-[#C2EAF0] hover:bg-[#C2EAF0] px-3 py-1.5 rounded-lg font-bold text-[10px] transition-colors">
-                                {`+ MOQ (`}
-                                {e.moq}
-                                {` Bxs)`}
-                              </button> : <span className="text-[10px] text-red-500 font-bold bg-red-50 px-2 py-1 rounded-md">{`Out of Stock`}</span>}
-                            </td>
-                          </tr>)}
+                          {myOrders.length === 0 ? (
+                            <tr>
+                              <td colSpan="7" className="px-5 py-12 text-center text-[#94A3B8]">
+                                <svg className="w-10 h-10 mx-auto mb-3 text-[#CBD5E1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                </svg>
+                                <p className="text-sm font-bold text-[#64748B]">{`No orders placed yet`}</p>
+                                <p className="text-[11px] text-[#94A3B8] mt-1 mb-4">{`When you place wholesale medicine orders, they will appear here.`}</p>
+                                <button
+                                  onClick={() => handleTabSwitch(`search`)}
+                                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#E0F5F7] text-[#0697A8] rounded-xl text-xs font-bold hover:bg-[#C2EAF0] transition-colors cursor-pointer"
+                                >
+                                  <span>{`Browse Catalog & Order`}</span>
+                                </button>
+                              </td>
+                            </tr>
+                          ) : (
+                            myOrders.slice((M - 1) * 8, M * 8).map((e, _idx) => {
+                              const totalUnits = Array.isArray(e.items) ? e.items.reduce((acc, it) => acc + (Number(it.quantity) || 1), 0) : 0;
+                              const firstItemName = Array.isArray(e.items) && e.items[0] ? (e.items[0].name || e.items[0].product_name || 'Item') : '';
+                              const otherItemsCount = Array.isArray(e.items) ? Math.max(0, e.items.length - 1) : 0;
+
+                              return (
+                                <tr key={e.id || _idx} className="hover:bg-slate-50/50 transition-colors">
+                                  <td className="px-5 py-4 font-mono font-bold text-[#0697A8]">
+                                    <button
+                                      onClick={() => ke(e)}
+                                      className="hover:underline cursor-pointer text-left font-mono font-bold"
+                                      title="View invoice / order details"
+                                    >
+                                      {e.id}
+                                    </button>
+                                  </td>
+                                  <td className="px-5 py-4 text-[#475569] whitespace-nowrap">
+                                    {e.date || e.order_date || 'N/A'}
+                                  </td>
+                                  <td className="px-5 py-4">
+                                    <div className="flex flex-col">
+                                      <span className="font-semibold text-[#1D2A3B] truncate max-w-[180px]" title={firstItemName}>
+                                        {firstItemName ? (
+                                          <>
+                                            {firstItemName}
+                                            {otherItemsCount > 0 && (
+                                              <span className="text-[10px] text-[#64748B] font-normal ml-1">
+                                                +{otherItemsCount} more
+                                              </span>
+                                            )}
+                                          </>
+                                        ) : (
+                                          `${Array.isArray(e.items) ? e.items.length : 0} items`
+                                        )}
+                                      </span>
+                                      <span className="text-[10px] text-[#94A3B8]">
+                                        {totalUnits} {totalUnits === 1 ? 'unit' : 'units'}
+                                      </span>
+                                    </div>
+                                  </td>
+                                  <td className="px-5 py-4 font-bold text-[#1D2A3B] whitespace-nowrap">
+                                    {`৳`}
+                                    {Number(e.totalAmount || 0).toFixed(2)}
+                                  </td>
+                                  <td className="px-5 py-4 whitespace-nowrap">
+                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${e.status === `Delivered & Invoiced` ? `bg-emerald-50 text-emerald-800 border-emerald-100` : e.status === `Out for Delivery` ? `bg-purple-50 text-purple-800 border-purple-100` : e.status === `Processing/Packing` ? `bg-[#E0F5F7] text-blue-800 border-[#C2EAF0]` : e.status === `Return Requested` ? `bg-rose-50 text-rose-800 border-rose-200 animate-pulse` : e.status === `Returned` ? `bg-slate-100 text-slate-700 border-slate-300` : `bg-yellow-50 text-yellow-800 border-yellow-200 animate-pulse`}`}>
+                                      {e.status}
+                                    </span>
+                                  </td>
+                                  <td className="px-5 py-4 whitespace-nowrap">
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${e.paymentStatus === `Paid` ? `bg-emerald-100 text-emerald-800` : `bg-yellow-100 text-yellow-800`}`}>
+                                      {e.paymentStatus || 'Pending'}
+                                    </span>
+                                  </td>
+                                  <td className="px-5 py-4 text-right whitespace-nowrap">
+                                    <div className="flex items-center justify-end gap-1.5">
+                                      {['Pending', 'Pending Verification', 'Processing/Packing', 'Approved'].includes(e.status) && (
+                                        <button
+                                          onClick={() => {
+                                            ke(e);
+                                            setIsEditingOrder(true);
+                                            let initialQs = {};
+                                            e.items.forEach((item, idx) => initialQs[item.id || idx] = item.quantity);
+                                            setEditedQuantities(initialQs);
+                                          }}
+                                          className="bg-amber-50 border border-amber-200 hover:bg-amber-100 text-amber-800 px-2 py-1 rounded-lg font-bold text-[10px] transition-colors inline-flex items-center gap-1 cursor-pointer"
+                                          title="Edit order quantities"
+                                        >
+                                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                          </svg>
+                                          <span>Edit</span>
+                                        </button>
+                                      )}
+                                      <button
+                                        onClick={() => ke(e)}
+                                        className="bg-[#E0F5F7] border border-[#C2EAF0] hover:bg-[#C2EAF0] text-[#0697A8] px-2.5 py-1 rounded-lg font-bold text-[10px] transition-colors inline-flex items-center gap-1 cursor-pointer"
+                                      >
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <span>Invoice</span>
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          )}
                         </tbody>
                       </table>
                     </div>
                     {(() => {
-                      let e = m.filter(e => e.stock <= 100 || e.expiryMonths < 6),
-                        t = Math.max(1, Math.ceil(e.length / 10));
-                      return e.length === 0 ? null : <div className="p-4 border-t border-[#E2E8F0] flex justify-between items-center bg-white">
-                        <span className="text-xs text-[#64748B]">
-                          {`Showing `}
-                          <span className="font-bold text-[#1D2A3B]">
-                            {Math.min(e.length, (M - 1) * 10 + 1)}
+                      let totalPages = Math.max(1, Math.ceil(myOrders.length / 8));
+                      if (myOrders.length <= 8) return null;
+                      return (
+                        <div className="p-4 border-t border-[#E2E8F0] flex justify-between items-center bg-white">
+                          <span className="text-xs text-[#64748B]">
+                            {`Showing `}
+                            <span className="font-bold text-[#1D2A3B]">
+                              {Math.min(myOrders.length, (M - 1) * 8 + 1)}
+                            </span>
+                            {` to `}
+                            <span className="font-bold text-[#1D2A3B]">
+                              {Math.min(myOrders.length, M * 8)}
+                            </span>
+                            {` of `}
+                            {myOrders.length}
+                            {` orders`}
                           </span>
-                          {` to `}
-                          <span className="font-bold text-[#1D2A3B]">
-                            {Math.min(e.length, M * 10)}
-                          </span>
-                          {` of `}
-                          {e.length}
-                          {` items`}
-                        </span>
-                        <div className="flex gap-2">
-                          <button onClick={() => ae(e => Math.max(1, e - 1))} disabled={M === 1} className="px-2 py-1 bg-slate-50 text-[#475569] text-[10px] font-bold rounded border border-[#CBD5E1] hover:bg-slate-100 disabled:opacity-50">{`Prev`}</button>
-                          <button onClick={() => ae(e => Math.min(t, e + 1))} disabled={M === t} className="px-2 py-1 bg-slate-50 text-[#475569] text-[10px] font-bold rounded border border-[#CBD5E1] hover:bg-slate-100 disabled:opacity-50">{`Next`}</button>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => ae(e => Math.max(1, e - 1))}
+                              disabled={M === 1}
+                              className="px-2.5 py-1 bg-slate-50 text-[#475569] text-[10px] font-bold rounded-lg border border-[#CBD5E1] hover:bg-slate-100 disabled:opacity-50 cursor-pointer"
+                            >
+                              {`Prev`}
+                            </button>
+                            <button
+                              onClick={() => ae(e => Math.min(totalPages, e + 1))}
+                              disabled={M === totalPages}
+                              className="px-2.5 py-1 bg-slate-50 text-[#475569] text-[10px] font-bold rounded-lg border border-[#CBD5E1] hover:bg-slate-100 disabled:opacity-50 cursor-pointer"
+                            >
+                              {`Next`}
+                            </button>
+                          </div>
                         </div>
-                      </div>;
+                      );
                     })()}
                   </div>
                 </div>
@@ -7432,7 +7584,7 @@ export default function App() {
                 </div>
               </div>
             </div>}
-            {O === `offers` && <div className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 bg-slate-50/50">
+            {O === `offers` && <div ref={offersScrollRef} className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 bg-slate-50/50">
               {Object.keys(specialDiscounts).length > 0 ? (
                 <div className="w-full max-w-7xl mx-auto">
                   <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -7624,7 +7776,7 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-                <div className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8">
+                <div ref={catalogScrollRef} className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8">
                   <ProductSlider />
                   {g ? (
                     <div className={ie === `grid` ? `grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 lg:gap-5` : `flex flex-col gap-4`}>
@@ -8203,7 +8355,24 @@ export default function App() {
                 outstandingBalance={tn.outstandingBalance}
               />
             )}
-              </>
+            </div>
+            {selectedProduct && (
+              <ProductDetailsView
+                product={selectedProduct}
+                catalog={m}
+                cart={ye}
+                wishlist={wishlist}
+                onToggleWishlist={handleToggleWishlist}
+                onAddToCart={addToCartQuiet}
+                onBuyNow={buyNowProduct}
+                onBack={handleBackProduct}
+                onSelectAlternative={handleSelectAlternative}
+                onOpenSearch={() => { setSelectedProduct(null); k('search'); }}
+                onOpenCart={() => Se(true)}
+                cartCount={sn.totalItems}
+                onRequestMedicine={handleOpenQuickRequest}
+                onOpenFullscreenImage={imgUrl => setFullscreenImage(imgUrl)}
+              />
             )}
           </div>}
           {f === `admin` && <div className="flex-1 flex overflow-hidden">
@@ -12723,15 +12892,39 @@ export default function App() {
                 </table>
               </div>
             </div>
-            <div className="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
+            <div className="mt-4 pt-4 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               {isEditingOrder ? (
                 <>
-                  <div className="text-sm font-black text-[#1D2A3B]">
-                    {`New Total: `}
-                    <span className="text-[#0697A8]">
-                      {`৳`}
-                      {Oe.items.reduce((sum, item, idx) => sum + (item.price * (editedQuantities[item.id || idx] || 0)), 0).toFixed(2)}
-                    </span>
+                  <div className="space-y-1 text-xs">
+                    {(() => {
+                      const editMRP = Oe.items.reduce((sum, item, idx) => {
+                        const details = getInvoiceItemPricing(item);
+                        const q = editedQuantities[item.id || idx] !== undefined ? editedQuantities[item.id || idx] : item.quantity;
+                        const mrp = Math.max(Number(details.mrp || 0), Number(details.unitPrice || 0));
+                        return sum + (mrp * q);
+                      }, 0);
+                      const editPayable = Oe.items.reduce((sum, item, idx) => {
+                        const q = editedQuantities[item.id || idx] !== undefined ? editedQuantities[item.id || idx] : item.quantity;
+                        return sum + (item.price * q);
+                      }, 0);
+                      const editDiscount = Math.max(0, editMRP - editPayable);
+                      return (
+                        <>
+                          <div className="text-[#64748B] flex items-center gap-2">
+                            <span>{`Subtotal (MRP):`}</span>
+                            <span className="font-bold text-[#1D2A3B]">৳{editMRP.toFixed(2)}</span>
+                          </div>
+                          <div className="text-emerald-600 font-semibold flex items-center gap-2">
+                            <span>{`Total Discount Amount:`}</span>
+                            <span>-৳{editDiscount.toFixed(2)}</span>
+                          </div>
+                          <div className="text-sm font-black text-[#1D2A3B] flex items-center gap-2 pt-1 border-t border-slate-100">
+                            <span>{`Total Payable Amount:`}</span>
+                            <span className="text-[#0697A8]">৳{editPayable.toFixed(2)}</span>
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
                   <div className="flex gap-2">
                     <button onClick={() => setIsEditingOrder(!1)} className="bg-slate-100 hover:bg-slate-200 text-[#475569] px-3.5 py-2 rounded-xl font-bold">{`Cancel`}</button>
@@ -12807,22 +13000,54 @@ export default function App() {
                     }} className="bg-[#0697A8] hover:bg-[#057A88] text-white px-3.5 py-2 rounded-xl font-bold">{`Save Changes`}</button>
                   </div>
                 </>
-              ) : (
-                <>
-                  <div className="text-sm font-black text-[#1D2A3B]">
-                    {`Total Value: `}
-                    <span className="text-[#0697A8]">
-                      {`৳`}
-                      {Oe.totalAmount.toFixed(2)}
-                    </span>
+              ) : (() => {
+                const subtotalMRP = Array.isArray(Oe.items)
+                  ? Oe.items.reduce((sum, e) => {
+                      const details = getInvoiceItemPricing(e);
+                      const qty = Number(e?.quantity) || 1;
+                      const mrp = Math.max(Number(details.mrp || 0), Number(details.unitPrice || 0));
+                      return sum + (mrp * qty);
+                    }, 0)
+                  : 0;
+                const totalPayable = Oe.totalAmount !== undefined && Oe.totalAmount !== null
+                  ? Number(Oe.totalAmount)
+                  : (Array.isArray(Oe.items)
+                      ? Oe.items.reduce((sum, e) => {
+                          const details = getInvoiceItemPricing(e);
+                          return sum + (Number(details.unitPrice || 0) * (Number(e?.quantity) || 1));
+                        }, 0)
+                      : 0);
+                const totalDiscount = Math.max(0, subtotalMRP - totalPayable);
+
+                return (
+                  <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+                    <div className="space-y-1 text-xs">
+                      <div className="text-[#64748B] flex items-center gap-2">
+                        <span>{`Subtotal (MRP):`}</span>
+                        <span className="font-bold text-[#1D2A3B]">৳{subtotalMRP.toFixed(2)}</span>
+                      </div>
+                      <div className="text-emerald-600 font-semibold flex items-center gap-2">
+                        <span>{`Total Discount Amount:`}</span>
+                        <span>-৳{totalDiscount.toFixed(2)}</span>
+                      </div>
+                      <div className="text-sm font-black text-[#1D2A3B] flex items-center gap-2 pt-1 border-t border-slate-100">
+                        <span>{`Total Payable Amount:`}</span>
+                        <span className="text-[#0697A8]">৳{totalPayable.toFixed(2)}</span>
+                      </div>
+                    </div>
+                    <button onClick={() => {
+                      setInvoicesToPrint([Oe]);
+                      setTriggersPrint(!0);
+                      T(`Preparing print for invoice #${Oe.id}...`);
+                    }} className="bg-slate-50 hover:bg-slate-100 border border-[#E2E8F0] text-[#475569] px-3.5 py-2 rounded-xl font-bold flex items-center gap-1.5 cursor-pointer">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      {`Download PDF Invoice`}
+                    </button>
                   </div>
-                  <button onClick={() => {
-                    setInvoicesToPrint([Oe]);
-                    setTriggersPrint(!0);
-                    T(`Preparing print for invoice #${Oe.id}...`);
-                  }} className="bg-slate-50 hover:bg-slate-100 border border-[#E2E8F0] text-[#475569] px-3.5 py-2 rounded-xl font-bold">{`Download PDF Invoice`}</button>
-                </>
-              )}
+                );
+              })()}
             </div>
           </div>
         </div>}
@@ -13228,8 +13453,9 @@ export default function App() {
         {invoicesToPrint.map((activeInvoice, idx) => (
           <div key={activeInvoice.id || idx} className="w-full mx-auto text-sm flex flex-col h-full print-page-break mb-8">
             <div className="flex justify-between items-start border-b-2 border-slate-800 pb-6 mb-6">
-              <div className="flex items-center gap-4">
-                <img src={logoUrl} className="h-12 w-auto object-contain" alt="" />
+              <div className="flex flex-col items-center text-center gap-1">
+                <img src={logoUrl} className="h-12 w-auto object-contain mx-auto" alt="DG Pharma Logo" />
+                <span className="text-[9px] font-black tracking-widest text-slate-600 uppercase text-center w-full block">BETA VERSION</span>
               </div>
               <div className="text-right flex flex-col items-end">
                 <h1 className="text-4xl font-black text-slate-800 mb-2 uppercase tracking-widest">{`INVOICE`}</h1>
@@ -13302,20 +13528,58 @@ export default function App() {
               </table>
             </div>
 
-            <div className="flex justify-end mb-12">
-              <div className="w-1/2">
-                <div className="space-y-2 text-sm text-slate-700 border-t-2 border-slate-800 pt-4">
-                  <div className="flex justify-between">
-                    <span>{`Subtotal:`}</span>
-                    <span className="font-semibold">৳{Number(activeInvoice.totalAmount || 0).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between border-t border-slate-300 pt-2 mt-2 text-lg font-black text-slate-900">
-                    <span>{`Total Payable:`}</span>
-                    <span>৳{Number(activeInvoice.totalAmount || 0).toFixed(2)}</span>
+            {(() => {
+              const subtotalMRP = Array.isArray(activeInvoice.items)
+                ? activeInvoice.items.reduce((sum, e) => {
+                    const details = getInvoiceItemPricing(e);
+                    const qty = Number(e?.quantity) || 1;
+                    const mrp = Math.max(Number(details.mrp || 0), Number(details.unitPrice || 0));
+                    return sum + (mrp * qty);
+                  }, 0)
+                : 0;
+              const totalPayable = activeInvoice.totalAmount !== undefined && activeInvoice.totalAmount !== null
+                ? Number(activeInvoice.totalAmount)
+                : (Array.isArray(activeInvoice.items)
+                    ? activeInvoice.items.reduce((sum, e) => {
+                        const details = getInvoiceItemPricing(e);
+                        return sum + (Number(details.unitPrice || 0) * (Number(e?.quantity) || 1));
+                      }, 0)
+                    : 0);
+              const totalDiscount = Math.max(0, subtotalMRP - totalPayable);
+
+              return (
+                <div className="flex justify-end mb-12">
+                  <div className="w-1/2">
+                    <div className="space-y-2 text-sm text-slate-700 border-t-2 border-slate-800 pt-4">
+                      <div className="flex justify-between">
+                        <span>{`Subtotal (MRP):`}</span>
+                        <span className="font-semibold">৳{subtotalMRP.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-emerald-700 font-semibold">
+                        <span>{`Total Discount Amount:`}</span>
+                        <span>-৳{totalDiscount.toFixed(2)}</span>
+                      </div>
+                      {Number(activeInvoice.totalSpecialDiscounts || 0) > 0 && (
+                        <div className="flex justify-between text-xs text-slate-500 pl-3">
+                          <span>{`↳ includes Special Offer Discount:`}</span>
+                          <span>-৳{Number(activeInvoice.totalSpecialDiscounts).toFixed(2)}</span>
+                        </div>
+                      )}
+                      {Number(activeInvoice.couponDiscountAmount || 0) > 0 && (
+                        <div className="flex justify-between text-xs text-slate-500 pl-3">
+                          <span>{`↳ includes Coupon Discount:`}</span>
+                          <span>-৳{Number(activeInvoice.couponDiscountAmount).toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between border-t border-slate-300 pt-2 mt-2 text-lg font-black text-slate-900">
+                        <span>{`Total Payable Amount:`}</span>
+                        <span>৳{totalPayable.toFixed(2)}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              );
+            })()}
 
             <div className="border-t-2 border-slate-800 pt-6 mt-auto">
               <h4 className="font-bold text-slate-900 mb-2 uppercase text-xs tracking-wider">{`Terms & Conditions`}</h4>
@@ -13339,8 +13603,9 @@ export default function App() {
         <div className="hidden print:block absolute top-0 left-0 w-full bg-white z-[99999] text-black font-sans p-8">
           <div className="w-full mx-auto text-sm flex flex-col h-full">
             <div className="flex justify-between items-start border-b-2 border-slate-800 pb-6 mb-6">
-              <div className="flex items-center gap-4">
-                <img src={logoUrl} className="h-12 w-auto object-contain" alt="" />
+              <div className="flex flex-col items-center text-center gap-1">
+                <img src={logoUrl} className="h-12 w-auto object-contain mx-auto" alt="DG Pharma Logo" />
+                <span className="text-[9px] font-black tracking-widest text-slate-600 uppercase text-center w-full block">BETA VERSION</span>
               </div>
               <div className="text-right flex flex-col items-end">
                 <h1 className="text-4xl font-black text-slate-800 mb-2 uppercase tracking-widest">{`INVOICE`}</h1>
@@ -13413,32 +13678,58 @@ export default function App() {
               </table>
             </div>
 
-            <div className="flex justify-end mb-12">
-              <div className="w-1/2">
-                <div className="space-y-2 text-sm text-slate-700 border-t-2 border-slate-800 pt-4">
-                  <div className="flex justify-between">
-                    <span>{`Subtotal (Medicine Cost):`}</span>
-                    <span className="font-semibold">৳{Number(activeInvoice.subtotal || activeInvoice.totalAmount || 0).toFixed(2)}</span>
-                  </div>
-                  {Number(activeInvoice.totalSpecialDiscounts || 0) > 0 && (
-                    <div className="flex justify-between text-slate-600">
-                      <span>{`Special Discount:`}</span>
-                      <span>-৳{Number(activeInvoice.totalSpecialDiscounts).toFixed(2)}</span>
+            {(() => {
+              const subtotalMRP = Array.isArray(activeInvoice.items)
+                ? activeInvoice.items.reduce((sum, e) => {
+                    const details = getInvoiceItemPricing(e);
+                    const qty = Number(e?.quantity) || 1;
+                    const mrp = Math.max(Number(details.mrp || 0), Number(details.unitPrice || 0));
+                    return sum + (mrp * qty);
+                  }, 0)
+                : 0;
+              const totalPayable = activeInvoice.totalAmount !== undefined && activeInvoice.totalAmount !== null
+                ? Number(activeInvoice.totalAmount)
+                : (Array.isArray(activeInvoice.items)
+                    ? activeInvoice.items.reduce((sum, e) => {
+                        const details = getInvoiceItemPricing(e);
+                        return sum + (Number(details.unitPrice || 0) * (Number(e?.quantity) || 1));
+                      }, 0)
+                    : 0);
+              const totalDiscount = Math.max(0, subtotalMRP - totalPayable);
+
+              return (
+                <div className="flex justify-end mb-12">
+                  <div className="w-1/2">
+                    <div className="space-y-2 text-sm text-slate-700 border-t-2 border-slate-800 pt-4">
+                      <div className="flex justify-between">
+                        <span>{`Subtotal (MRP):`}</span>
+                        <span className="font-semibold">৳{subtotalMRP.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-emerald-700 font-semibold">
+                        <span>{`Total Discount Amount:`}</span>
+                        <span>-৳{totalDiscount.toFixed(2)}</span>
+                      </div>
+                      {Number(activeInvoice.totalSpecialDiscounts || 0) > 0 && (
+                        <div className="flex justify-between text-xs text-slate-500 pl-3">
+                          <span>{`↳ includes Special Offer Discount:`}</span>
+                          <span>-৳{Number(activeInvoice.totalSpecialDiscounts).toFixed(2)}</span>
+                        </div>
+                      )}
+                      {Number(activeInvoice.couponDiscountAmount || 0) > 0 && (
+                        <div className="flex justify-between text-xs text-slate-500 pl-3">
+                          <span>{`↳ includes Coupon Discount:`}</span>
+                          <span>-৳{Number(activeInvoice.couponDiscountAmount).toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between border-t border-slate-300 pt-2 mt-2 text-lg font-black text-slate-900">
+                        <span>{`Total Payable Amount:`}</span>
+                        <span>৳{totalPayable.toFixed(2)}</span>
+                      </div>
                     </div>
-                  )}
-                  {Number(activeInvoice.couponDiscountAmount || 0) > 0 && (
-                    <div className="flex justify-between text-slate-600">
-                      <span>{`Coupon Discount:`}</span>
-                      <span>-৳{Number(activeInvoice.couponDiscountAmount).toFixed(2)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between border-t border-slate-300 pt-2 mt-2 text-lg font-black text-slate-900">
-                    <span>{`Total Payable:`}</span>
-                    <span>৳{Number(activeInvoice.totalAmount || 0).toFixed(2)}</span>
                   </div>
                 </div>
-              </div>
-            </div>
+              );
+            })()}
 
             <div className="border-t-2 border-slate-800 pt-6 mt-auto">
               <h4 className="font-bold text-slate-900 mb-2 uppercase text-xs tracking-wider">{`Terms & Conditions (শর্তাবলী)`}</h4>
@@ -13494,9 +13785,10 @@ export default function App() {
 
     {e === `login` && (
       <div className="w-full max-w-[420px] bg-white rounded-[32px] border border-[#E2E8F0] shadow-[0_12px_40px_rgba(0,0,0,0.03)] p-8 sm:p-10 flex flex-col justify-center relative overflow-hidden transition-all duration-300 z-10">
-        <div className="flex flex-col items-center mb-8">
-          <img src={logoUrl} className="h-10 w-auto object-contain" alt="DG Pharma Logo" />
-          <p className="text-xs font-semibold text-[#64748B] mt-4">{`Sign in to access your dashboard`}</p>
+        <div className="flex flex-col items-center text-center mb-8">
+          <img src={logoUrl} className="h-11 w-auto object-contain mx-auto" alt="DG Pharma Logo" />
+          <span className="text-[9px] font-black tracking-widest text-[#0697A8] uppercase mt-1.5 text-center w-full block">BETA VERSION</span>
+          <p className="text-xs font-semibold text-[#64748B] mt-3">{`Sign in to access your dashboard`}</p>
         </div>
         <form onSubmit={async e => {
           e.preventDefault();
@@ -13926,9 +14218,10 @@ export default function App() {
 
     {e === `register` && (
       <div className="w-full max-w-[560px] bg-white rounded-[32px] border border-[#E2E8F0] shadow-[0_12px_40px_rgba(0,0,0,0.03)] p-8 sm:p-10 flex flex-col justify-center relative overflow-hidden transition-all duration-300 z-10">
-        <div className="flex flex-col items-center mb-6">
-          <img src={logoUrl} className="h-10 w-auto object-contain" alt="DG Pharma Logo" />
-          <p className="text-xs font-semibold text-[#64748B] mt-4">{`Register New Pharmacy Shop`}</p>
+        <div className="flex flex-col items-center text-center mb-6">
+          <img src={logoUrl} className="h-11 w-auto object-contain mx-auto" alt="DG Pharma Logo" />
+          <span className="text-[9px] font-black tracking-widest text-[#0697A8] uppercase mt-1.5 text-center w-full block">BETA VERSION</span>
+          <p className="text-xs font-semibold text-[#64748B] mt-3">{`Register New Pharmacy Shop`}</p>
         </div>
         <form noValidate onSubmit={async e => {
           e.preventDefault();
