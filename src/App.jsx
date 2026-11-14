@@ -8244,7 +8244,13 @@ export default function App() {
             {O === `support` && <div className="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8 space-y-6">
               <div>
                 <h2 className="text-2xl font-bold text-[#1D2A3B] tracking-tight">{`Approved Buyer Support Center`}</h2>
-                <p className="text-xs text-[#64748B] mt-0.5">{`Submit expiry return claims, dispute statements, or contact support.`}</p>
+                <p className="text-xs text-[#64748B] mt-0.5">
+                  {`Submit expiry return claims, dispute statements, or contact support directly at `}
+                  <a href={`tel:${(supportContact || '+880 1711-223344').replace(/\s+/g, '')}`} className="font-bold text-[#0697A8] hover:underline">
+                    {supportContact || '+880 1711-223344'}
+                  </a>
+                  {`.`}
+                </p>
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 bg-white rounded-2xl border border-[#E2E8F0] p-6 shadow-sm">
@@ -8255,6 +8261,12 @@ export default function App() {
                       {`Case Ref: #TKT-2026-`}
                       {Math.floor(1e3 + Math.random() * 9e3)}
                       {`. Your dedicated representative (${buyerDeliveryMen.length > 0 ? buyerDeliveryMen[0].name : 'B2B Support Lead'}) will respond within 2 hours.`}
+                    </p>
+                    <p className="text-[11px] text-[#64748B]">
+                      {`Need urgent follow-up? Call support directly at `}
+                      <a href={`tel:${(supportContact || '+880 1711-223344').replace(/\s+/g, '')}`} className="font-bold text-[#0697A8] hover:underline">
+                        {supportContact || '+880 1711-223344'}
+                      </a>
                     </p>
                     <button onClick={() => Fe({
                       subject: ``,
@@ -8284,16 +8296,66 @@ export default function App() {
                     <button type="submit" className="bg-[#0697A8] hover:bg-[#057A88] text-white font-bold px-5 py-2.5 rounded-xl shadow-md">{`Log Ticket Case`}</button>
                   </form>}
                 </div>
-                <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5 shadow-sm space-y-4">
-                  <h3 className="text-xs font-bold text-[#64748B] uppercase tracking-wider">{`B2B Buying FAQs`}</h3>
-                  <div className="space-y-3.5 text-xs text-[#475569]">
-                    <div>
-                      <h4 className="font-bold text-[#1D2A3B]">{`Short-expiry return policy?`}</h4>
-                      <p className="text-[11px] text-[#64748B]">{`Approved pharmacies can return batch items with less than 3 months expiry for full credit note refunds.`}</p>
+                <div className="space-y-4">
+                  {/* Direct Support Contact Card */}
+                  <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5 shadow-sm relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0697A8] to-teal-400"></div>
+                    <div className="flex items-center gap-3 mb-3.5">
+                      <div className="w-10 h-10 rounded-xl bg-[#0697A8]/10 text-[#0697A8] flex items-center justify-center flex-shrink-0">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="text-xs font-bold text-[#1D2A3B] uppercase tracking-wider">{`Support Contact`}</h3>
+                        <p className="text-[11px] text-[#64748B]">{`Order help & urgent assistance`}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-[#1D2A3B]">{`Accepted payment methods?`}</h4>
-                      <p className="text-[11px] text-[#64748B]">{`Currently, all B2B orders are processed via Cash on Delivery (COD). You can verify items upon courier arrival before paying.`}</p>
+
+                    <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3 flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] font-semibold text-[#64748B] uppercase tracking-wider block">{`Helpline`}</span>
+                        <a
+                          href={`tel:${(supportContact || '+880 1711-223344').replace(/\s+/g, '')}`}
+                          className="text-base font-bold font-mono text-[#0697A8] hover:underline"
+                        >
+                          {supportContact || '+880 1711-223344'}
+                        </a>
+                      </div>
+                      <a
+                        href={`tel:${(supportContact || '+880 1711-223344').replace(/\s+/g, '')}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0697A8] hover:bg-[#057A88] text-white rounded-lg text-xs font-bold transition shadow-sm active:scale-95"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                        </svg>
+                        {`Call Now`}
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* B2B Buying FAQs */}
+                  <div className="bg-white rounded-2xl border border-[#E2E8F0] p-5 shadow-sm space-y-4">
+                    <h3 className="text-xs font-bold text-[#64748B] uppercase tracking-wider">{`B2B Buying FAQs`}</h3>
+                    <div className="space-y-3.5 text-xs text-[#475569]">
+                      <div>
+                        <h4 className="font-bold text-[#1D2A3B]">{`Short-expiry return policy?`}</h4>
+                        <p className="text-[11px] text-[#64748B]">{`Approved pharmacies can return batch items with less than 3 months expiry for full credit note refunds.`}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-[#1D2A3B]">{`Accepted payment methods?`}</h4>
+                        <p className="text-[11px] text-[#64748B]">{`Currently, all B2B orders are processed via Cash on Delivery (COD). You can verify items upon courier arrival before paying.`}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-[#1D2A3B]">{`Direct phone helpline?`}</h4>
+                        <p className="text-[11px] text-[#64748B]">
+                          {`Call our support desk directly at `}
+                          <a href={`tel:${(supportContact || '+880 1711-223344').replace(/\s+/g, '')}`} className="font-bold text-[#0697A8] hover:underline">
+                            {supportContact || '+880 1711-223344'}
+                          </a>
+                          {` for rapid query resolution.`}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
