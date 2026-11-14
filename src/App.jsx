@@ -1054,18 +1054,17 @@ const ProductSkeleton = ({ viewMode = "grid" }) => {
 };
 
 
-import slider1 from "./assets/sliders/MedEasy-26.webp";
-import slider2 from "./assets/sliders/Medeasy-website-slider-for-innsaei.webp";
+import slide1 from "./assets/sliders/Slide-1.jpeg";
 
 const ProductSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const slides = [slider1, slider2];
+  const slides = [slide1];
 
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || slides.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentSlide(prev => (prev + 1) % slides.length);
     }, 4500);
@@ -1073,15 +1072,17 @@ const ProductSlider = () => {
   }, [isPaused, slides.length]);
 
   const handleTouchStart = e => {
+    if (slides.length <= 1) return;
     setTouchStart(e.targetTouches[0].clientX);
   };
 
   const handleTouchMove = e => {
+    if (slides.length <= 1) return;
     setTouchEnd(e.targetTouches[0].clientX);
   };
 
   const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+    if (slides.length <= 1 || !touchStart || !touchEnd) return;
     const distance = touchStart - touchEnd;
     const minSwipeDistance = 40;
     if (distance > minSwipeDistance) {
@@ -1096,13 +1097,14 @@ const ProductSlider = () => {
   return (
     <div
       className="relative w-full mb-5 overflow-hidden rounded-2xl md:rounded-3xl shadow-sm border border-slate-200/80 bg-slate-100 group select-none"
+      style={{ aspectRatio: "1600 / 533" }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="relative aspect-[2.7/1] sm:aspect-[2.9/1] md:aspect-[3.5/1] lg:aspect-[4/1] min-h-[125px] w-full overflow-hidden">
+      <div className="relative w-full h-full overflow-hidden" style={{ aspectRatio: "1600 / 533" }}>
         <div
           className="flex h-full w-full transition-transform duration-500 ease-out"
           style={{ transform: `translateX(-${currentSlide * 100}%)` }}
@@ -1111,8 +1113,13 @@ const ProductSlider = () => {
             <div key={idx} className="w-full min-w-full h-full flex-shrink-0 relative overflow-hidden bg-slate-50">
               <img
                 src={slide}
+                onError={e => {
+                  if (e.currentTarget.src !== window.location.origin + "/Slide-1.jpeg") {
+                    e.currentTarget.src = "/Slide-1.jpeg";
+                  }
+                }}
                 alt={`Banner slide ${idx + 1}`}
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-cover object-center block"
                 draggable={false}
               />
             </div>
@@ -1120,40 +1127,44 @@ const ProductSlider = () => {
         </div>
       </div>
 
-      {/* Navigation Arrows */}
-      <button
-        type="button"
-        onClick={() => setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length)}
-        className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 md:w-9 md:h-9 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer shadow-md z-10 hover:scale-105 active:scale-95"
-        title="Previous Slide"
-      >
-        <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-      <button
-        type="button"
-        onClick={() => setCurrentSlide(prev => (prev + 1) % slides.length)}
-        className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 md:w-9 md:h-9 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer shadow-md z-10 hover:scale-105 active:scale-95"
-        title="Next Slide"
-      >
-        <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
-
-      {/* Dot Indicators */}
-      <div className="absolute bottom-2.5 md:bottom-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 md:gap-2 bg-black/40 px-3 py-1 md:px-3.5 md:py-1.5 rounded-full backdrop-blur-md z-10 shadow-sm">
-        {slides.map((_, idx) => (
+      {/* Navigation Controls (if multiple slides exist) */}
+      {slides.length > 1 && (
+        <>
           <button
-            key={idx}
             type="button"
-            onClick={() => setCurrentSlide(idx)}
-            className={`transition-all duration-300 rounded-full cursor-pointer ${idx === currentSlide ? "w-5 md:w-6 h-1.5 md:h-2 bg-[#0697A8]" : "w-1.5 md:w-2 h-1.5 md:h-2 bg-white/60 hover:bg-white"
-              }`}
-          />
-        ))}
-      </div>
+            onClick={() => setCurrentSlide(prev => (prev - 1 + slides.length) % slides.length)}
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 md:w-9 md:h-9 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer shadow-md z-10 hover:scale-105 active:scale-95"
+            title="Previous Slide"
+          >
+            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => setCurrentSlide(prev => (prev + 1) % slides.length)}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 md:w-9 md:h-9 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer shadow-md z-10 hover:scale-105 active:scale-95"
+            title="Next Slide"
+          >
+            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          {/* Dot Indicators */}
+          <div className="absolute bottom-2.5 md:bottom-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 md:gap-2 bg-black/40 px-3 py-1 md:px-3.5 md:py-1.5 rounded-full backdrop-blur-md z-10 shadow-sm">
+            {slides.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => setCurrentSlide(idx)}
+                className={`transition-all duration-300 rounded-full cursor-pointer ${idx === currentSlide ? "w-5 md:w-6 h-1.5 md:h-2 bg-[#0697A8]" : "w-1.5 md:w-2 h-1.5 md:h-2 bg-white/60 hover:bg-white"
+                  }`}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };
