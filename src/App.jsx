@@ -4541,6 +4541,13 @@ export default function App() {
     [barcodeModalOpen, setBarcodeModalOpen] = useState(!1),
     [invoicesToPrint, setInvoicesToPrint] = useState([]),
     [triggersPrint, setTriggersPrint] = useState(!1),
+    [requestsToPrint, setRequestsToPrint] = useState([]),
+    [triggersReqPrint, setTriggersReqPrint] = useState(!1),
+    [reqBuyerFilter, setReqBuyerFilter] = useState('all'),
+    [reqDateFrom, setReqDateFrom] = useState(''),
+    [reqDateTo, setReqDateTo] = useState(''),
+    [reqSearchQuery, setReqSearchQuery] = useState(''),
+    [selectedReqIds, setSelectedReqIds] = useState([]),
     [Ze, Qe] = useState(``),
     [$e, et] = useState(``),
     [tt, nt] = useState(``),
@@ -5418,6 +5425,16 @@ export default function App() {
     }
   }, [triggersPrint, invoicesToPrint]);
 
+  useEffect(() => {
+    if (triggersReqPrint && requestsToPrint.length > 0) {
+      const timer = setTimeout(() => {
+        window.print();
+        setTriggersReqPrint(!1);
+      }, 250);
+      return () => clearTimeout(timer);
+    }
+  }, [triggersReqPrint, requestsToPrint]);
+
 
 
   const getInvoiceItemPricing = (item) => {
@@ -5492,6 +5509,110 @@ export default function App() {
       return false;
     });
   }, [Re, f, n, tn]);
+
+  const uniqueReqBuyers = useMemo(() => {
+    if (!Array.isArray(Re)) return [];
+    const map = new Map();
+    Re.forEach(r => {
+      const name = (r.buyerName || 'Registered Pharmacy').trim();
+      map.set(name, (map.get(name) || 0) + 1);
+    });
+    return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [Re]);
+
+  const filteredMedicineRequests = useMemo(() => {
+    if (!Array.isArray(Re)) return [];
+    return Re.filter(req => {
+      if (!req) return false;
+
+      // 1. Buyer / Pharmacy filter
+      if (reqBuyerFilter && reqBuyerFilter !== 'all') {
+        const bName = (req.buyerName || 'Registered Pharmacy').trim().toLowerCase();
+        if (bName !== reqBuyerFilter.trim().toLowerCase()) return false;
+      }
+
+      // 2. Date Range filter
+      if (reqDateFrom || reqDateTo) {
+        let reqTime = 0;
+        if (req.createdAt) {
+          const t = new Date(req.createdAt).getTime();
+          if (!isNaN(t)) reqTime = t;
+        }
+        if (!reqTime && req.date) {
+          const parts = String(req.date).split('/');
+          if (parts.length === 3) {
+            const m = parseInt(parts[0], 10) - 1;
+            const d = parseInt(parts[1], 10);
+            const y = parseInt(parts[2], 10);
+            const dt = new Date(y, m, d).getTime();
+            if (!isNaN(dt)) reqTime = dt;
+          }
+          if (!reqTime) {
+            const t = new Date(req.date).getTime();
+            if (!isNaN(t)) reqTime = t;
+          }
+        }
+        if (reqDateFrom) {
+          const fromTime = new Date(reqDateFrom + 'T00:00:00').getTime();
+          if (!isNaN(fromTime) && reqTime < fromTime) return false;
+        }
+        if (reqDateTo) {
+          const toTime = new Date(reqDateTo + 'T23:59:59.999').getTime();
+          if (!isNaN(toTime) && reqTime > toTime) return false;
+        }
+      }
+
+      // 3. Search query filter
+      if (reqSearchQuery && reqSearchQuery.trim()) {
+        const q = reqSearchQuery.trim().toLowerCase();
+        const matchName = (req.name || '').toLowerCase().includes(q);
+        const matchGeneric = (req.generic || '').toLowerCase().includes(q);
+        const matchManufacturer = (req.manufacturer || '').toLowerCase().includes(q);
+        const matchBuyer = (req.buyerName || '').toLowerCase().includes(q);
+        const matchId = (req.id || '').toLowerCase().includes(q);
+        const matchNotes = (req.notes || '').toLowerCase().includes(q);
+        if (!matchName && !matchGeneric && !matchManufacturer && !matchBuyer && !matchId && !matchNotes) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [Re, reqBuyerFilter, reqDateFrom, reqDateTo, reqSearchQuery]);
+
+  const selectedFilteredReqs = useMemo(() => {
+    return filteredMedicineRequests.filter(r => selectedReqIds.includes(r.id));
+  }, [filteredMedicineRequests, selectedReqIds]);
+
+  const isAllSelected = filteredMedicineRequests.length > 0 && selectedFilteredReqs.length === filteredMedicineRequests.length;
+  const isSomeSelected = selectedFilteredReqs.length > 0 && !isAllSelected;
+
+  const handleToggleSelectAllReqs = () => {
+    if (isAllSelected) {
+      setSelectedReqIds(prev => prev.filter(id => !filteredMedicineRequests.some(r => r.id === id)));
+    } else {
+      const allFilteredIds = filteredMedicineRequests.map(r => r.id);
+      setSelectedReqIds(prev => Array.from(new Set([...prev, ...allFilteredIds])));
+    }
+  };
+
+  const handleToggleSelectReq = (id) => {
+    setSelectedReqIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
+
+  const handlePrintRequests = () => {
+    const itemsToPrint = selectedFilteredReqs.length > 0 ? selectedFilteredReqs : filteredMedicineRequests;
+    if (itemsToPrint.length === 0) {
+      T('No requested medicines to print for current selection or filter.');
+      return;
+    }
+    setInvoicesToPrint([]);
+    setRequestsToPrint(itemsToPrint);
+    setTriggersReqPrint(!0);
+    T(`Preparing print for ${itemsToPrint.length} requested medicine(s)...`);
+  };
 
   const myOrders = useMemo(() => {
     if (f === 'admin') return b;
@@ -8992,33 +9113,57 @@ export default function App() {
                   <p className="text-xs text-[#64748B] mt-0.5">{`Track submitted orders, verify payment credentials, dispatch logistics, and sign invoices.`}</p>
                 </div>
                 <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      const approved = b.filter(o => o.status === 'Processing/Packing');
-                      if (approved.length === 0) {
-                        T('No approved invoices to print.');
-                        return;
-                      }
-                      setInvoicesToPrint(approved);
-                      setTriggersPrint(!0);
-                      T(`Preparing print for ${approved.length} approved invoices...`);
-                    }}
-                    className="bg-[#E0F5F7] hover:bg-[#C2EAF0] text-[#0697A8] font-bold px-4 py-2.5 rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg>
-                    <span>{`Print all invoices`}</span>
-                  </button>
-                  <button
-                    onClick={handleApproveAll}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>{`Approve all`}</span>
-                  </button>
+                  {Yt === `Requested Medicine` ? (
+                    <button
+                      onClick={handlePrintRequests}
+                      disabled={filteredMedicineRequests.length === 0}
+                      className={`font-bold px-4 py-2.5 rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-xs ${
+                        filteredMedicineRequests.length === 0
+                          ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                          : 'bg-[#0697A8] hover:bg-[#057A88] text-white cursor-pointer active:scale-95'
+                      }`}
+                      title="Print medicine requisition sheet"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                      </svg>
+                      <span>
+                        {selectedFilteredReqs.length > 0
+                          ? `Print Selected Requisitions (${selectedFilteredReqs.length})`
+                          : `Print Requisition Sheet (${filteredMedicineRequests.length})`}
+                      </span>
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => {
+                          const approved = b.filter(o => o.status === 'Processing/Packing');
+                          if (approved.length === 0) {
+                            T('No approved invoices to print.');
+                            return;
+                          }
+                          setInvoicesToPrint(approved);
+                          setTriggersPrint(!0);
+                          T(`Preparing print for ${approved.length} approved invoices...`);
+                        }}
+                        className="bg-[#E0F5F7] hover:bg-[#C2EAF0] text-[#0697A8] font-bold px-4 py-2.5 rounded-xl text-xs transition-all cursor-pointer flex items-center gap-1.5"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        <span>{`Print all invoices`}</span>
+                      </button>
+                      <button
+                        onClick={handleApproveAll}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>{`Approve all`}</span>
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="flex border-b border-[#E2E8F0] gap-4 text-xs font-semibold select-none overflow-x-auto whitespace-nowrap scrollbar-none pb-0.5">
@@ -9045,138 +9190,300 @@ export default function App() {
                   </button>;
                 })}
               </div>
-              <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden overflow-x-auto">
+              <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
                 {Yt === `Requested Medicine` ? (
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-slate-50 text-[10px] text-[#64748B] uppercase tracking-wider font-bold border-b border-[#E2E8F0]">
-                        <th className="px-5 py-3.5">{`Request ID`}</th>
-                        <th className="px-5 py-3.5">{`Pharmacy / Buyer`}</th>
-                        <th className="px-5 py-3.5">{`Request Date`}</th>
-                        <th className="px-5 py-3.5">{`Medicine Details`}</th>
-                        <th className="px-5 py-3.5">{`Requested Qty`}</th>
-                        <th className="px-5 py-3.5">{`Source & Notes`}</th>
-                        <th className="px-5 py-3.5">{`Status`}</th>
-                        <th className="px-5 py-3.5 text-right w-52">{`Operations`}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 text-xs">
-                      {Re.length === 0 ? (
-                        <tr>
-                          <td colSpan="8" className="px-5 py-12 text-center text-[#94A3B8]">
-                            <svg className="w-10 h-10 mx-auto mb-3 text-[#CBD5E1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <p className="text-sm font-bold text-[#64748B]">{`No requested medicines found`}</p>
-                            <p className="text-[11px] mt-1">{`When buyers request out-of-stock items or custom medicines, they will appear here.`}</p>
-                          </td>
-                        </tr>
-                      ) : (
-                        Re.map((req, _idx) => {
-                          const matchedMed = m.find(item => (req.medId && item.id === req.medId) || (req.name && item.name && item.name.toLowerCase() === req.name.toLowerCase()));
-                          return (
-                            <tr key={req.id || _idx} className="hover:bg-slate-50/70 transition-colors group">
-                              <td className="px-5 py-4 font-mono font-bold text-amber-600">
-                                {req.id}
-                              </td>
-                              <td className="px-5 py-4">
-                                <div className="font-bold text-[#1D2A3B]">{req.buyerName || `Registered Pharmacy`}</div>
-                                <div className="text-[10px] text-[#94A3B8] font-mono mt-0.5">
-                                  {req.buyerEmail ? `${req.buyerEmail}` : ''}
-                                  {req.buyerEmail && req.buyerPhone ? ` • ` : ''}
-                                  {req.buyerPhone && req.buyerPhone !== 'N/A' ? req.buyerPhone : ''}
-                                </div>
-                              </td>
-                              <td className="px-5 py-4 text-[#475569] font-mono text-[11px]">
-                                {req.date}
-                              </td>
-                              <td className="px-5 py-4">
-                                <div className="flex items-center gap-3">
-                                  {req.photo ? (
-                                    <img src={req.photo} alt={req.name} className="w-10 h-10 object-cover rounded-lg border border-slate-200 flex-shrink-0 bg-slate-50 shadow-sm" />
-                                  ) : (
-                                    <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 flex-shrink-0">
-                                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                                      </svg>
-                                    </div>
-                                  )}
-                                  <div>
-                                    <div className="font-bold text-[#1D2A3B]">{req.name}</div>
-                                    <div className="text-[10px] text-[#64748B]">
-                                      {req.generic ? `${req.generic}` : matchedMed?.generic || ''}
-                                      {req.manufacturer ? ` · ${req.manufacturer}` : matchedMed?.manufacturer ? ` · ${matchedMed.manufacturer}` : ''}
-                                    </div>
-                                    {matchedMed && (
-                                      <div className="text-[9px] text-emerald-700 font-bold mt-0.5">
-                                        {`Current Stock: ${matchedMed.stock} | Trade: ৳${(matchedMed.wholesalePrice || 0).toFixed(2)}`}
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="px-5 py-4 font-bold text-[#1D2A3B]">
-                                <span className="px-2.5 py-1 bg-slate-100 text-slate-700 font-bold rounded-lg text-xs">
-                                  {req.quantity || 100} {`Units`}
-                                </span>
-                              </td>
-                              <td className="px-5 py-4">
-                                <div className="space-y-1">
-                                  <span className={`inline-block px-2 py-0.5 rounded text-[9px] font-bold ${req.source === 'Catalog Out-of-Stock' ? 'bg-amber-100 text-amber-800' : 'bg-teal-100 text-teal-800'}`}>
-                                    {req.source || 'Medicine Request'}
-                                  </span>
-                                  {req.notes && (
-                                    <p className="text-[11px] text-[#64748B] italic max-w-xs line-clamp-2" title={req.notes}>
-                                      {req.notes}
-                                    </p>
-                                  )}
-                                </div>
-                              </td>
-                              <td className="px-5 py-4">
-                                <select
-                                  value={req.status || 'Pending Review'}
-                                  onChange={(e) => handleUpdateRequestStatus(req.id, e.target.value)}
-                                  className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border focus:outline-none cursor-pointer ${req.status === 'Restocked & Available' ? 'bg-emerald-50 text-emerald-800 border-emerald-300' :
-                                      req.status === 'In Procurement' ? 'bg-blue-50 text-blue-800 border-blue-300' :
-                                        req.status === 'Unavailable / Rejected' ? 'bg-red-50 text-red-800 border-red-300' :
-                                          'bg-amber-50 text-amber-800 border-amber-300'
-                                    }`}
-                                >
-                                  <option value="Pending Review">Pending Review</option>
-                                  <option value="In Procurement">In Procurement</option>
-                                  <option value="Restocked & Available">Restocked & Available</option>
-                                  <option value="Unavailable / Rejected">Unavailable / Rejected</option>
-                                </select>
-                              </td>
-                              <td className="px-5 py-4 text-right">
-                                <div className="flex items-center justify-end gap-1.5">
-                                  <button
-                                    onClick={() => handleAdminRestockMed(req, 100)}
-                                    title="Add 100 units to inventory stock and mark Restocked & Available"
-                                    className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg font-bold text-[10px] transition-colors flex items-center gap-1 cursor-pointer"
-                                  >
-                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
-                                    </svg>
-                                    <span>{`Restock +100`}</span>
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteRequest(req.id)}
-                                    title="Delete Request"
-                                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                                  >
-                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                  </button>
-                                </div>
+                  <div>
+                    {/* Filters & Action Bar */}
+                    <div className="p-4 border-b border-[#E2E8F0] bg-slate-50/70 flex flex-col xl:flex-row gap-3 items-stretch xl:items-center justify-between">
+                      <div className="flex flex-wrap items-center gap-2.5 flex-1">
+                        {/* Buyer/Pharmacy filter */}
+                        <div className="flex items-center gap-1.5 bg-white border border-[#E2E8F0] rounded-xl px-3 py-1.5 shadow-2xs">
+                          <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">{`Pharmacy:`}</span>
+                          <select
+                            value={reqBuyerFilter}
+                            onChange={e => setReqBuyerFilter(e.target.value)}
+                            className="bg-transparent text-xs font-bold text-[#1D2A3B] focus:outline-none cursor-pointer pr-1"
+                          >
+                            <option value="all">{`All Pharmacies (${Re.length})`}</option>
+                            {uniqueReqBuyers.map(([bName, bCount]) => (
+                              <option key={bName} value={bName}>
+                                {bName} ({bCount})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Date Filter Range */}
+                        <div className="flex items-center gap-1.5 bg-white border border-[#E2E8F0] rounded-xl px-2.5 py-1.5 shadow-2xs">
+                          <span className="text-[10px] font-bold text-[#64748B] uppercase">{`From:`}</span>
+                          <input
+                            type="date"
+                            value={reqDateFrom}
+                            onChange={e => setReqDateFrom(e.target.value)}
+                            className="bg-transparent text-xs font-semibold text-[#1D2A3B] focus:outline-none cursor-pointer"
+                          />
+                          <span className="text-[#CBD5E1] text-xs">|</span>
+                          <span className="text-[10px] font-bold text-[#64748B] uppercase">{`To:`}</span>
+                          <input
+                            type="date"
+                            value={reqDateTo}
+                            onChange={e => setReqDateTo(e.target.value)}
+                            className="bg-transparent text-xs font-semibold text-[#1D2A3B] focus:outline-none cursor-pointer"
+                          />
+                        </div>
+
+                        {/* Quick Presets */}
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const today = new Date().toISOString().split('T')[0];
+                              setReqDateFrom(today);
+                              setReqDateTo(today);
+                            }}
+                            className="px-2.5 py-1.5 bg-white hover:bg-slate-100 border border-[#E2E8F0] text-slate-700 rounded-lg text-[10px] font-bold transition-colors cursor-pointer shadow-2xs"
+                          >
+                            {`Today`}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const today = new Date().toISOString().split('T')[0];
+                              const past = new Date(Date.now() - 7 * 86400000).toISOString().split('T')[0];
+                              setReqDateFrom(past);
+                              setReqDateTo(today);
+                            }}
+                            className="px-2.5 py-1.5 bg-white hover:bg-slate-100 border border-[#E2E8F0] text-slate-700 rounded-lg text-[10px] font-bold transition-colors cursor-pointer shadow-2xs"
+                          >
+                            {`7 Days`}
+                          </button>
+                          {(reqDateFrom || reqDateTo || reqBuyerFilter !== 'all' || reqSearchQuery) && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setReqDateFrom('');
+                                setReqDateTo('');
+                                setReqBuyerFilter('all');
+                                setReqSearchQuery('');
+                              }}
+                              className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
+                              title="Clear all filters"
+                            >
+                              {`Reset Filters`}
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Search Input */}
+                        <div className="relative min-w-[170px] flex-1">
+                          <input
+                            type="text"
+                            value={reqSearchQuery}
+                            onChange={e => setReqSearchQuery(e.target.value)}
+                            placeholder="Search medicine, generic..."
+                            className="w-full bg-white border border-[#E2E8F0] rounded-xl pl-8 pr-3 py-1.5 text-xs font-semibold text-[#1D2A3B] focus:outline-none focus:border-[#0697A8] shadow-2xs"
+                          />
+                          <svg className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                        </div>
+                      </div>
+
+                      {/* Print & Selection Action */}
+                      <div className="flex items-center gap-3 justify-end pt-2 xl:pt-0 border-t xl:border-t-0 border-[#E2E8F0]">
+                        <span className="text-[11px] font-bold text-[#64748B] whitespace-nowrap">
+                          {selectedFilteredReqs.length > 0 ? (
+                            <span className="text-[#0697A8] bg-[#E0F5F7] px-2 py-0.5 rounded-md font-bold">
+                              {selectedFilteredReqs.length} of {filteredMedicineRequests.length} selected
+                            </span>
+                          ) : (
+                            <span>{filteredMedicineRequests.length} requests shown</span>
+                          )}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={handlePrintRequests}
+                          disabled={filteredMedicineRequests.length === 0}
+                          className={`font-bold px-3.5 py-2 rounded-xl text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-xs ${
+                            filteredMedicineRequests.length === 0
+                              ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                              : 'bg-[#0697A8] hover:bg-[#057A88] text-white active:scale-95'
+                          }`}
+                          title="Print requisition sheet in invoice style"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                          </svg>
+                          <span>
+                            {selectedFilteredReqs.length > 0
+                              ? `Print Selected (${selectedFilteredReqs.length})`
+                              : `Print All (${filteredMedicineRequests.length})`}
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-slate-50 text-[10px] text-[#64748B] uppercase tracking-wider font-bold border-b border-[#E2E8F0]">
+                            <th className="w-10 px-4 py-3.5 text-center">
+                              <input
+                                type="checkbox"
+                                checked={isAllSelected}
+                                ref={el => {
+                                  if (el) el.indeterminate = isSomeSelected;
+                                }}
+                                onChange={handleToggleSelectAllReqs}
+                                className="w-4 h-4 rounded border-slate-300 text-[#0697A8] focus:ring-[#0697A8] cursor-pointer accent-[#0697A8]"
+                                title={isAllSelected ? "Deselect all" : "Select all filtered"}
+                              />
+                            </th>
+                            <th className="px-5 py-3.5">{`Request ID`}</th>
+                            <th className="px-5 py-3.5">{`Pharmacy / Buyer`}</th>
+                            <th className="px-5 py-3.5">{`Request Date`}</th>
+                            <th className="px-5 py-3.5">{`Medicine Details`}</th>
+                            <th className="px-5 py-3.5">{`Requested Qty`}</th>
+                            <th className="px-5 py-3.5">{`Source & Notes`}</th>
+                            <th className="px-5 py-3.5">{`Status`}</th>
+                            <th className="px-5 py-3.5 text-right w-52">{`Operations`}</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-xs">
+                          {filteredMedicineRequests.length === 0 ? (
+                            <tr>
+                              <td colSpan="9" className="px-5 py-12 text-center text-[#94A3B8]">
+                                <svg className="w-10 h-10 mx-auto mb-3 text-[#CBD5E1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <p className="text-sm font-bold text-[#64748B]">
+                                  {Re.length === 0 ? `No requested medicines found` : `No requested medicines match your current filters`}
+                                </p>
+                                <p className="text-[11px] mt-1">
+                                  {Re.length === 0
+                                    ? `When buyers request out-of-stock items or custom medicines, they will appear here.`
+                                    : `Try adjusting or resetting your date or pharmacy filters.`}
+                                </p>
                               </td>
                             </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
+                          ) : (
+                            filteredMedicineRequests.map((req, _idx) => {
+                              const matchedMed = m.find(item => (req.medId && item.id === req.medId) || (req.name && item.name && item.name.toLowerCase() === req.name.toLowerCase()));
+                              const isSelected = selectedReqIds.includes(req.id);
+                              return (
+                                <tr key={req.id || _idx} className={`transition-colors group ${isSelected ? 'bg-teal-50/40 hover:bg-teal-50/70' : 'hover:bg-slate-50/70'}`}>
+                                  <td className="w-10 px-4 py-4 text-center">
+                                    <input
+                                      type="checkbox"
+                                      checked={isSelected}
+                                      onChange={() => handleToggleSelectReq(req.id)}
+                                      className="w-4 h-4 rounded border-slate-300 text-[#0697A8] focus:ring-[#0697A8] cursor-pointer accent-[#0697A8]"
+                                      title="Select request"
+                                    />
+                                  </td>
+                                  <td className="px-5 py-4 font-mono font-bold text-amber-600">
+                                    {req.id}
+                                  </td>
+                                  <td className="px-5 py-4">
+                                    <div className="font-bold text-[#1D2A3B]">{req.buyerName || `Registered Pharmacy`}</div>
+                                    <div className="text-[10px] text-[#94A3B8] font-mono mt-0.5">
+                                      {req.buyerEmail ? `${req.buyerEmail}` : ''}
+                                      {req.buyerEmail && req.buyerPhone ? ` • ` : ''}
+                                      {req.buyerPhone && req.buyerPhone !== 'N/A' ? req.buyerPhone : ''}
+                                    </div>
+                                  </td>
+                                  <td className="px-5 py-4 text-[#475569] font-mono text-[11px]">
+                                    {req.date}
+                                  </td>
+                                  <td className="px-5 py-4">
+                                    <div className="flex items-center gap-3">
+                                      {req.photo ? (
+                                        <img src={req.photo} alt={req.name} className="w-10 h-10 object-cover rounded-lg border border-slate-200 flex-shrink-0 bg-slate-50 shadow-sm" />
+                                      ) : (
+                                        <div className="w-10 h-10 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 flex-shrink-0">
+                                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                                          </svg>
+                                        </div>
+                                      )}
+                                      <div>
+                                        <div className="font-bold text-[#1D2A3B]">{req.name}</div>
+                                        <div className="text-[10px] text-[#64748B]">
+                                          {req.generic ? `${req.generic}` : matchedMed?.generic || ''}
+                                          {req.manufacturer ? ` · ${req.manufacturer}` : matchedMed?.manufacturer ? ` · ${matchedMed.manufacturer}` : ''}
+                                        </div>
+                                        {matchedMed && (
+                                          <div className="text-[9px] text-emerald-700 font-bold mt-0.5">
+                                            {`Current Stock: ${matchedMed.stock} | Trade: ৳${(matchedMed.wholesalePrice || 0).toFixed(2)}`}
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="px-5 py-4 font-bold text-[#1D2A3B]">
+                                    <span className="px-2.5 py-1 bg-slate-100 text-slate-700 font-bold rounded-lg text-xs">
+                                      {req.quantity || 100} {`Units`}
+                                    </span>
+                                  </td>
+                                  <td className="px-5 py-4">
+                                    <div className="space-y-1">
+                                      <span className={`inline-block px-2 py-0.5 rounded text-[9px] font-bold ${req.source === 'Catalog Out-of-Stock' ? 'bg-amber-100 text-amber-800' : 'bg-teal-100 text-teal-800'}`}>
+                                        {req.source || 'Medicine Request'}
+                                      </span>
+                                      {req.notes && (
+                                        <p className="text-[11px] text-[#64748B] italic max-w-xs line-clamp-2" title={req.notes}>
+                                          {req.notes}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </td>
+                                  <td className="px-5 py-4">
+                                    <select
+                                      value={req.status || 'Pending Review'}
+                                      onChange={(e) => handleUpdateRequestStatus(req.id, e.target.value)}
+                                      className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border focus:outline-none cursor-pointer ${req.status === 'Restocked & Available' ? 'bg-emerald-50 text-emerald-800 border-emerald-300' :
+                                          req.status === 'In Procurement' ? 'bg-blue-50 text-blue-800 border-blue-300' :
+                                            req.status === 'Unavailable / Rejected' ? 'bg-red-50 text-red-800 border-red-300' :
+                                              'bg-amber-50 text-amber-800 border-amber-300'
+                                        }`}
+                                    >
+                                      <option value="Pending Review">Pending Review</option>
+                                      <option value="In Procurement">In Procurement</option>
+                                      <option value="Restocked & Available">Restocked & Available</option>
+                                      <option value="Unavailable / Rejected">Unavailable / Rejected</option>
+                                    </select>
+                                  </td>
+                                  <td className="px-5 py-4 text-right">
+                                    <div className="flex items-center justify-end gap-1.5">
+                                      <button
+                                        onClick={() => handleAdminRestockMed(req, 100)}
+                                        title="Add 100 units to inventory stock and mark Restocked & Available"
+                                        className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg font-bold text-[10px] transition-colors flex items-center gap-1 cursor-pointer"
+                                      >
+                                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        <span>{`Restock +100`}</span>
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteRequest(req.id)}
+                                        title="Delete Request"
+                                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                                      >
+                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 ) : (
                   <table className="w-full text-left border-collapse">
                     <thead>
@@ -14011,9 +14318,218 @@ export default function App() {
         ))}
       </div>
     )}
+    {requestsToPrint && requestsToPrint.length > 0 && (
+      <div className="hidden print:block absolute top-0 left-0 w-full bg-white z-[99999] text-black font-sans p-8">
+        <div className="w-full mx-auto text-sm flex flex-col h-full print-page-break mb-8">
+          {/* Header block with Logo and Document Meta */}
+          <div className="flex justify-between items-start border-b-2 border-slate-800 pb-6 mb-6">
+            <div className="flex flex-col items-start gap-1">
+              <div className="flex items-center gap-3">
+                <img src={logoUrl} className="h-12 w-auto object-contain" alt="DG Pharma Logo" />
+                <div>
+                  <span className="text-[9px] font-black tracking-widest text-slate-600 uppercase block">BETA VERSION</span>
+                  <p className="text-xs font-bold text-slate-700">B2B Pharmacy Marketplace & Distribution</p>
+                </div>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-1">
+                Central Inventory & Warehouse Procurement Desk
+              </p>
+            </div>
+            <div className="text-right flex flex-col items-end">
+              <h1 className="text-2xl md:text-3xl font-black text-slate-800 mb-1 uppercase tracking-wider">
+                {`MEDICINE REQUISITION SHEET`}
+              </h1>
+              <p className="font-bold text-slate-700 text-sm font-mono">
+                #{`REQ-MNF-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}-${requestsToPrint.length}ITEMS`}
+              </p>
+              <p className="text-slate-500 text-xs mt-0.5 mb-2 font-mono">
+                {`Generated: ${new Date().toLocaleDateString('en-GB')} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+              </p>
+              <img
+                src={`https://bwipjs-api.metafloor.com/?bcid=code128&text=REQ-MANIFEST-${requestsToPrint.length}&scale=3&height=10&includetext=false`}
+                alt="Barcode"
+                className="h-10 w-auto mix-blend-multiply"
+              />
+            </div>
+          </div>
+
+          {/* Details Grid (Buyer Scope & Requisition Summary) */}
+          <div className="grid grid-cols-2 gap-8 mb-6 text-xs">
+            <div>
+              <h3 className="font-bold text-slate-800 uppercase tracking-wider border-b border-slate-300 pb-1 mb-2">
+                {`Pharmacy / Buyer Details`}
+              </h3>
+              {(() => {
+                const uniqueBuyers = Array.from(new Set(requestsToPrint.map(r => r.buyerName).filter(Boolean)));
+                if (uniqueBuyers.length === 1) {
+                  const sample = requestsToPrint[0];
+                  return (
+                    <div className="space-y-1">
+                      <p className="font-bold text-base text-slate-900">{sample.buyerName}</p>
+                      <p className="text-slate-600 font-mono">{`Phone: ${sample.buyerPhone || 'N/A'}`}</p>
+                      {sample.buyerEmail && <p className="text-slate-500 font-mono">{`Email: ${sample.buyerEmail}`}</p>}
+                      <p className="text-[11px] text-slate-500">{`Requisition Type: Dedicated Pharmacy Demand`}</p>
+                    </div>
+                  );
+                }
+                return (
+                  <div className="space-y-1">
+                    <p className="font-bold text-base text-slate-900">{`Multi-Pharmacy Consolidated List`}</p>
+                    <p className="text-slate-700 font-medium">
+                      {`Total Pharmacies: `}<span className="font-bold">{uniqueBuyers.length}</span>
+                    </p>
+                    <p className="text-[11px] text-slate-500 font-mono leading-tight">
+                      {uniqueBuyers.slice(0, 5).join(', ')}{uniqueBuyers.length > 5 ? ` + ${uniqueBuyers.length - 5} more` : ''}
+                    </p>
+                  </div>
+                );
+              })()}
+            </div>
+            <div className="text-right">
+              <h3 className="font-bold text-slate-800 uppercase tracking-wider border-b border-slate-300 pb-1 mb-2">
+                {`Requisition Scope`}
+              </h3>
+              <p className="text-slate-700 mb-1">
+                <span className="font-semibold">{`Date Filter: `}</span>
+                {reqDateFrom || reqDateTo
+                  ? `${reqDateFrom || 'Earliest'} to ${reqDateTo || 'Latest'}`
+                  : 'All Dates'}
+              </p>
+              <p className="text-slate-700 mb-1">
+                <span className="font-semibold">{`Total Line Items: `}</span>
+                <span className="font-bold font-mono">{requestsToPrint.length}</span>
+              </p>
+              <p className="text-slate-700 mb-1">
+                <span className="font-semibold">{`Total Units Requested: `}</span>
+                <span className="font-bold font-mono text-emerald-800">
+                  {requestsToPrint.reduce((acc, r) => acc + (Number(r.quantity) || 100), 0).toLocaleString()} {`Units`}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="flex-grow">
+            <table className="w-full text-left border-collapse mb-6">
+              <thead>
+                <tr className="bg-slate-100 border-y-2 border-slate-800 text-[11px]">
+                  <th className="py-2.5 px-2 font-bold text-slate-800 text-center w-8">{`#`}</th>
+                  <th className="py-2.5 px-2 font-bold text-slate-800 uppercase tracking-wider w-24">{`Req ID`}</th>
+                  <th className="py-2.5 px-3 font-bold text-slate-800 uppercase tracking-wider">{`Medicine Name & Generic`}</th>
+                  <th className="py-2.5 px-3 font-bold text-slate-800 uppercase tracking-wider">{`Pharmacy / Buyer`}</th>
+                  <th className="py-2.5 px-2 font-bold text-slate-800 uppercase tracking-wider text-center w-20">{`Req Date`}</th>
+                  <th className="py-2.5 px-2 font-bold text-slate-800 uppercase tracking-wider text-center w-20">{`Qty`}</th>
+                  <th className="py-2.5 px-2 font-bold text-slate-800 uppercase tracking-wider text-center w-28">{`Status`}</th>
+                  <th className="py-2.5 px-3 font-bold text-slate-800 uppercase tracking-wider">{`Notes / Specs`}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 text-xs">
+                {requestsToPrint.map((req, idx) => {
+                  const matchedMed = m.find(item => (req.medId && item.id === req.medId) || (req.name && item.name && item.name.toLowerCase() === req.name.toLowerCase()));
+                  return (
+                    <tr key={req.id || idx} className="hover:bg-slate-50">
+                      <td className="py-2.5 px-2 text-center text-slate-500 font-mono font-bold text-[10px]">
+                        {idx + 1}
+                      </td>
+                      <td className="py-2.5 px-2 font-mono font-bold text-[10px] text-slate-800 whitespace-nowrap">
+                        {req.id}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <div className="font-bold text-slate-900 text-xs leading-tight">{req.name}</div>
+                        <div className="text-[10px] text-slate-500 leading-tight mt-0.5">
+                          {req.generic ? req.generic : matchedMed?.generic || ''}
+                          {(req.manufacturer || matchedMed?.manufacturer) ? ` · ${req.manufacturer || matchedMed?.manufacturer}` : ''}
+                        </div>
+                        {matchedMed && (
+                          <div className="text-[9px] text-emerald-800 font-medium">
+                            {`Stock: ${matchedMed.stock} | Trade: ৳${(matchedMed.wholesalePrice || 0).toFixed(2)}`}
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-2.5 px-3">
+                        <div className="font-bold text-slate-900 text-xs">{req.buyerName || 'Pharmacy'}</div>
+                        <div className="text-[10px] text-slate-500 font-mono">
+                          {req.buyerPhone && req.buyerPhone !== 'N/A' ? req.buyerPhone : req.buyerEmail || ''}
+                        </div>
+                      </td>
+                      <td className="py-2.5 px-2 text-center font-mono text-[10px] text-slate-600 whitespace-nowrap">
+                        {req.date}
+                      </td>
+                      <td className="py-2.5 px-2 text-center font-bold text-slate-900 font-mono">
+                        {req.quantity || 100}
+                      </td>
+                      <td className="py-2.5 px-2 text-center">
+                        <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold border border-slate-300 text-slate-700 uppercase">
+                          {req.status || 'Pending'}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-3 text-[10px] text-slate-600 max-w-[180px] break-words">
+                        {req.notes || <span className="text-slate-400 italic">{`No notes`}</span>}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Summary Box */}
+          <div className="flex justify-end mb-8">
+            <div className="w-1/2">
+              <div className="space-y-1.5 text-xs text-slate-700 border-t-2 border-slate-800 pt-3">
+                <div className="flex justify-between">
+                  <span>{`Total Distinct Items:`}</span>
+                  <span className="font-bold font-mono">{requestsToPrint.length} {`Medicines`}</span>
+                </div>
+                <div className="flex justify-between text-slate-900 font-bold border-t border-slate-300 pt-1.5">
+                  <span>{`Total Requested Quantity:`}</span>
+                  <span className="font-mono text-sm text-emerald-800">
+                    {requestsToPrint.reduce((acc, r) => acc + (Number(r.quantity) || 100), 0).toLocaleString()} {`Units`}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer & Terms */}
+          <div className="border-t-2 border-slate-800 pt-4 mt-auto">
+            <h4 className="font-bold text-slate-900 mb-1.5 uppercase text-[10px] tracking-wider">
+              {`Procurement & Warehouse Instructions`}
+            </h4>
+            <ol className="list-decimal list-inside space-y-0.5 text-[10px] text-slate-600 font-medium mb-6">
+              <li>{`This document is an authorized medicine requisition sheet generated from buyer demand and out-of-stock requests.`}</li>
+              <li>{`Procurement officer will contact suppliers/manufacturers for availability and batch quotation.`}</li>
+              <li>{`Upon arrival at warehouse, items will be restocked in catalog and notifying buyers for order confirmation.`}</li>
+            </ol>
+
+            <div className="grid grid-cols-2 gap-8 pt-4 pb-4 border-t border-slate-200 text-xs">
+              <div>
+                <p className="text-slate-400 text-[10px] uppercase font-semibold mb-6">{`Prepared / Verified By`}</p>
+                <div className="border-b border-slate-400 w-48"></div>
+                <p className="text-[10px] text-slate-600 mt-1">{`Signature & Date`}</p>
+              </div>
+              <div className="text-right flex flex-col items-end">
+                <p className="text-slate-400 text-[10px] uppercase font-semibold mb-6">{`Authorized By Procurement Lead`}</p>
+                <div className="border-b border-slate-400 w-48"></div>
+                <p className="text-[10px] text-slate-600 mt-1">{`Signature & Date`}</p>
+              </div>
+            </div>
+
+            <p className="mt-4 text-xs font-bold text-slate-800">
+              {`Thank you for doing business with DG Pharma.`}
+            </p>
+            {supportContact && (
+              <p className="text-xs font-semibold text-slate-700 mt-0.5">
+                {`Contact: ${supportContact}`}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    )}
     {(() => {
       const activeInvoice = I || Oe;
-      if (!activeInvoice || (invoicesToPrint && invoicesToPrint.length > 0)) return null;
+      if (!activeInvoice || (invoicesToPrint && invoicesToPrint.length > 0) || (requestsToPrint && requestsToPrint.length > 0)) return null;
       return (
         <div className="hidden print:block absolute top-0 left-0 w-full bg-white z-[99999] text-black font-sans p-8">
           <div className="w-full mx-auto text-sm flex flex-col h-full">
