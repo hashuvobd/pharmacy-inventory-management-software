@@ -2593,10 +2593,12 @@ const getSearchRelevance = (item, query) => {
 };
 
 const BuyerProfileView = ({ user, allUsers, onUpdateUser, onShowToast, orderCount, creditLimit, outstandingBalance }) => {
+  const getCleanEmail = (em) => (em && em.endsWith('@buyer.dgpharma.shop') ? '' : (em || ''));
+
   const [formData, setFormData] = useState({
     name: user?.name || '',
     ownerName: user?.ownerName || '',
-    email: user?.email || '',
+    email: getCleanEmail(user?.email),
     phone: user?.phone || '',
     addressLine1: user?.addressLine1 || '',
     addressLine2: user?.addressLine2 || '',
@@ -2623,7 +2625,7 @@ const BuyerProfileView = ({ user, allUsers, onUpdateUser, onShowToast, orderCoun
       setFormData({
         name: user.name || '',
         ownerName: user.ownerName || '',
-        email: user.email || '',
+        email: getCleanEmail(user.email),
         phone: user.phone || '',
         addressLine1: user.addressLine1 || '',
         addressLine2: user.addressLine2 || '',
@@ -2678,12 +2680,13 @@ const BuyerProfileView = ({ user, allUsers, onUpdateUser, onShowToast, orderCoun
       setErrorMessage('Pharmacy / Business Name is required.');
       return;
     }
-    if (!formData.email.trim()) {
-      setErrorMessage('Email address is required.');
+
+    if (formData.email.trim() && (!formData.email.includes('@') || !formData.email.includes('.'))) {
+      setErrorMessage('Please enter a valid email address.');
       return;
     }
 
-    if (allUsers && allUsers.length > 0) {
+    if (formData.email.trim() && allUsers && allUsers.length > 0) {
       const emailTaken = allUsers.some(
         u => u.email.toLowerCase() === formData.email.trim().toLowerCase() &&
           u.email.toLowerCase() !== (user?.email || '').toLowerCase()
@@ -2716,7 +2719,7 @@ const BuyerProfileView = ({ user, allUsers, onUpdateUser, onShowToast, orderCoun
         ...user,
         name: formData.name.trim(),
         ownerName: formData.ownerName.trim(),
-        email: formData.email.trim(),
+        email: formData.email.trim() || user?.email || '',
         phone: formData.phone.trim(),
         addressLine1: formData.addressLine1.trim(),
         addressLine2: formData.addressLine2.trim(),
@@ -2857,14 +2860,13 @@ const BuyerProfileView = ({ user, allUsers, onUpdateUser, onShowToast, orderCoun
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-1">
-                  Email Address <span className="text-red-500">*</span>
+                  Email Address (Optional)
                 </label>
                 <input
                   type="email"
-                  required
                   value={formData.email}
                   onChange={e => handleChange('email', e.target.value)}
-                  placeholder="buyer@dgpharma.com"
+                  placeholder="contact@pharmacy.com (Optional)"
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-[#0697A8] focus:bg-white focus:ring-1 focus:ring-[#C2EAF0] transition-all text-slate-800"
                 />
               </div>
@@ -14730,20 +14732,63 @@ export default function App() {
           e.preventDefault();
           setLoginError('');
           setLoginLoading(true);
-          const cleanEmail = qe.trim().toLowerCase();
+          const rawInput = qe.trim();
           const cleanPass = Ye.trim();
+          const isEmail = rawInput.includes('@');
+          const cleanEmail = isEmail ? rawInput.toLowerCase() : '';
+          const inputDigits = rawInput.replace(/\D/g, '');
+          const phoneLast10 = inputDigits.length >= 10 ? inputDigits.slice(-10) : inputDigits;
 
           try {
-            let n = i.find(u => u.email.toLowerCase() === cleanEmail && (u.password?.trim() === cleanPass || u.password?.trim().toLowerCase() === cleanPass.toLowerCase()));
+            let n = i.find(u => {
+              const passMatches = (u.password?.trim() === cleanPass || u.password?.trim().toLowerCase() === cleanPass.toLowerCase());
+              if (!passMatches) return false;
+
+              if (isEmail) {
+                return (u.email || '').toLowerCase() === cleanEmail;
+              }
+              if (phoneLast10 && phoneLast10.length >= 10) {
+                const uDigits = (u.phone || '').replace(/\D/g, '');
+                if (uDigits && (uDigits.endsWith(phoneLast10) || phoneLast10.endsWith(uDigits.slice(-10)))) return true;
+                const uEmail = (u.email || '').toLowerCase();
+                if (uEmail.startsWith(inputDigits + '@') || uEmail.startsWith(phoneLast10 + '@')) return true;
+              }
+              return false;
+            });
 
             // 1. Authenticate against Supabase buyers table directly
             if (!n) {
               try {
-                let { data: buyerRow } = await supabase
-                  .from('buyers')
-                  .select('*')
-                  .ilike('email', cleanEmail)
-                  .maybeSingle();
+                let buyerRow = null;
+                if (isEmail) {
+                  const { data } = await supabase
+                    .from('buyers')
+                    .select('*')
+                    .ilike('email', cleanEmail)
+                    .maybeSingle();
+                  buyerRow = data;
+                } else if (phoneLast10 && phoneLast10.length >= 10) {
+                  const { data: phoneRows } = await supabase
+                    .from('buyers')
+                    .select('*')
+                    .ilike('phone', `%${phoneLast10}%`);
+
+                  if (phoneRows && phoneRows.length > 0) {
+                    buyerRow = phoneRows.find(b => {
+                      const bDigits = (b.phone || '').replace(/\D/g, '');
+                      return bDigits.endsWith(phoneLast10) || phoneLast10.endsWith(bDigits.slice(-10));
+                    }) || phoneRows[0];
+                  }
+
+                  if (!buyerRow) {
+                    const { data: bByEmail } = await supabase
+                      .from('buyers')
+                      .select('*')
+                      .or(`email.ilike.${inputDigits}@buyer.dgpharma.shop,email.ilike.${phoneLast10}@buyer.dgpharma.shop`)
+                      .maybeSingle();
+                    if (bByEmail) buyerRow = bByEmail;
+                  }
+                }
 
                 if (buyerRow) {
                   const storedPass = (buyerRow.password || '').trim();
@@ -14777,70 +14822,104 @@ export default function App() {
                       creditLimit: buyerRow.credit_limit || 50000,
                       outstandingBalance: buyerRow.outstanding_balance || 0
                     };
-                    a(prev => [...prev.filter(u => u.email.toLowerCase() !== cleanEmail), n]);
+                    const bEmail = buyerRow.email.toLowerCase();
+                    a(prev => [...prev.filter(u => u.email.toLowerCase() !== bEmail), n]);
                     try {
                       const saved = JSON.parse(localStorage.getItem('dg_users') || '[]');
-                      localStorage.setItem('dg_users', JSON.stringify([...saved.filter(u => u.email.toLowerCase() !== cleanEmail), n]));
+                      localStorage.setItem('dg_users', JSON.stringify([...saved.filter(u => u.email.toLowerCase() !== bEmail), n]));
                     } catch { }
                   }
                 } else {
                   // Fallback: Check if the pharmacy was registered in pharmacy_registrations
-                  const { data: regRow } = await supabase
-                    .from('pharmacy_registrations')
-                    .select('*')
-                    .ilike('email', cleanEmail)
-                    .maybeSingle();
+                  let regRow = null;
+                  if (isEmail) {
+                    const { data } = await supabase
+                      .from('pharmacy_registrations')
+                      .select('*')
+                      .ilike('email', cleanEmail)
+                      .maybeSingle();
+                    regRow = data;
+                  } else if (phoneLast10 && phoneLast10.length >= 10) {
+                    const { data: regRows } = await supabase
+                      .from('pharmacy_registrations')
+                      .select('*')
+                      .ilike('phone', `%${phoneLast10}%`);
 
-                  if (regRow) {
-                    const newBuyer = {
-                      name: regRow.name || 'Verified Pharmacy',
-                      license_number: regRow.license_number,
-                      contact_person: regRow.owner_name,
-                      owner_name: regRow.owner_name,
-                      email: cleanEmail,
-                      password: cleanPass,
-                      phone: regRow.phone || '01711111111',
-                      address: regRow.location || 'Dhaka',
-                      address_line1: regRow.address_line1,
-                      address_line2: regRow.address_line2,
-                      city: regRow.city,
-                      division: regRow.division,
-                      postal_code: regRow.postal_code,
-                      pharmacy_id: regRow.id,
-                      trade_license: regRow.trade_license,
-                      drug_license_file: regRow.drug_license_file,
-                      status: regRow.status || 'Approved',
-                      credit_limit: 50000,
-                      outstanding_balance: 0
-                    };
-
-                    try {
-                      await supabase.from('buyers').upsert([newBuyer], { onConflict: 'email' });
-                    } catch (insErr) {
-                      console.log('Error migrating registration to buyers table:', insErr);
+                    if (regRows && regRows.length > 0) {
+                      regRow = regRows.find(r => {
+                        const rDigits = (r.phone || '').replace(/\D/g, '');
+                        return rDigits.endsWith(phoneLast10) || phoneLast10.endsWith(rDigits.slice(-10));
+                      }) || regRows[0];
                     }
 
-                    n = {
-                      id: regRow.id,
-                      email: cleanEmail,
-                      password: cleanPass,
-                      role: 'buyer',
-                      status: regRow.status || 'Approved',
-                      name: regRow.name || 'Verified Pharmacy',
-                      ownerName: regRow.owner_name,
-                      pharmacyId: regRow.id,
-                      licenseNumber: regRow.license_number,
-                      phone: regRow.phone,
-                      location: regRow.location,
-                      address: regRow.location,
-                      creditLimit: 50000,
-                      outstandingBalance: 0
-                    };
-                    a(prev => [...prev.filter(u => u.email.toLowerCase() !== cleanEmail), n]);
-                    try {
-                      const saved = JSON.parse(localStorage.getItem('dg_users') || '[]');
-                      localStorage.setItem('dg_users', JSON.stringify([...saved.filter(u => u.email.toLowerCase() !== cleanEmail), n]));
-                    } catch { }
+                    if (!regRow) {
+                      const { data: rByEmail } = await supabase
+                        .from('pharmacy_registrations')
+                        .select('*')
+                        .or(`email.ilike.${inputDigits}@buyer.dgpharma.shop,email.ilike.${phoneLast10}@buyer.dgpharma.shop`)
+                        .maybeSingle();
+                      if (rByEmail) regRow = rByEmail;
+                    }
+                  }
+
+                  if (regRow) {
+                    const storedPass = (regRow.password || '').trim();
+                    const passMatches = storedPass === cleanPass ||
+                      storedPass.toLowerCase() === cleanPass.toLowerCase() ||
+                      !storedPass;
+
+                    if (passMatches) {
+                      const regEmail = regRow.email || (phoneLast10 ? `${inputDigits}@buyer.dgpharma.shop` : 'buyer@dgpharma.shop');
+                      const newBuyer = {
+                        name: regRow.name || 'Verified Pharmacy',
+                        license_number: regRow.license_number,
+                        contact_person: regRow.owner_name,
+                        owner_name: regRow.owner_name,
+                        email: regEmail,
+                        password: cleanPass,
+                        phone: regRow.phone || rawInput,
+                        address: regRow.location || 'Dhaka',
+                        address_line1: regRow.address_line1,
+                        address_line2: regRow.address_line2,
+                        city: regRow.city,
+                        division: regRow.division,
+                        postal_code: regRow.postal_code,
+                        pharmacy_id: regRow.id,
+                        trade_license: regRow.trade_license,
+                        drug_license_file: regRow.drug_license_file,
+                        status: regRow.status || 'Pending',
+                        credit_limit: 50000,
+                        outstanding_balance: 0
+                      };
+
+                      try {
+                        await supabase.from('buyers').upsert([newBuyer], { onConflict: 'email' });
+                      } catch (insErr) {
+                        console.log('Error migrating registration to buyers table:', insErr);
+                      }
+
+                      n = {
+                        id: regRow.id,
+                        email: regEmail,
+                        password: cleanPass,
+                        role: 'buyer',
+                        status: regRow.status || 'Pending',
+                        name: regRow.name || 'Verified Pharmacy',
+                        ownerName: regRow.owner_name,
+                        pharmacyId: regRow.id,
+                        licenseNumber: regRow.license_number,
+                        phone: regRow.phone,
+                        location: regRow.location,
+                        address: regRow.location,
+                        creditLimit: 50000,
+                        outstandingBalance: 0
+                      };
+                      a(prev => [...prev.filter(u => u.email.toLowerCase() !== regEmail.toLowerCase()), n]);
+                      try {
+                        const saved = JSON.parse(localStorage.getItem('dg_users') || '[]');
+                        localStorage.setItem('dg_users', JSON.stringify([...saved.filter(u => u.email.toLowerCase() !== regEmail.toLowerCase()), n]));
+                      } catch { }
+                    }
                   }
                 }
               } catch (err) {
@@ -14852,17 +14931,33 @@ export default function App() {
             if (!n) {
               try {
                 let adminRow = null;
-                const { data: dbAdminRow } = await supabase
-                  .from('admin_users')
-                  .select('*')
-                  .ilike('email', cleanEmail)
-                  .maybeSingle();
-
-                if (dbAdminRow) {
+                if (isEmail) {
+                  const { data: dbAdminRow } = await supabase
+                    .from('admin_users')
+                    .select('*')
+                    .ilike('email', cleanEmail)
+                    .maybeSingle();
                   adminRow = dbAdminRow;
-                } else {
+                } else if (phoneLast10 && phoneLast10.length >= 10) {
+                  const { data: adminRows } = await supabase
+                    .from('admin_users')
+                    .select('*')
+                    .ilike('phone', `%${phoneLast10}%`);
+                  if (adminRows && adminRows.length > 0) {
+                    adminRow = adminRows.find(a => (a.phone || '').replace(/\D/g, '').endsWith(phoneLast10)) || adminRows[0];
+                  }
+                }
+
+                if (!adminRow) {
                   // Fallback check in local adminStaffUsers
-                  const localStaff = adminStaffUsers.find(u => u.email && u.email.toLowerCase() === cleanEmail);
+                  const localStaff = adminStaffUsers.find(u => {
+                    if (isEmail) return u.email && u.email.toLowerCase() === cleanEmail;
+                    if (phoneLast10 && phoneLast10.length >= 10) {
+                      const uDigits = (u.phone || '').replace(/\D/g, '');
+                      return uDigits && uDigits.endsWith(phoneLast10);
+                    }
+                    return false;
+                  });
                   if (localStaff) adminRow = localStaff;
                 }
 
@@ -14874,7 +14969,8 @@ export default function App() {
                       setLoginLoading(false);
                       return;
                     }
-                    const isSuper = adminRow.is_super_admin || adminRow.isSuperAdmin || cleanEmail === 'admin@dgpharma.shop' || cleanEmail === 'admin@dgpharma.com' || adminRow.role_id === 'role_superadmin' || adminRow.roleId === 'role_superadmin';
+                    const admEmail = (adminRow.email || '').toLowerCase();
+                    const isSuper = adminRow.is_super_admin || adminRow.isSuperAdmin || admEmail === 'admin@dgpharma.shop' || admEmail === 'admin@dgpharma.com' || adminRow.role_id === 'role_superadmin' || adminRow.roleId === 'role_superadmin';
                     n = {
                       id: adminRow.id,
                       email: adminRow.email,
@@ -14885,7 +14981,7 @@ export default function App() {
                       roleId: adminRow.role_id || adminRow.roleId || (isSuper ? 'role_superadmin' : 'role_inventory'),
                       isSuperAdmin: isSuper
                     };
-                    a(prev => [...prev.filter(u => u.email.toLowerCase() !== cleanEmail), n]);
+                    a(prev => [...prev.filter(u => u.email.toLowerCase() !== admEmail), n]);
                   }
                 }
               } catch (err) {
@@ -14894,7 +14990,7 @@ export default function App() {
             }
 
             // 3. Supabase Auth fallback
-            if (!n) {
+            if (!n && isEmail) {
               try {
                 const { data: authData } = await supabase.auth.signInWithPassword({
                   email: cleanEmail,
@@ -14918,28 +15014,29 @@ export default function App() {
 
             if (n && n.role === 'buyer') {
               try {
-                const { data: bCheck } = await supabase.from('buyers').select('status, id, name').ilike('email', cleanEmail).maybeSingle();
+                const targetEmail = (n.email || '').trim().toLowerCase();
+                const { data: bCheck } = await supabase.from('buyers').select('status, id, name').ilike('email', targetEmail).maybeSingle();
                 if (bCheck) {
                   n.status = bCheck.status;
                   n.buyerUuid = bCheck.id;
-                  a(prev => prev.map(u => u.email.toLowerCase() === cleanEmail ? { ...u, status: bCheck.status, buyerUuid: bCheck.id } : u));
+                  a(prev => prev.map(u => u.email.toLowerCase() === targetEmail ? { ...u, status: bCheck.status, buyerUuid: bCheck.id } : u));
                   try {
                     const saved = JSON.parse(localStorage.getItem('dg_users') || '[]');
-                    localStorage.setItem('dg_users', JSON.stringify(saved.map(u => u.email.toLowerCase() === cleanEmail ? { ...u, status: bCheck.status, buyerUuid: bCheck.id } : u)));
+                    localStorage.setItem('dg_users', JSON.stringify(saved.map(u => u.email.toLowerCase() === targetEmail ? { ...u, status: bCheck.status, buyerUuid: bCheck.id } : u)));
                   } catch { }
                 } else {
                   // Not found in buyers table. Check pharmacy_registrations
-                  const { data: regCheck } = await supabase.from('pharmacy_registrations').select('status, rejection_reason').ilike('email', cleanEmail).maybeSingle();
+                  const { data: regCheck } = await supabase.from('pharmacy_registrations').select('status, rejection_reason').ilike('email', targetEmail).maybeSingle();
                   if (regCheck) {
                     n.status = regCheck.status;
                     if (regCheck.rejection_reason) n.rejectionReason = regCheck.rejection_reason;
                   } else {
                     // DELETED: Buyer does not exist in buyers AND does not exist in pharmacy_registrations!
-                    console.warn(`Buyer ${cleanEmail} does not exist in database (deleted). Purging local cache.`);
-                    a(prev => prev.filter(u => u.email.toLowerCase() !== cleanEmail));
+                    console.warn(`Buyer ${targetEmail} does not exist in database (deleted). Purging local cache.`);
+                    a(prev => prev.filter(u => u.email.toLowerCase() !== targetEmail));
                     try {
                       const saved = JSON.parse(localStorage.getItem('dg_users') || '[]');
-                      localStorage.setItem('dg_users', JSON.stringify(saved.filter(u => u.email.toLowerCase() !== cleanEmail)));
+                      localStorage.setItem('dg_users', JSON.stringify(saved.filter(u => u.email.toLowerCase() !== targetEmail)));
                     } catch { }
                     try {
                       localStorage.removeItem('dg_session');
@@ -14956,27 +15053,48 @@ export default function App() {
             }
 
             if (!n) {
-              // Check whether email exists in the system to give a helpful message
-              let emailFound = i.some(u => u.email.toLowerCase() === cleanEmail);
-              if (!emailFound) {
+              // Check whether identifier exists in the system to give a helpful message
+              let identifierFound = i.some(u => {
+                if (isEmail && u.email && u.email.toLowerCase() === cleanEmail) return true;
+                if (phoneLast10 && phoneLast10.length >= 10) {
+                  const uDigits = (u.phone || '').replace(/\D/g, '');
+                  if (uDigits && uDigits.endsWith(phoneLast10)) return true;
+                }
+                return false;
+              });
+
+              if (!identifierFound) {
                 try {
-                  const { data: bRow } = await supabase.from('buyers').select('email').ilike('email', cleanEmail).maybeSingle();
-                  if (bRow) emailFound = true;
-                  if (!emailFound) {
-                    const { data: regRow } = await supabase.from('pharmacy_registrations').select('email').ilike('email', cleanEmail).maybeSingle();
-                    if (regRow) emailFound = true;
-                  }
-                  if (!emailFound) {
-                    const { data: admRow } = await supabase.from('admin_users').select('email').ilike('email', cleanEmail).maybeSingle();
-                    if (admRow) emailFound = true;
+                  if (isEmail) {
+                    const { data: bRow } = await supabase.from('buyers').select('email').ilike('email', cleanEmail).maybeSingle();
+                    if (bRow) identifierFound = true;
+                    if (!identifierFound) {
+                      const { data: regRow } = await supabase.from('pharmacy_registrations').select('email').ilike('email', cleanEmail).maybeSingle();
+                      if (regRow) identifierFound = true;
+                    }
+                    if (!identifierFound) {
+                      const { data: admRow } = await supabase.from('admin_users').select('email').ilike('email', cleanEmail).maybeSingle();
+                      if (admRow) identifierFound = true;
+                    }
+                  } else if (phoneLast10 && phoneLast10.length >= 10) {
+                    const { data: bRow } = await supabase.from('buyers').select('phone').ilike('phone', `%${phoneLast10}%`).maybeSingle();
+                    if (bRow) identifierFound = true;
+                    if (!identifierFound) {
+                      const { data: regRow } = await supabase.from('pharmacy_registrations').select('phone').ilike('phone', `%${phoneLast10}%`).maybeSingle();
+                      if (regRow) identifierFound = true;
+                    }
+                    if (!identifierFound) {
+                      const { data: admRow } = await supabase.from('admin_users').select('phone').ilike('phone', `%${phoneLast10}%`).maybeSingle();
+                      if (admRow) identifierFound = true;
+                    }
                   }
                 } catch { }
               }
 
-              if (emailFound) {
+              if (identifierFound) {
                 setLoginError('Incorrect password. Please verify your password or use "Forgot password?" to reset.');
               } else {
-                setLoginError('Invalid email or password. No account found for this email address.');
+                setLoginError('Invalid credentials. No account found for this email address or phone number.');
               }
               setLoginLoading(false);
               return;
@@ -15062,16 +15180,16 @@ export default function App() {
           }
         }} className="space-y-4">
           <div>
-            <label className="block text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-1.5">{`Email Address`}</label>
+            <label className="block text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-1.5">{`Email Address or Phone Number`}</label>
             <input
-              type="email"
+              type="text"
               required={!0}
               value={qe}
               onChange={e => { Je(e.target.value); setLoginError(''); }}
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck="false"
-              placeholder="Enter your email"
+              placeholder="Enter your email or phone number"
               className="w-full px-4 py-2.5 bg-white border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-slate-800 placeholder-slate-300"
             />
           </div>
@@ -15172,16 +15290,18 @@ export default function App() {
             setRegError('Please enter the Owner Full Name.');
             return;
           }
-          if (!tt.trim()) {
-            setRegError('Please enter your Email Address.');
-            return;
-          }
-          if (!tt.includes('@') || !tt.includes('.')) {
+          if (tt.trim() && (!tt.includes('@') || !tt.includes('.'))) {
             setRegError('Please enter a valid Email Address.');
             return;
           }
           if (!rt.trim()) {
             setRegError('Please enter your Phone Number.');
+            return;
+          }
+          const rawPhone = rt.trim();
+          const cleanPhoneDigits = rawPhone.replace(/\D/g, '');
+          if (cleanPhoneDigits.length < 10) {
+            setRegError('Please enter a valid Phone Number (at least 10 digits).');
             return;
           }
           if (!at.trim()) {
@@ -15214,29 +15334,59 @@ export default function App() {
           }
           setRegSubmitting(true);
 
-          const emailToCheck = tt.trim().toLowerCase();
+          const rawEmail = tt.trim();
+          const effectiveEmail = rawEmail ? rawEmail.toLowerCase() : `${cleanPhoneDigits}@buyer.dgpharma.shop`;
+          const phoneLast10 = cleanPhoneDigits.slice(-10);
 
           try {
-            const { data: existingBuyer } = await supabase
+            // Check email uniqueness if email provided
+            if (rawEmail) {
+              const { data: existingBuyer } = await supabase
+                .from('buyers')
+                .select('email')
+                .eq('email', effectiveEmail)
+                .maybeSingle();
+
+              if (existingBuyer) {
+                setRegError('This email is already registered in the system. Please log in instead.');
+                setRegSubmitting(false);
+                return;
+              }
+
+              const { data: existingReg } = await supabase
+                .from('pharmacy_registrations')
+                .select('email')
+                .eq('email', effectiveEmail)
+                .maybeSingle();
+
+              if (existingReg) {
+                setRegError('A registration application with this email is already pending or registered. Please log in.');
+                setRegSubmitting(false);
+                return;
+              }
+            }
+
+            // Check phone number uniqueness
+            const { data: existingPhoneBuyer } = await supabase
               .from('buyers')
-              .select('email')
-              .eq('email', emailToCheck)
+              .select('id, phone')
+              .ilike('phone', `%${phoneLast10}%`)
               .maybeSingle();
 
-            if (existingBuyer) {
-              setRegError('This email is already registered in the system. Please log in instead.');
+            if (existingPhoneBuyer) {
+              setRegError('This phone number is already registered in the system. Please log in instead.');
               setRegSubmitting(false);
               return;
             }
 
-            const { data: existingReg } = await supabase
+            const { data: existingPhoneReg } = await supabase
               .from('pharmacy_registrations')
-              .select('email')
-              .eq('email', emailToCheck)
+              .select('id, phone')
+              .ilike('phone', `%${phoneLast10}%`)
               .maybeSingle();
 
-            if (existingReg) {
-              setRegError('A registration application with this email is already pending or registered. Please log in.');
+            if (existingPhoneReg) {
+              setRegError('A registration application with this phone number is already pending or registered. Please log in.');
               setRegSubmitting(false);
               return;
             }
@@ -15244,9 +15394,16 @@ export default function App() {
             console.log('Error checking existing Supabase registration:', err);
           }
 
-          // If the email only existed in local storage/state from earlier testing, purge it cleanly
+          // If the user already existed in local storage/state from earlier testing, purge it cleanly
           a(prev => {
-            const filtered = prev.filter(u => u.email.toLowerCase() !== emailToCheck);
+            const filtered = prev.filter(u => {
+              const uEmail = (u.email || '').toLowerCase();
+              if (rawEmail && uEmail === effectiveEmail) return false;
+              if (uEmail === `${cleanPhoneDigits}@buyer.dgpharma.shop`) return false;
+              const uPhone = (u.phone || '').replace(/\D/g, '');
+              if (uPhone && uPhone.endsWith(phoneLast10)) return false;
+              return true;
+            });
             try {
               localStorage.setItem('dg_users', JSON.stringify(filtered));
             } catch { }
@@ -15261,7 +15418,8 @@ export default function App() {
           ].filter(Boolean).join(', ');
 
           let n = {
-            email: tt.trim().toLowerCase(),
+            email: effectiveEmail,
+            displayEmail: rawEmail || '',
             password: regPassword.trim(),
             role: `buyer`,
             status: `Pending`,
@@ -15276,7 +15434,7 @@ export default function App() {
             address: combinedAddress,
             licenseNumber: at.trim(),
             ownerName: $e.trim(),
-            phone: rt.trim(),
+            phone: rawPhone,
             tradeLicense: st.trim(),
             drugLicenseFile: dt || `uploaded_drug_license.pdf`
           };
@@ -15415,7 +15573,7 @@ export default function App() {
 
           {/* 3. Email Address */}
           <div>
-            <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Email Address *`}</label>
+            <label className="block text-[11px] font-bold text-[#64748B] uppercase tracking-wider mb-1">{`Email Address (Optional)`}</label>
             <input
               type="email"
               value={tt}
@@ -15423,7 +15581,7 @@ export default function App() {
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck="false"
-              placeholder="contact@pharmacy.com"
+              placeholder="contact@pharmacy.com (Optional)"
               className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#E2E8F0] rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-500 focus:bg-white transition-all text-slate-800 placeholder-slate-400"
             />
           </div>
