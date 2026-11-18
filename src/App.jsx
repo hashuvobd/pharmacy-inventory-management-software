@@ -15536,6 +15536,7 @@ export default function App() {
               options: {
                 data: {
                   name: n.name,
+                  phone: n.phone,
                   role: 'buyer',
                   pharmacy_id: n.pharmacyId
                 }
